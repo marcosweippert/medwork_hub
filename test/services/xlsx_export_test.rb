@@ -65,7 +65,7 @@ class XlsxExportTest < ActiveSupport::TestCase
         data[offset, 30].unpack("VvvvvvVVVvv")
       name = data[offset + 30, name_len]
       payload = data[offset + 30 + name_len + extra_len, compressed]
-      files[name] = method == 8 ? inflate(payload) : payload
+      files[name] = (method == 8 ? inflate(payload) : payload).to_s.force_encoding("UTF-8")
       offset += 30 + name_len + extra_len + compressed
     end
     files

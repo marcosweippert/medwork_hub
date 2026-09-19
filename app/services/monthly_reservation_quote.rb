@@ -152,7 +152,7 @@ class MonthlyReservationQuote
   end
 
   def load_holds
-    @room.bookings.holding.where("start_time < ? AND end_time > ?", to_date.end_of_day, from_date.beginning_of_day).to_a
+    @room.bookings.visible_on_calendar.where("start_time < ? AND end_time > ?", to_date.end_of_day, from_date.beginning_of_day).to_a
   end
 
   def money(value)

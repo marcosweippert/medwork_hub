@@ -1,6 +1,5 @@
 class DashboardsController < ApplicationController
   before_action :require_clinic_staff
-  before_action :set_dashboard, only: %i[show edit update destroy]
 
   def index
     @metrics = {
@@ -29,36 +28,6 @@ class DashboardsController < ApplicationController
     @delinquents = Professional.delinquent.includes(:user)
   end
 
-  def show; end
-
-  def new
-    @dashboard = Dashboard.new
-  end
-
-  def create
-    @dashboard = Dashboard.new(dashboard_params)
-    if @dashboard.save
-      redirect_to @dashboard, notice: "Dashboard created successfully."
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
-
-  def edit; end
-
-  def update
-    if @dashboard.update(dashboard_params)
-      redirect_to @dashboard, notice: "Dashboard updated successfully."
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
-  def destroy
-    @dashboard.destroy
-    redirect_to root_path, notice: "Dashboard deleted."
-  end
-
   private
 
   def occupancy_average
@@ -66,13 +35,5 @@ class DashboardsController < ApplicationController
     return 0 if rooms.empty?
 
     (rooms.sum { |room| room.occupancy_on(Date.current) } / rooms.size.to_f).round
-  end
-
-  def set_dashboard
-    @dashboard = Dashboard.find(params[:id])
-  end
-
-  def dashboard_params
-    params.require(:dashboard).permit(:name, :description, :layout)
   end
 end

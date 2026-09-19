@@ -1,0 +1,118 @@
+pt-BR:
+  nav:
+    workspace: Área de trabalho
+    dashboard: Painel
+    rooms: Salas
+    bookings: Agendamentos
+    waitlist: Lista de espera
+    professionals: Profissionais
+    patients: Pacientes
+    reports: Relatórios
+    invoices: Faturas
+    settings: Configurações
+    users: Usuários
+    emails: E-mails
+    audit: Auditoria
+    finance: Financeiro
+    admin: Administração
+    log_out: Sair
+  helpers:
+    page:
+      dashboards: Painel
+      professionals: Profissionais
+      patients: Pacientes
+      bookings: Agendamentos
+      rooms: Salas
+      invoices: Faturas
+      reports: Relatórios
+      users: Usuários
+      settings: Configurações
+      waitlist_entries: Lista de espera
+      room_blocks: Bloqueios
+      audit_events: Auditoria
+      outbound_emails: E-mails
+      calendar: "%{base} · calendário"
+      welcome_email: E-mail de boas-vindas
+      new: "Novo(a) %{base}"
+      edit: "Editar %{base}"
+    select_professional: Selecione o profissional
+    select_room: Selecione a sala
+    professional_overdue: "%{name} (em atraso)"
+    all: Todos
+  statuses:
+    pending: Reservado
+    confirmed: Ocupado
+    bounced: Devolvido
+    refunded: Estornado
+    open: Aberto
+    paid: Pago
+    overdue: Em atraso
+    cancelled: Cancelado
+    scheduled: Agendado
+    reserved: Reservado
+    occupied: Ocupado
+    completed: Concluído
+    waiting: Na fila
+    offered: Ofertado
+    booked: Reservado
+    sent: Enviado
+    failed: Falhou
+    blocked: Bloqueado
+  dashboards:
+    title: Painel
+    occupancy: ocupação
+    open: em aberto
+    rooms: Salas
+    new_booking: Novo agendamento
+    paid_month: Recebido no mês
+    refunded: estornado
+    occupancy_today: Ocupação hoje
+    active_holds: Reservas ativas
+    receivables: A receber
+    overdue: em atraso
+    rooms_today: Salas hoje
+    manage: Gerenciar
+    upcoming: Próximos
+    all: Todos
+    professional: Profissional
+    room: Sala
+    when: Quando
+    actions: Ações
+    delinquent:
+      one: "%{count} profissional com faturas em atraso não pode criar novas reservas:"
+      other: "%{count} profissionais com faturas em atraso não podem criar novas reservas:"
+    open_receivables: Abrir a receber
+  rooms:
+    title: Salas
+    new: Nova sala
+    find_slot: Buscar horário
+    search: Buscar
+    search_placeholder: Nome ou equipamento
+    calendar: Calendário
+    today: Hoje
+  sessions:
+    welcome: Bem-vindo de volta
+    subtitle: Entre com a conta da clínica para continuar.
+    email: E-mail
+    password: Senha
+    remember: Manter conectado neste dispositivo
+    submit: Entrar
+    tagline: Agendamento de salas, faturas e PIX para a equipe da clínica.
+    hold: Reserve salas e confirme ocupação
+    overdue: Acompanhe faturas em atraso
+    bulk: Pague, cancele ou estorne em lote
+    staff_only: Acesso da equipe
+  invoices:
+    mark_paid: Marcar como paga
+    cancel_selected: Cancelar horários selecionados
+  date:
+    day_names: [Domingo, Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira, Sábado]
+    abbr_day_names: [Dom, Seg, Ter, Qua, Qui, Sex, Sáb]
+  number:
+    currency:
+      format:
+        unit: "R$"
+        separator: ","
+        delimiter: "."
+        format: "%u %n"
+        precision: 2

@@ -1,4 +1,5 @@
 # Compact demo data for local testing. Does not send email.
+abort "db:seed is disabled in production." if Rails.env.production?
 PERIOD_START = Date.new(2024, 1, 2)
 PERIOD_END = Date.new(2026, 10, 30)
 ADMIN_EMAIL = "admin@medworkhub.com"
@@ -182,7 +183,6 @@ Professional.delete_all
 Room.delete_all
 AuditEvent.delete_all
 OutboundEmail.delete_all
-Dashboard.delete_all
 User.delete_all
 
 smtp = Setting.order(:id).first&.attributes&.slice(*SMTP_KEYS) || {}

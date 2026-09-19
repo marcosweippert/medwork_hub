@@ -50,7 +50,6 @@ class Setting < ApplicationRecord
       "MAILER_PORT" => mailer_port,
       "MAILER_PROTOCOL" => mailer_protocol
     }
-    payload["SMTP_PASSWORD"] = smtp_password if smtp_password_set?
     EnvFileSync.write(payload)
   end
 

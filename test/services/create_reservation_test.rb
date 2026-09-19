@@ -25,25 +25,27 @@ class CreateReservationTest < ActiveSupport::TestCase
     end
   end
 
-  test "accepts sunday slots within the room hours" do
+  test "rejects sunday slots when the clinic is closed on sunday" do
     travel_to Time.zone.local(2026, 8, 28, 7, 0, 0) do
       sunday = Date.new(2026, 8, 30)
       slots = [Time.zone.local(sunday.year, sunday.month, sunday.day, 10, 0).iso8601]
 
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
-      assert result.success?, result.error
+      assert_not result.success?
+      assert_match(/opening hours/, result.error)
     end
   end
 
-  test "accepts saturday afternoon slots within the room hours" do
+  test "rejects saturday slots after clinic saturday closing time" do
     travel_to Time.zone.local(2026, 8, 28, 7, 0, 0) do
       saturday = Date.new(2026, 8, 29)
       slots = [Time.zone.local(saturday.year, saturday.month, saturday.day, 14, 0).iso8601]
 
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
-      assert result.success?, result.error
+      assert_not result.success?
+      assert_match(/opening hours/, result.error)
     end
   end
 
@@ -88,7 +90,7 @@ class CreateReservationTest < ActiveSupport::TestCase
 
       assert result.success?, result.error
       days = result.invoice.bookings.map { |booking| booking.start_time.to_date }
-      assert_includes days, Date.new(2026, 8, 2) # sunday
+      assert_not_includes days, Date.new(2026, 8, 2)
       assert_includes days, Date.new(2026, 8, 3)
       assert days.size > 15
       assert_equal (4200 / 30.0 * 31).round(2), result.invoice.amount
@@ -108,7 +110,7 @@ class CreateReservationTest < ActiveSupport::TestCase
         license_number: "OCC1",
         practice_areas: %w[psicologia_psiquiatria]
       )
-      taken = Time.zone.local(2026, 9, 20, 10, 0)
+      taken = Time.zone.local(2026, 9, 21, 10, 0)
       Booking.create!(
         professional: other,
         room: @room,
@@ -127,8 +129,8 @@ class CreateReservationTest < ActiveSupport::TestCase
       expected = ((3300 / 30.0) * 12).round(2) - deduction
       assert_equal expected, result.invoice.amount
       assert_match(/calendário da sala/, result.invoice.notes)
-      two_hour = result.invoice.bookings.find { |booking| booking.start_time.to_date == Date.new(2026, 9, 20) && booking.duration_hours == 2 }
-      rest = result.invoice.bookings.find { |booking| booking.start_time.to_date == Date.new(2026, 9, 20) && booking.start_time.hour == 10 }
+      two_hour = result.invoice.bookings.find { |booking| booking.start_time.to_date == Date.new(2026, 9, 21) && booking.duration_hours == 2 }
+      rest = result.invoice.bookings.find { |booking| booking.start_time.to_date == Date.new(2026, 9, 21) && booking.start_time.hour == 10 }
       assert_in_delta 18.33, two_hour.amount, 0.01
       assert two_hour.present?
       assert rest.amount.to_d.positive?

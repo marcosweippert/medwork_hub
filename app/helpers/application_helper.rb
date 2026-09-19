@@ -1,28 +1,13 @@
 module ApplicationHelper
   def page_heading
-    labels = {
-      "dashboards" => "Dashboard",
-      "professionals" => "Professionals",
-      "patients" => "Patients",
-      "bookings" => "Bookings",
-      "rooms" => "Rooms",
-      "invoices" => "Invoices",
-      "reports" => "Reports",
-      "users" => "Users",
-      "settings" => "Settings",
-      "waitlist_entries" => "Waitlist",
-      "room_blocks" => "Room blocks",
-      "audit_events" => "Audit log",
-      "outbound_emails" => "Emails"
-    }
-    base = labels.fetch(controller_name, controller_name.titleize)
-    return "#{base} calendar" if action_name == "calendar"
-    return "Welcome email" if action_name == "edit_welcome"
+    base = t("helpers.page.#{controller_name}", default: controller_name.humanize)
+    return t("helpers.page.calendar", base: base) if action_name == "calendar"
+    return t("helpers.page.welcome_email") if action_name == "edit_welcome"
 
     case action_name
-    when "new" then "New #{base.singularize}"
-    when "edit" then "Edit #{base.singularize}"
-    when "show" then base.singularize
+    when "new" then t("helpers.page.new", base: base)
+    when "edit" then t("helpers.page.edit", base: base)
+    when "show" then base
     else base
     end
   end
@@ -56,8 +41,8 @@ module ApplicationHelper
       "updated" => "t-info",
       "deleted" => "t-unavail"
     }
-    labels = { "pending" => "Reserved", "confirmed" => "Occupied", "bounced" => "Returned" }
-    content_tag(:span, labels.fetch(status.to_s.downcase, status.to_s.titleize), class: "tag #{mapping.fetch(status.to_s.downcase, 't-info')}")
+    labels = I18n.t("statuses").stringify_keys
+    content_tag(:span, labels.fetch(status.to_s.downcase, status.to_s.humanize), class: "tag #{mapping.fetch(status.to_s.downcase, 't-info')}")
   end
 
   def nav_active?(path)
@@ -84,9 +69,9 @@ module ApplicationHelper
     end
   end
 
-  def professional_options(professionals, include_blank: "Select professional", selected: nil)
+  def professional_options(professionals, include_blank: t("helpers.select_professional"), selected: nil)
     options = professionals.map do |professional|
-      label = professional.delinquent? ? "#{professional.display_name} (overdue)" : professional.display_name
+      label = professional.delinquent? ? t("helpers.professional_overdue", name: professional.display_name) : professional.display_name
       html = { data: { room_types: professional.allowed_room_types.join(",") } }
       html[:disabled] = true if professional.delinquent?
       [label, professional.id, html]
@@ -94,7 +79,7 @@ module ApplicationHelper
     options_for_select([[include_blank, ""]] + options, selected)
   end
 
-  def room_options(rooms, selected: nil, include_blank: "Select room")
+  def room_options(rooms, selected: nil, include_blank: t("helpers.select_room"))
     options = rooms.map do |room|
       label = room.room_types.any? ? "#{room.name} · #{room.types_label}" : room.name
       [label, room.id, { data: { types: Array(room.room_types).join(","), hourly_rate: room.hourly_price } }]
@@ -103,7 +88,8 @@ module ApplicationHelper
   end
 
   def weekday_options
-    %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday].each_with_index.map { |name, wday| [name, wday] }
+    names = I18n.t("date.day_names")
+    Array(names).each_with_index.map { |name, wday| [name, wday] }
   end
 
   def print_path_for(path)
@@ -113,7 +99,7 @@ module ApplicationHelper
     "#{uri.path}?#{params.to_query}"
   end
 
-  def filter_select(name, choices, selected: nil, include_blank: "All")
+  def filter_select(name, choices, selected: nil, include_blank: t("helpers.all"))
     select_tag name, options_for_select([[include_blank, ""]] + choices, selected), class: "select"
   end
 

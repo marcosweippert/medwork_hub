@@ -25,7 +25,7 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Therapy", response.body
     assert_no_match "Dental", response.body
-    assert_no_match "New room", response.body
+    assert_no_match "Nova sala", response.body
   end
 
   test "cannot open a room of another type" do
@@ -58,8 +58,8 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
 
     get invoice_path(@own_invoice)
     assert_response :success
-    assert_no_match "Mark paid", response.body
-    assert_no_match "Cancel selected times", response.body
+    assert_no_match "Marcar como paga", response.body
+    assert_no_match "Cancelar horários selecionados", response.body
 
     get invoice_path(@other_invoice)
     assert_response :not_found

@@ -1,20 +1,20 @@
-<h1 class="page-title">Welcome back</h1>
-<p class="page-sub">Sign in with your clinic account to continue.</p>
+<h1 class="page-title"><%= t("sessions.welcome") %></h1>
+<p class="page-sub"><%= t("sessions.subtitle") %></p>
 
 <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { data: { turbo: false } }) do |f| %>
   <div class="field">
-    <%= f.label :email, class: "field-label" %>
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "you@clinic.com" %>
+    <%= f.label :email, t("sessions.email"), class: "field-label" %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "voce@clinica.com" %>
   </div>
   <div class="field" style="margin-top:12px;">
-    <%= f.label :password, class: "field-label" %>
+    <%= f.label :password, t("sessions.password"), class: "field-label" %>
     <%= f.password_field :password, autocomplete: "current-password", class: "input", placeholder: "••••••••" %>
   </div>
   <% if devise_mapping.rememberable? %>
     <label class="field-check" style="margin:14px 0 4px;">
       <%= f.check_box :remember_me %>
-      <span>Keep me signed in on this device</span>
+      <span><%= t("sessions.remember") %></span>
     </label>
   <% end %>
-  <%= f.submit "Sign in", class: "btn btn--primary auth-submit" %>
+  <%= f.submit t("sessions.submit"), class: "btn btn--primary auth-submit" %>
 <% end %>

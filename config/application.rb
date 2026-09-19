@@ -22,6 +22,8 @@ module MedworkHub
     # in config/environments, which are processed later.
     #
     config.time_zone = "America/Sao_Paulo"
+    config.i18n.available_locales = [:"pt-BR", :en]
+    config.i18n.default_locale = :"pt-BR"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

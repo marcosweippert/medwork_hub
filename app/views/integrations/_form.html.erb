@@ -1,0 +1,59 @@
+<%= form_with model: integration, url: (integration.persisted? ? integration_path(integration) : integrations_path), class: "form-grid" do |f| %>
+  <%= render "shared/errors", resource: integration %>
+
+  <% if integration.new_record? %>
+    <div class="field">
+      <%= f.label :kind, t("integrations.kind"), class: "field-label" %>
+      <%= f.select :kind, ([integration.kind] | ClinicIntegration.available_kinds | ["custom"]).uniq.map { |kind| [t("integrations.providers.#{kind}.name"), kind] }, {}, class: "input" %>
+    </div>
+  <% else %>
+    <div class="field">
+      <span class="field-label"><%= t("integrations.kind") %></span>
+      <p class="page-sub"><%= t("integrations.providers.#{integration.kind}.name") %></p>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, t("ui.name"), class: "field-label" %>
+    <%= f.text_field :name, class: "input" %>
+  </div>
+
+  <div class="field span-2">
+    <%= f.label :notes, t("integrations.notes"), class: "field-label" %>
+    <%= f.text_area :notes, class: "input", rows: 3, placeholder: t("integrations.notes_placeholder") %>
+  </div>
+
+  <% if integration.webhook? || integration.new_record? %>
+    <div class="field span-2">
+      <%= f.label :webhook_url, t("integrations.n8n.webhook_url"), class: "field-label" %>
+      <%= f.text_field :webhook_url, class: "input", placeholder: "https://…" %>
+      <p class="field-help"><%= t("integrations.webhook_help") %></p>
+    </div>
+    <div class="field">
+      <%= f.label :channel, t("integrations.channel"), class: "field-label" %>
+      <%= f.text_field :channel, class: "input", placeholder: t("integrations.channel_placeholder") %>
+    </div>
+  <% end %>
+
+  <% if integration.api? %>
+    <div class="field">
+      <%= f.label :api_base_url, t("integrations.n8n.api_base_url"), class: "field-label" %>
+      <%= f.text_field :api_base_url, class: "input", placeholder: "https://n8n.seudominio.com" %>
+    </div>
+    <div class="field">
+      <%= f.label :api_token, t("integrations.n8n.api_token"), class: "field-label" %>
+      <%= f.password_field :api_token, class: "input", autocomplete: "new-password", placeholder: (integration.api_token_set? ? t("integrations.n8n.token_set") : t("integrations.n8n.token_placeholder")) %>
+    </div>
+  <% end %>
+
+  <% unless integration.builtin? %>
+    <div class="field">
+      <label class="field-label"><%= f.check_box :enabled %> <%= t("integrations.enabled") %></label>
+    </div>
+  <% end %>
+
+  <div class="span-2 form-actions">
+    <%= f.submit t("ui.save"), class: "btn btn--primary" %>
+    <%= link_to t("ui.cancel"), integrations_path, class: "btn btn--ghost" %>
+  </div>
+<% end %>

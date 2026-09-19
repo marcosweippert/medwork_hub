@@ -1,0 +1,98 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("api_keys.title") %></h1>
+    <p class="page-sub"><%= t("api_keys.subtitle") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("nav.integrations"), integrations_path, class: "btn btn--ghost" %>
+  </div>
+</div>
+
+<% if flash[:api_token].present? %>
+  <div class="notice-banner">
+    <div>
+      <strong><%= t("api_keys.copy_now", name: flash[:api_key_name]) %></strong>
+      <code class="api-token"><%= flash[:api_token] %></code>
+    </div>
+    <button type="button" class="btn btn--ghost btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= flash[:api_token] %>" data-clipboard-copied-value="<%= t("ui.copied") %>" data-clipboard-failed-value="<%= t("ui.copy_failed") %>" data-action="clipboard#copy"><%= t("ui.copy") %></button>
+  </div>
+<% end %>
+
+<section class="card form-card" style="margin-bottom:18px;">
+  <h2 class="card-title"><%= t("api_keys.generate") %></h2>
+  <p class="page-sub"><%= t("api_keys.generate_help") %></p>
+  <%= form_with model: @api_key, url: api_keys_path, class: "form-grid", style: "margin-top:14px;" do |f| %>
+    <%= render "shared/errors", resource: @api_key %>
+    <div class="field">
+      <%= f.label :name, t("api_keys.platform"), class: "field-label" %>
+      <%= f.text_field :name, class: "input", placeholder: t("api_keys.platform_placeholder") %>
+    </div>
+    <div class="field">
+      <%= f.label :renewal_on, t("api_keys.renewal"), class: "field-label" %>
+      <%= f.date_field :renewal_on, class: "input" %>
+    </div>
+    <div class="span-2 form-actions">
+      <%= f.submit t("api_keys.generate"), class: "btn btn--primary" %>
+    </div>
+  <% end %>
+</section>
+
+<%= form_with url: bulk_api_keys_path, method: :patch, data: { controller: "bulk-select" } do %>
+  <div class="bulk-bar" data-bulk-select-target="bar" hidden>
+    <strong data-bulk-select-target="count">0 selected</strong>
+    <div class="page-actions">
+      <%= button_tag t("api_keys.activate_all"), name: "bulk_action", value: "activate", class: "btn btn--primary btn--sm" %>
+      <%= button_tag t("api_keys.deactivate_all"), name: "bulk_action", value: "deactivate", class: "btn btn--ghost btn--sm" %>
+      <%= button_tag t("api_keys.delete_all"), name: "bulk_action", value: "delete", class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("api_keys.confirm_delete_all") } %>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("ui.all") %>">
+            </th>
+            <th><%= t("api_keys.platform") %></th>
+            <th><%= t("api_keys.key") %></th>
+            <th><%= t("api_keys.renewal") %></th>
+            <th><%= t("ui.status") %></th>
+            <th><%= t("api_keys.toggle") %></th>
+            <th class="cell-actions"><%= t("ui.actions") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @api_keys.each do |key| %>
+            <tr>
+              <td>
+                <%= check_box_tag "ids[]", key.id, false, class: "row-check", id: "api_key_#{key.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" } %>
+              </td>
+              <td class="cell-name"><%= key.name %></td>
+              <td><code class="api-token api-token--masked"><%= key.masked_token %></code></td>
+              <td class="data-cell-mono"><%= key.renewal_on&.strftime("%d/%m/%Y") || "—" %></td>
+              <td><%= status_tag(key.enabled? ? "active" : "paused") %></td>
+              <td>
+                <%= link_to toggle_api_key_path(key), class: "switch", data: { turbo_method: :patch }, aria: { label: t("api_keys.toggle") } do %>
+                  <span class="track <%= "is-on" if key.enabled? %>"></span>
+                <% end %>
+              </td>
+              <td class="cell-actions">
+                <div class="row-actions">
+                  <%= link_to t("api_keys.regenerate"), regenerate_api_key_path(key), class: "btn btn--chip", data: { turbo_method: :patch, turbo_confirm: t("api_keys.confirm_regenerate") } %>
+                  <%= link_to t("ui.edit"), edit_api_key_path(key), class: "btn btn--chip" %>
+                  <%= link_to t("ui.delete"), api_key_path(key), class: "btn btn--chip btn--danger", data: { turbo_method: :delete, turbo_confirm: t("api_keys.confirm_delete") } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% if @api_keys.empty? %>
+            <tr><td colspan="7"><%= t("api_keys.empty") %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <%= render "shared/pager" %>
+  </section>
+<% end %>

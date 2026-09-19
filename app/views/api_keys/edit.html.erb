@@ -1,0 +1,27 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("api_keys.edit") %></h1>
+    <p class="page-sub"><%= @api_key.masked_token %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("ui.back"), api_keys_path, class: "btn btn--ghost" %>
+  </div>
+</div>
+
+<section class="card form-card">
+  <%= form_with model: @api_key, class: "form-grid" do |f| %>
+    <%= render "shared/errors", resource: @api_key %>
+    <div class="field">
+      <%= f.label :name, t("api_keys.platform"), class: "field-label" %>
+      <%= f.text_field :name, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :renewal_on, t("api_keys.renewal"), class: "field-label" %>
+      <%= f.date_field :renewal_on, class: "input" %>
+    </div>
+    <div class="span-2 form-actions">
+      <%= f.submit t("ui.save"), class: "btn btn--primary" %>
+      <%= link_to t("ui.cancel"), api_keys_path, class: "btn btn--ghost" %>
+    </div>
+  <% end %>
+</section>

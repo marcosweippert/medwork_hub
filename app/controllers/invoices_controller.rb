@@ -4,15 +4,11 @@ class InvoicesController < ApplicationController
   layout :invoice_layout
 
   def index
-    @invoices = Invoice.includes(:room, professional: :user, bookings: :room).order(created_at: :desc)
-    @invoices = scope_to_current_professional(@invoices)
-    @invoices = @invoices.where(status: params[:status]) if params[:status].present?
-    @invoices = @invoices.where(professional_id: params[:professional_id]) if params[:professional_id].present?
-    if params[:q].present?
-      @invoices = @invoices.left_joins(:room, professional: :user).where("users.name ILIKE :q OR rooms.name ILIKE :q OR invoices.notes ILIKE :q", q: like_query)
-    end
     @professionals = professional_user? ? Array(current_professional) : Professional.includes(:user)
-    @invoices = paginate(@invoices, per: 20)
+    @invoices = paginate(
+      filtered_invoices.includes(:room, professional: :user, bookings: :room),
+      per: 20
+    )
   end
 
   def show
@@ -100,7 +96,7 @@ class InvoicesController < ApplicationController
   end
 
   def bulk
-    invoices = Invoice.where(id: Array(params[:invoice_ids]))
+    invoices = bulk_invoices_scope
     if invoices.none?
       redirect_back_to invoices_path, alert: "Select at least one invoice."
       return
@@ -114,6 +110,41 @@ class InvoicesController < ApplicationController
 
   def set_invoice
     @invoice = scope_to_current_professional(Invoice.includes(:room, professional: :user, bookings: :room)).find(params[:id])
+  end
+
+  def filtered_invoices
+    invoices = Invoice.order(created_at: :desc)
+    invoices = scope_to_current_professional(invoices)
+    invoices = invoices.where(status: params[:status]) if params[:status].present?
+    invoices = invoices.where(professional_id: params[:professional_id]) if params[:professional_id].present?
+    due_from = filter_date(:from)
+    due_to = filter_date(:to)
+    invoices = invoices.where("due_date >= ?", due_from) if due_from
+    invoices = invoices.where("due_date <= ?", due_to) if due_to
+    if params[:q].present?
+      invoices = invoices.left_joins(:room, professional: :user).where(
+        "users.name ILIKE :q OR rooms.name ILIKE :q OR invoices.notes ILIKE :q",
+        q: like_query
+      ).distinct
+    end
+    invoices
+  end
+
+  def bulk_invoices_scope
+    if params[:select_matching].to_s == "1"
+      filtered_invoices
+    else
+      scope_to_current_professional(Invoice.where(id: Array(params[:invoice_ids])))
+    end
+  end
+
+  def filter_date(key)
+    raw = params[key].to_s.strip
+    return if raw.blank?
+
+    Date.parse(raw)
+  rescue Date::Error, ArgumentError
+    nil
   end
 
   def invoice_params

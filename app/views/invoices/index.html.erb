@@ -20,6 +20,14 @@
     <label class="field-label">Status</label>
     <%= select_tag :status, options_for_select([["All", ""]] + Invoice::STATUSES.map { |s| [s.titleize, s] }, params[:status]), class: "select" %>
   </div>
+  <div class="field">
+    <label class="field-label">Due from</label>
+    <%= date_field_tag :from, params[:from], class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">Due to</label>
+    <%= date_field_tag :to, params[:to], class: "input" %>
+  </div>
   <% if clinic_staff? %>
     <div class="field">
       <label class="field-label">Professional</label>
@@ -29,12 +37,18 @@
   <%= submit_tag "Filter", class: "btn btn--ghost" %>
 <% end %>
 
-<%= form_with url: bulk_invoices_path, method: :patch, data: { controller: "bulk-select" } do %>
+<%= form_with url: bulk_invoices_path, method: :patch, data: { controller: "bulk-select", bulk_select_matching_value: @total_count } do %>
   <%= hidden_field_tag :return_to, originating_path %>
+  <%= hidden_field_tag :q, params[:q] %>
+  <%= hidden_field_tag :status, params[:status] %>
+  <%= hidden_field_tag :professional_id, params[:professional_id] %>
+  <%= hidden_field_tag :from, params[:from] %>
+  <%= hidden_field_tag :to, params[:to] %>
+  <%= hidden_field_tag :select_matching, "0", data: { bulk_select_target: "matching" } %>
   <% if clinic_staff? %>
   <div class="bulk-bar" data-bulk-select-target="bar" hidden>
     <strong data-bulk-select-target="count">0 selected</strong>
-    <span class="field-help">Bulk pay, cancel or refund. To drop a single 30-min time, open the invoice.</span>
+    <span class="field-help">The header checkbox selects every invoice matching the current filters, not only this page. To drop a single 30-min time, open the invoice.</span>
     <div class="page-actions">
       <%= button_tag "Pay", name: "bulk_action", value: "pay", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Mark selected invoices as paid?" } %>
       <%= button_tag "Cancel", name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Cancel selected invoices? Paid invoices are refunded according to the cancellation policy." } %>
@@ -63,7 +77,7 @@
           <tr>
             <% if clinic_staff? %>
               <th class="cell-check">
-                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all invoices">
+                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all invoices matching this filter">
               </th>
             <% end %>
             <th class="cell-num">#</th>

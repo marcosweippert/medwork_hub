@@ -1,0 +1,102 @@
+<%= form_with model: room do |f| %>
+  <%= render "shared/errors", resource: room %>
+  <div class="form-grid">
+    <div class="field span-2">
+      <%= f.label :name, class: "field-label" %>
+      <%= f.text_field :name, class: "input" %>
+    </div>
+    <div class="field span-2">
+      <span class="field-label">Room type</span>
+      <p class="field-help">A room can serve more than one area. Professionals only see rooms that match their practice area. Medicina professionals can also book Psicologia / Psiquiatria.</p>
+      <%= hidden_field_tag "room[room_types][]", "" %>
+      <div class="choice-grid">
+        <% PracticeArea::ROOM_TYPES.each do |key, label| %>
+          <label class="check">
+            <%= check_box_tag "room[room_types][]", key, Array(room.room_types).include?(key), id: "room_type_#{key}" %>
+            <span class="box"></span>
+            <%= label %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+    <div class="field">
+      <%= f.label :capacity, class: "field-label" %>
+      <%= f.number_field :capacity, min: 1, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :hourly_rate, class: "field-label" %>
+      <%= f.number_field :hourly_rate, step: 0.01, min: 0, class: "input" %>
+      <p class="field-help">30-minute slots are billed at half of this rate.</p>
+    </div>
+    <div class="field">
+      <%= f.label :daily_rate, class: "field-label" %>
+      <%= f.number_field :daily_rate, step: 0.01, min: 0, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :monthly_rate, class: "field-label" %>
+      <%= f.number_field :monthly_rate, step: 0.01, min: 0, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :opens_at, "Opens (hour)", class: "field-label" %>
+      <%= f.number_field :opens_at, min: 0, max: 23, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :closes_at, "Closes (hour)", class: "field-label" %>
+      <%= f.number_field :closes_at, min: 1, max: 24, class: "input" %>
+    </div>
+    <div class="field span-2">
+      <span class="field-label">Closed weekdays</span>
+      <p class="field-help">Optional. Checked weekdays stay unavailable even though the room hours apply to every other day.</p>
+      <%= render "shared/weekday_checks", name: "room[closed_weekdays]", selected: room.closed_weekdays %>
+    </div>
+    <div class="field span-2">
+      <%= f.label :equipment, class: "field-label" %>
+      <%= f.text_area :equipment, class: "textarea" %>
+    </div>
+    <div class="field span-2">
+      <%= f.label :photo, class: "field-label" %>
+      <%= f.file_field :photo, class: "input", accept: "image/*" %>
+      <p class="field-help">Optional photo shown on the room page.</p>
+    </div>
+  </div>
+
+  <div class="card-head" style="margin-top:18px;">
+    <h2 class="card-title">Blocked days and hours</h2>
+  </div>
+  <p class="field-help">One-time periods use start/end. Check weekdays to repeat those hours every week (maintenance, classes, lunch).</p>
+  <%= f.fields_for :room_blocks do |block| %>
+    <div class="form-grid block-row">
+      <div class="field">
+        <%= block.label :starts_at, class: "field-label" %>
+        <%= block.datetime_local_field :starts_at, class: "input" %>
+      </div>
+      <div class="field">
+        <%= block.label :ends_at, class: "field-label" %>
+        <%= block.datetime_local_field :ends_at, class: "input" %>
+      </div>
+      <div class="field">
+        <%= block.label :reason, class: "field-label" %>
+        <%= block.text_field :reason, class: "input", placeholder: "Maintenance, holiday…" %>
+      </div>
+      <div class="field">
+        <% if block.object.persisted? %>
+          <label class="check" style="margin-top:22px;">
+            <%= block.check_box :_destroy %>
+            <span class="box"></span>
+            Remove
+          </label>
+        <% end %>
+      </div>
+      <div class="field span-2">
+        <span class="field-label">Repeat weekly</span>
+        <%= render "shared/weekday_checks", name: "#{block.object_name}[weekdays]", selected: block.object.weekdays, short: true %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="span-2 form-actions">
+    <%= f.submit class: "btn btn--primary" %>
+    <%= link_to "Cancel", rooms_path, class: "btn btn--ghost" %>
+  </div>
+  </div>
+<% end %>

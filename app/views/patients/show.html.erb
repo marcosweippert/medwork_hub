@@ -1,0 +1,32 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @patient.name %></h1>
+    <p class="page-sub"><%= @patient.contact.presence || "No contact" %> · <%= @patient.professional.display_name %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Edit", edit_patient_path(@patient), class: "btn btn--ghost" %>
+    <%= link_to "Professional", @patient.professional, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<section class="card">
+  <div class="card-head"><h2 class="card-title">Clinical notes</h2></div>
+  <% if @patient.history.present? %>
+    <p style="font-size:12px;margin:0;white-space:pre-wrap;"><%= @patient.history %></p>
+  <% else %>
+    <p class="field-help" style="margin:0;">No history recorded yet.</p>
+  <% end %>
+</section>
+
+<% if @notes.any? %>
+  <section class="card" style="margin-top:12px;">
+    <div class="card-head"><h2 class="card-title">Slot notes</h2></div>
+    <% @notes.each do |note| %>
+      <article class="note-item">
+        <strong><%= note.booking.room.name %></strong>
+        <span><%= note.booking.start_time&.strftime("%d/%m %H:%M") %></span>
+        <p><%= note.body %></p>
+      </article>
+    <% end %>
+  </section>
+<% end %>

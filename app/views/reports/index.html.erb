@@ -1,0 +1,53 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Reports</h1>
+    <p class="page-sub">Open a report to filter, switch synthetic or analytical view, and export</p>
+  </div>
+</div>
+
+<%= form_with url: reports_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Occupancy, waitlist, emails" %>
+  </div>
+  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Report</th>
+          <th>Area</th>
+          <th>Description</th>
+          <th>Snapshot</th>
+          <th class="cell-actions">Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @reports.each do |report| %>
+          <tr>
+            <td class="cell-name"><%= report[:name] %></td>
+            <td><%= report[:group] %></td>
+            <td><%= report[:hint] %></td>
+            <td>
+              <% if report[:stat] %>
+                <span class="data-cell-mono"><%= report[:stat] %></span>
+                <% if report[:detail] %><span class="field-help" style="display:inline;margin-left:6px;"><%= report[:detail] %></span><% end %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="cell-actions">
+              <%= link_to "Open", report[:path], class: "btn btn--chip btn--view", title: "Open", data: { turbo: false } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @reports.empty? %>
+          <tr><td colspan="5">No reports match this filter.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

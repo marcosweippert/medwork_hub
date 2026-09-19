@@ -1,0 +1,93 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Professionals</h1>
+    <p class="page-sub">Sorted by overdue · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: professionals_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">Professional</label>
+    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+  </div>
+  <label class="field field-check">
+    <%= check_box_tag :delinquent, "1", params[:delinquent] == "1" %>
+    <span class="field-label" style="margin:0;">Only overdue</span>
+  </label>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Invoices</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Professional</th>
+            <th>Room</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Due</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@detail_invoices).each do |invoice| %>
+            <tr>
+              <td class="data-cell-mono"><%= link_to "##{invoice.id}", path_with_return(invoice_path(invoice)), class: "table-link" %></td>
+              <td class="cell-name"><%= invoice.professional.display_name %></td>
+              <td><%= invoice.room&.name || "—" %></td>
+              <td><%= status_tag(invoice.status) %></td>
+              <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+              <td class="data-cell-mono"><%= invoice.due_date&.strftime("%d/%m/%Y") %></td>
+            </tr>
+          <% end %>
+          <% if Array(@detail_invoices).empty? %><tr><td colspan="6">No invoices for this filter.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Professional</th>
+          <th>Reserved</th>
+          <th>Occupied</th>
+          <th>Billed</th>
+          <th>Paid / open / overdue</th>
+          <th>Overdue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |row| %>
+          <% billed = [row[:billed].to_d, 0.01].max %>
+          <tr>
+            <td class="cell-name">
+              <%= row[:professional].display_name %>
+              <%= status_tag("overdue") if row[:delinquent] %>
+            </td>
+            <td class="data-cell-mono"><%= number_with_precision(row[:reserved_hours], precision: 1) %> h</td>
+            <td class="data-cell-mono"><%= number_with_precision(row[:occupied_hours], precision: 1) %> h</td>
+            <td class="cell-price"><%= number_to_currency(row[:billed], precision: 0) %></td>
+            <td>
+              <div class="stack-bar" title="Paid / billed">
+                <i class="paid" style="width:<%= ((row[:paid].to_d / billed) * 100).round %>%"></i>
+                <i class="overdue" style="width:<%= ((row[:overdue].to_d / billed) * 100).round %>%"></i>
+              </div>
+            </td>
+            <td class="cell-price"><%= number_to_currency(row[:overdue], precision: 0) %></td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><tr><td colspan="6">No professionals match this filter.</td></tr><% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

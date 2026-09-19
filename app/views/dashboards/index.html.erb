@@ -1,0 +1,126 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub"><%= Date.current.strftime("%d/%m/%Y") %> · occupancy <%= @occupancy_today %>% · open <%= number_to_currency(@open_amount) %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Rooms", rooms_path, class: "btn btn--ghost" %>
+    <%= link_to "New booking", new_booking_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<% if @delinquents.any? %>
+  <div class="notice-banner">
+    <strong><%= @delinquents.size %></strong>
+    <%= "professional".pluralize(@delinquents.size) %> with overdue invoices cannot create new reservations:
+    <%= @delinquents.map(&:display_name).to_sentence %>.
+    <%= link_to "Open receivables", receivables_reports_path, class: "table-link" %>
+  </div>
+<% end %>
+
+<section class="kpi-grid" aria-label="Key metrics">
+  <article class="kpi-card c-success">
+    <div class="kpi-label">Paid this month</div>
+    <div class="kpi-value"><%= number_to_currency(@revenue_month, precision: 0) %></div>
+    <div class="kpi-compare"><%= number_to_currency(@refunded_month, precision: 0) %> refunded</div>
+  </article>
+  <article class="kpi-card c-primary">
+    <div class="kpi-label">Occupancy today</div>
+    <div class="kpi-value"><%= @occupancy_today %><sup>%</sup></div>
+  </article>
+  <article class="kpi-card c-purple">
+    <div class="kpi-label">Active holds</div>
+    <div class="kpi-value"><%= @metrics[:bookings] %></div>
+  </article>
+  <article class="kpi-card c-danger">
+    <div class="kpi-label">Receivables</div>
+    <div class="kpi-value"><%= number_to_currency(@open_amount, precision: 0) %></div>
+    <div class="kpi-compare"><%= @financial_summary[:overdue] %> overdue</div>
+  </article>
+</section>
+
+<div class="grid">
+  <section class="col-6 card">
+    <div class="card-head">
+      <h2 class="card-title">Rooms today</h2>
+      <%= link_to "Manage", rooms_path, class: "card-action" %>
+    </div>
+    <% @rooms.each do |room| %>
+      <% occ = room.occupancy_on(Date.current) %>
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <strong><%= room.name %></strong>
+          <span class="mono"><%= occ %>%</span>
+        </div>
+        <div class="occ-bar"><span class="<%= occupancy_tone(occ) %>" style="width: <%= occ %>%"></span></div>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="col-6 card">
+    <div class="card-head">
+      <h2 class="card-title">Upcoming</h2>
+      <%= link_to "All", bookings_path, class: "card-action" %>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Professional</th>
+            <th>Room</th>
+            <th>When</th>
+            <th class="cell-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @upcoming_bookings.each do |booking| %>
+            <tr>
+              <td class="cell-name"><%= booking.professional.display_name %></td>
+              <td><%= booking.room.name %></td>
+              <td class="cell-date"><%= booking.start_time&.strftime("%d/%m %H:%M") %></td>
+              <td class="cell-actions">
+                <div class="row-actions">
+                  <%= action_btn "View", path_with_return(booking_path(booking)), tone: "view" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% if @upcoming_bookings.empty? %>
+            <tr><td colspan="4">No upcoming holds.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="col-12 card">
+    <div class="card-head">
+      <h2 class="card-title">Recent invoices</h2>
+      <%= link_to "All", invoices_path, class: "card-action" %>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Professional</th><th>Room</th><th>Amount</th><th>Status</th><th>Due</th><th class="cell-actions">Actions</th></tr></thead>
+        <tbody>
+          <% @recent_invoices.each do |invoice| %>
+            <tr>
+              <td class="cell-name"><%= invoice.professional.display_name %></td>
+              <td><%= invoice.room&.name || "—" %></td>
+              <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+              <td><%= status_tag(invoice.status) %></td>
+              <td class="cell-date"><%= invoice.due_date&.strftime("%d/%m/%Y") %></td>
+              <td class="cell-actions">
+                <div class="row-actions">
+                  <%= action_btn "View", path_with_return(invoice_path(invoice)), tone: "view" %>
+                  <% if invoice.payable? %>
+                    <%= action_btn "Pay", pay_invoice_path(invoice), tone: "pay", method: :patch, params: { return_to: originating_path } %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

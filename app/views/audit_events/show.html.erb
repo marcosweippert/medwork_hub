@@ -1,0 +1,34 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @event.action.tr("._", " ") %></h1>
+    <p class="page-sub"><%= @event.actor_name %> · <%= @event.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", audit_events_path, class: "btn btn--ghost" %>
+    <% if (path = auditable_path_for(@event)) %>
+      <%= link_to "Open record", path, class: "btn btn--primary" %>
+    <% end %>
+    <%= button_to "Delete", audit_event_path(@event), method: :delete, class: "btn btn--ghost", data: { turbo_confirm: "Remove this event from the log?" } %>
+  </div>
+</div>
+
+<section class="card form-card form-card--wide">
+  <dl class="dl-meta">
+    <dt>When</dt><dd><%= @event.created_at.strftime("%d/%m/%Y %H:%M:%S") %></dd>
+    <dt>User</dt><dd><%= @event.user ? link_to(@event.actor_name, @event.user) : @event.actor_name %></dd>
+    <dt>Action</dt><dd><%= @event.action %></dd>
+    <dt>Status</dt><dd><%= status_tag(@event.verb) %></dd>
+    <dt>Record</dt>
+    <dd>
+      <%= @event.record_name %>
+      <% if (path = auditable_path_for(@event)) %>
+        · <%= link_to "Open", path %>
+      <% end %>
+    </dd>
+  </dl>
+</section>
+
+<section class="card form-card form-card--wide">
+  <div class="card-head"><h2 class="card-title">Changed fields</h2></div>
+  <pre class="email-text"><%= JSON.pretty_generate(@event.parsed_details) %></pre>
+</section>

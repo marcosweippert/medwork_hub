@@ -1,0 +1,31 @@
+<% professional = f.object %>
+<div class="field span-2">
+  <span class="field-label">Practice area</span>
+  <p class="field-help">This controls which rooms the professional can reserve.</p>
+  <%= hidden_field_tag "#{f.object_name}[practice_areas][]", "" %>
+  <div class="choice-grid">
+    <% PracticeArea::AREAS.each do |key, config| %>
+      <label class="check">
+        <%= check_box_tag "#{f.object_name}[practice_areas][]", key, Array(professional.practice_areas).include?(key), id: "#{f.object_name.to_s.parameterize}_practice_area_#{key}" %>
+        <span class="box"></span>
+        <%= config[:label] %>
+      </label>
+    <% end %>
+  </div>
+</div>
+<div class="field">
+  <%= f.label :specialty, "Specialty / title", class: "field-label" %>
+  <%= f.text_field :specialty, class: "input", placeholder: "Cardiologist, pediatrician, CBT…" %>
+</div>
+<div class="field">
+  <%= f.label :license_number, class: "field-label" %>
+  <%= f.text_field :license_number, class: "input" %>
+</div>
+<div class="field">
+  <%= f.label :phone, "WhatsApp / phone", class: "field-label" %>
+  <%= f.text_field :phone, class: "input", placeholder: "11999998888" %>
+</div>
+<div class="field span-2">
+  <%= f.label :bio, class: "field-label" %>
+  <%= f.text_area :bio, class: "textarea", placeholder: "Short professional profile" %>
+</div>

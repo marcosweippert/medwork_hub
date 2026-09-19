@@ -1,0 +1,48 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Patients</h1>
+    <p class="page-sub">Linked to a professional</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "New patient", new_patient_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<%= form_with url: patients_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name, contact or professional" %>
+  </div>
+  <%= submit_tag "Search", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Professional</th>
+          <th class="cell-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @patients.each do |patient| %>
+          <tr>
+            <td class="cell-name"><%= patient.name %></td>
+            <td><%= patient.contact %></td>
+            <td><%= patient.professional.display_name %></td>
+            <td class="cell-actions">
+              <div class="row-actions">
+                <%= action_btn "View", patient, tone: "view" %>
+                <%= action_btn "Edit", edit_patient_path(patient), tone: "edit" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

@@ -1,0 +1,30 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Compose email</h1>
+    <p class="page-sub">Send a message through the clinic SMTP and keep it in the sent log</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", outbound_emails_path, class: "btn btn--ghost" %>
+  </div>
+</div>
+
+<section class="card form-card form-card--wide">
+  <%= form_with url: outbound_emails_path, method: :post, class: "form-grid" do %>
+    <div class="field">
+      <label class="field-label">To</label>
+      <%= email_field_tag :to, @to, class: "input", required: true %>
+    </div>
+    <div class="field">
+      <label class="field-label">Subject</label>
+      <%= text_field_tag :subject, @subject, class: "input", placeholder: "Optional" %>
+    </div>
+    <div class="field span-2">
+      <label class="field-label">Message</label>
+      <%= text_area_tag :body, @body, class: "input", rows: 8, required: true %>
+    </div>
+    <div class="span-2 form-actions">
+      <%= submit_tag "Send", class: "btn btn--primary" %>
+      <%= link_to "Cancel", outbound_emails_path, class: "btn btn--ghost" %>
+    </div>
+  <% end %>
+</section>

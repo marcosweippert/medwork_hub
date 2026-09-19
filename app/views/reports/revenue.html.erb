@@ -1,0 +1,170 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Revenue</h1>
+    <p class="page-sub"><%= @from.strftime("%d/%m/%Y") %> – <%= @to.strftime("%d/%m/%Y") %> · collection <%= @collection_rate %>% · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: revenue_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">From</label>
+    <%= date_field_tag :from, @from, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">To</label>
+    <%= date_field_tag :to, @to, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">Room</label>
+    <%= select_tag :room_id, options_from_collection_for_select(@rooms, :id, :name, params[:room_id]), include_blank: "All rooms", class: "select" %>
+  </div>
+  <div class="field">
+    <label class="field-label">Professional</label>
+    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Invoices</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Professional</th>
+            <th>Room</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Paid at</th>
+            <th>Refunded</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@detail_invoices).each do |invoice| %>
+            <tr>
+              <td class="data-cell-mono"><%= link_to "##{invoice.id}", path_with_return(invoice_path(invoice)), class: "table-link" %></td>
+              <td class="cell-name"><%= invoice.professional.display_name %></td>
+              <td><%= invoice.room&.name || "—" %></td>
+              <td><%= status_tag(invoice.status) %></td>
+              <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+              <td class="data-cell-mono"><%= invoice.paid_at&.strftime("%d/%m/%Y") || "—" %></td>
+              <td class="cell-price"><%= invoice.refunded_amount.to_d.positive? ? number_to_currency(invoice.refunded_amount) : "—" %></td>
+            </tr>
+          <% end %>
+          <% if Array(@detail_invoices).empty? %><tr><td colspan="7">No paid or refunded invoices in this range.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid">
+  <article class="kpi-card c-success">
+    <div class="kpi-label">Received</div>
+    <div class="kpi-value"><%= number_to_currency(@totals[:received], precision: 0) %></div>
+  </article>
+  <article class="kpi-card c-danger">
+    <div class="kpi-label">Refunded</div>
+    <div class="kpi-value"><%= number_to_currency(@totals[:refunded], precision: 0) %></div>
+  </article>
+  <article class="kpi-card c-primary">
+    <div class="kpi-label">Net collected</div>
+    <div class="kpi-value"><%= number_to_currency(@totals[:net], precision: 0) %></div>
+  </article>
+  <article class="kpi-card c-purple">
+    <div class="kpi-label">Open / overdue</div>
+    <div class="kpi-value"><%= number_to_currency(@totals[:open].to_d + @totals[:overdue].to_d, precision: 0) %></div>
+  </article>
+</section>
+
+<div class="grid">
+  <section class="col-12 card">
+    <div class="card-head"><h2 class="card-title">By month</h2></div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th class="cell-price">Received</th>
+          <th class="cell-price">Refunded</th>
+          <th class="cell-price">Net</th>
+          <th></th>
+          <th class="cell-price">Open</th>
+          <th class="cell-price">Overdue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @months.each do |row| %>
+          <% width = ((row[:net].to_d / @max_month) * 100).round %>
+          <tr>
+            <td class="cell-name"><%= row[:month].strftime("%b %Y") %></td>
+            <td class="cell-price"><%= number_to_currency(row[:received]) %></td>
+            <td class="cell-price"><%= number_to_currency(row[:refunded]) %></td>
+            <td class="cell-price"><%= number_to_currency(row[:net]) %></td>
+            <td style="width:28%;"><div class="occ-bar"><span style="width:<%= [width, 0].max %>%"></span></div></td>
+            <td class="cell-price"><%= number_to_currency(row[:open]) %></td>
+            <td class="cell-price"><%= number_to_currency(row[:overdue]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+  <section class="col-6 card">
+    <div class="card-head"><h2 class="card-title">Received / refunded by room</h2></div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th class="cell-price">Received</th>
+          <th class="cell-price">Refunded</th>
+          <th class="cell-price">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% names = (@by_room.keys + @refunded_by_room.keys).uniq %>
+        <% names.sort_by { |name| -(@by_room[name].to_d - @refunded_by_room[name].to_d) }.each do |name| %>
+          <% received = @by_room[name].to_d %>
+          <% refunded = @refunded_by_room[name].to_d %>
+          <tr>
+            <td class="cell-name"><%= name %></td>
+            <td class="cell-price"><%= number_to_currency(received) %></td>
+            <td class="cell-price"><%= number_to_currency(refunded) %></td>
+            <td class="cell-price"><%= number_to_currency(received - refunded) %></td>
+          </tr>
+        <% end %>
+        <% if names.empty? %><tr><td colspan="4">No paid invoices in this range.</td></tr><% end %>
+      </tbody>
+    </table>
+  </section>
+  <section class="col-6 card">
+    <div class="card-head"><h2 class="card-title">Received / refunded by professional</h2></div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Professional</th>
+          <th class="cell-price">Received</th>
+          <th class="cell-price">Refunded</th>
+          <th class="cell-price">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% names = (@by_professional.keys + @refunded_by_professional.keys).uniq %>
+        <% names.sort_by { |name| -(@by_professional[name].to_d - @refunded_by_professional[name].to_d) }.each do |name| %>
+          <% received = @by_professional[name].to_d %>
+          <% refunded = @refunded_by_professional[name].to_d %>
+          <tr>
+            <td class="cell-name"><%= name %></td>
+            <td class="cell-price"><%= number_to_currency(received) %></td>
+            <td class="cell-price"><%= number_to_currency(refunded) %></td>
+            <td class="cell-price"><%= number_to_currency(received - refunded) %></td>
+          </tr>
+        <% end %>
+        <% if names.empty? %><tr><td colspan="4">No paid invoices in this range.</td></tr><% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

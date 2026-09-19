@@ -1,0 +1,13 @@
+<% name = local_assigns.fetch(:name)
+   selected = Array(local_assigns[:selected]).map(&:to_i)
+   short = local_assigns[:short] %>
+<%= hidden_field_tag "#{name}[]", "", id: nil %>
+<div class="choice-grid">
+  <% weekday_options.each do |label, wday| %>
+    <label class="check">
+      <%= check_box_tag "#{name}[]", wday, selected.include?(wday), id: "#{name.to_s.parameterize}_#{wday}" %>
+      <span class="box"></span>
+      <%= short ? label.slice(0, 3) : label %>
+    </label>
+  <% end %>
+</div>

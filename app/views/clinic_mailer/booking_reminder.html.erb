@@ -1,0 +1,11 @@
+<p>Hello <%= @professional.display_name %>,</p>
+<p>
+  This is a reminder that you have a reservation in
+  <strong><%= @booking.room.name %></strong>
+  on <strong><%= @booking.start_time.strftime("%d/%m/%Y at %H:%M") %></strong>
+  (until <%= @booking.end_time.strftime("%H:%M") %>).
+</p>
+<p>Please arrive on time or cancel according to clinic policy.</p>
+<% if @whatsapp_url %>
+  <p><a href="<%= @whatsapp_url %>">Open WhatsApp reminder</a></p>
+<% end %>

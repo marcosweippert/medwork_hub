@@ -1,0 +1,35 @@
+<%= form_with model: user, data: { controller: "role-fields" } do |f| %>
+  <%= render "shared/errors", resource: user %>
+  <div class="form-grid">
+    <div class="field">
+      <%= f.label :name, class: "field-label" %>
+      <%= f.text_field :name, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :email, class: "field-label" %>
+      <%= f.email_field :email, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :role, class: "field-label" %>
+      <%= f.select :role, User::ROLES.map { |role| [role.titleize, role] }, {}, class: "select", data: { role_fields_target: "role", action: "change->role-fields#sync" } %>
+    </div>
+    <% if user.new_record? %>
+      <div class="field">
+        <span class="field-label">Password</span>
+        <p class="field-help">A temporary password is emailed to the user. They must change it on first login.</p>
+      </div>
+    <% end %>
+    <% user.build_professional if user.professional.nil? %>
+    <div class="span-2" data-role-fields-target="professional">
+      <div class="form-grid">
+        <%= f.fields_for :professional do |professional_fields| %>
+          <%= render "shared/professional_fields", f: professional_fields %>
+        <% end %>
+      </div>
+    </div>
+    <div class="span-2 form-actions">
+      <%= f.submit class: "btn btn--primary" %>
+      <%= link_to "Cancel", users_path, class: "btn btn--ghost" %>
+    </div>
+  </div>
+<% end %>

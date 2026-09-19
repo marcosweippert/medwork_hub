@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= @clinic.presence || "MedWork Hub" %></title>
+  </head>
+  <body style="margin:0;padding:0;background:#F0F4F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;color:#1E293B;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4F8;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FFFFFF;border-radius:12px;overflow:hidden;border:1px solid #E4E8EF;">
+            <tr>
+              <td style="background:#2563EB;padding:18px 24px;">
+                <p style="margin:0;font-size:11px;letter-spacing:0.14em;color:#BFDBFE;text-transform:uppercase;">MedWork</p>
+                <p style="margin:2px 0 0;font-size:20px;font-weight:700;color:#FFFFFF;letter-spacing:-0.03em;">HUB</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 24px 8px;">
+                <%= yield %>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 24px 24px;color:#64748B;font-size:12px;line-height:1.5;">
+                <%= @clinic.presence || "MedWork Hub" %> · este e-mail foi enviado automaticamente.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Rooms</h1>
+    <p class="page-sub"><%= @total_count %> rooms · occupancy from today through <%= @occupancy_days.last.strftime("%d/%m") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Find slot", availability_rooms_path, class: "btn btn--ghost" %>
+    <% if clinic_staff? %>
+      <%= link_to "New room", new_room_path, class: "btn btn--primary" %>
+    <% end %>
+  </div>
+</div>
+
+<%= form_with url: rooms_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name or equipment" %>
+  </div>
+  <%= submit_tag "Search", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th class="cell-room-type">Type</th>
+          <th class="cell-actions"></th>
+          <th class="data-cell-mono">Hours</th>
+          <th class="cell-num">Cap</th>
+          <th class="cell-price">Daily</th>
+          <th class="cell-price">30 min</th>
+          <th class="cell-price">Monthly</th>
+          <% @occupancy_days.each_with_index do |day, index| %>
+            <th class="occ-day"><%= index.zero? ? "Today #{day.strftime('%d/%m')}" : day.strftime("%a %d/%m") %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rooms.each do |room| %>
+          <tr>
+            <td class="cell-name"><%= link_to room.name, room, class: "table-link" %></td>
+            <td class="cell-room-type" title="<%= room.types_label %>"><%= room.types_label.presence || "—" %></td>
+            <td class="cell-actions">
+              <div class="row-actions">
+                <%= action_btn "Calendar", calendar_room_path(room), tone: "cal" %>
+              </div>
+            </td>
+            <td class="data-cell-mono"><%= format("%02d:00–%02d:00", room.opens_at, room.closes_at) %></td>
+            <td class="cell-num"><%= room.capacity %></td>
+            <td class="cell-price"><%= number_to_currency(room.daily_rate, precision: 0) %></td>
+            <td class="cell-price"><%= number_to_currency(room.slot_price) %></td>
+            <td class="cell-price"><%= number_to_currency(room.monthly_rate, precision: 0) %></td>
+            <% @occupancy_days.each do |day| %>
+              <% occ = room.occupancy_on(day) %>
+              <td class="occ-day">
+                <% if room.schedule_for(day).blank? %>
+                  <span class="heat heat-0">—</span>
+                <% else %>
+                  <span class="heat <%= occupancy_tone(occ) %>"><%= occ %>%</span>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+        <% if @rooms.empty? %>
+          <tr><td colspan="<%= 8 + @occupancy_days.size %>">No rooms match this search.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

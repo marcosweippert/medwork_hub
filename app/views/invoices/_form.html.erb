@@ -1,0 +1,34 @@
+<%= form_with model: invoice do |f| %>
+  <%= render "shared/errors", resource: invoice %>
+  <div class="form-grid">
+    <div class="field">
+      <%= f.label :professional_id, class: "field-label" %>
+      <%= f.collection_select :professional_id, Professional.includes(:user), :id, :display_name, { include_blank: "Select" }, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :room_id, class: "field-label" %>
+      <%= f.collection_select :room_id, Room.order(:name), :id, :name, { include_blank: "Optional" }, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :amount, class: "field-label" %>
+      <%= f.number_field :amount, step: 0.01, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :status, class: "field-label" %>
+      <%= f.select :status, Invoice::STATUSES.map { |s| [s.titleize, s] }, {}, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :due_date, class: "field-label" %>
+      <%= f.date_field :due_date, class: "input" %>
+    </div>
+    <div class="field span-2">
+      <%= f.label :notes, class: "field-label" %>
+      <%= f.text_area :notes, class: "textarea" %>
+    </div>
+    <div class="span-2 form-actions">
+      <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+      <%= f.submit class: "btn btn--primary" %>
+      <%= link_to "Cancel", back_path(invoices_path), class: "btn btn--ghost" %>
+    </div>
+  </div>
+<% end %>

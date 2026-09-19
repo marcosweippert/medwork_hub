@@ -1,0 +1,12 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Edit patient</h1>
+    <p class="page-sub"><%= @patient.name %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", patient_path(@patient), class: "btn btn--ghost" %>
+  </div>
+</div>
+<section class="card form-card">
+  <%= render "form", patient: @patient %>
+</section>

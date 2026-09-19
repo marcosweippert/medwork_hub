@@ -1,0 +1,80 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Patients</h1>
+    <p class="page-sub"><%= @total_patients %> patients · <%= @with_bookings %> with bookings · <%= @notes %> notes · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: patients_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">Professional</label>
+    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Patients</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Professional</th>
+            <th>Contact</th>
+            <th>Notes</th>
+            <th>Bookings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@patients).each do |patient| %>
+            <tr>
+              <td class="cell-name"><%= patient.name %></td>
+              <td><%= patient.professional.display_name %></td>
+              <td><%= patient.contact.presence || "—" %></td>
+              <td class="cell-num"><%= patient.appointment_notes.size %></td>
+              <td class="cell-num"><%= patient.bookings.size %></td>
+            </tr>
+          <% end %>
+          <% if Array(@patients).empty? %><tr><td colspan="5">No patients yet.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid kpi-compact">
+  <article class="kpi-card c-primary"><div class="kpi-label">Patients</div><div class="kpi-value"><%= @total_patients %></div></article>
+  <article class="kpi-card"><div class="kpi-label">With bookings</div><div class="kpi-value"><%= @with_bookings %></div></article>
+  <article class="kpi-card c-purple"><div class="kpi-label">Notes</div><div class="kpi-value"><%= @notes %></div></article>
+</section>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Professional</th>
+          <th>Patients</th>
+          <th>Notes</th>
+          <th>Linked bookings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.sort_by { |row| -row[:patients] }.each do |row| %>
+          <tr>
+            <td class="cell-name"><%= row[:professional].display_name %></td>
+            <td class="cell-num"><%= row[:patients] %></td>
+            <td class="cell-num"><%= row[:notes] %></td>
+            <td class="cell-num"><%= row[:bookings] %></td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><tr><td colspan="4">No patients yet.</td></tr><% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

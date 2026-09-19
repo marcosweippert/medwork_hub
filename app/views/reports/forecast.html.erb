@@ -1,0 +1,75 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Occupancy forecast</h1>
+    <p class="page-sub">Next 8 weeks based on current holds · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: forecast_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">Room</label>
+    <%= select_tag :room_id, options_from_collection_for_select(Room.order(:name), :id, :name, params[:room_id]), include_blank: "All rooms", class: "select" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Weekly occupancy</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Week starting</th>
+            <th>Occupancy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @rows.each do |row| %>
+            <% @weeks.each_with_index do |week, index| %>
+              <% value = row[:weekly][index] %>
+              <tr>
+                <td class="cell-name"><%= row[:room].name %></td>
+                <td class="data-cell-mono"><%= week.strftime("%d/%m/%Y") %></td>
+                <td><span class="heat <%= occupancy_tone(value) %>"><%= value %>%</span></td>
+              </tr>
+            <% end %>
+          <% end %>
+          <% if @rows.empty? %><tr><td colspan="3">No rooms.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <% @weeks.each do |week| %>
+            <th><%= week.strftime("%d/%m") %></th>
+          <% end %>
+          <th>Avg</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |row| %>
+          <tr>
+            <td class="cell-name"><%= row[:room].name %></td>
+            <% row[:weekly].each do |value| %>
+              <td><span class="heat <%= occupancy_tone(value) %>"><%= value %>%</span></td>
+            <% end %>
+            <td class="cell-num"><%= row[:average] %>%</td>
+          </tr>
+        <% end %>
+        <% if @rows.empty? %><tr><td colspan="<%= @weeks.size + 2 %>">No rooms.</td></tr><% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

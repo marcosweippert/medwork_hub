@@ -1,0 +1,64 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">New booking</h1>
+    <p class="page-sub">Rooms follow the professional’s practice area. Pick a room, then hours on the calendar.</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", back_path(bookings_path), class: "btn btn--ghost" %>
+  </div>
+</div>
+<section class="card form-card--wide">
+
+  <%= form_with url: bookings_path, method: :post, data: {
+        controller: "booking-form slot-picker",
+        slot_picker_minutes_value: Room.slot_minutes,
+        booking_form_calendar_url_value: calendar_bookings_path
+      } do %>
+    <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+    <%= hidden_field_tag :billing_type, "hourly" %>
+    <input type="hidden" data-slot-picker-target="hourlyRate" value="0">
+
+    <%= render "shared/errors", resource: @booking if @booking&.errors&.any? %>
+
+    <div class="form-grid">
+      <div class="field">
+        <label class="field-label">Professional</label>
+        <%= professional_field_tag "booking[professional_id]", @professionals, selected: @booking.professional_id,
+              html: { data: { booking_form_target: "professional", action: "change->booking-form#professionalChanged" } } %>
+      </div>
+      <div class="field">
+        <label class="field-label">Room</label>
+        <%= select_tag "booking[room_id]",
+              room_options(@rooms, selected: @booking.room_id),
+              class: "select",
+              data: { booking_form_target: "room", action: "change->booking-form#roomChanged" } %>
+      </div>
+      <div class="field">
+        <label class="field-label">Repeat weekly</label>
+        <%= select_tag :weeks, options_for_select([["This week only", 1]] + (2..12).map { |n| ["#{n} weeks", n] }, params[:weeks] || 1), class: "select" %>
+      </div>
+      <div class="field">
+        <label class="field-label">Selection</label>
+        <div class="field-help">
+          <span data-slot-picker-target="count">0</span> × <%= Setting.current.slot_minutes %> min · R$
+          <span data-slot-picker-target="total">0,00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend" style="margin-top:12px;">
+      <span><i class="free"></i>Available</span>
+      <span><i class="reserved"></i>Reserved</span>
+      <span><i class="occupied"></i>Occupied</span>
+      <span><i class="blocked"></i>Blocked</span>
+      <span><i class="closed"></i>Closed</span>
+    </div>
+
+    <%= render "calendar_frame" %>
+
+    <div class="page-actions" style="margin-top:14px;">
+      <%= submit_tag "Reserve selected hours", class: "btn btn--primary" %>
+      <%= link_to "Cancel", back_path(bookings_path), class: "btn btn--ghost", data: { turbo_frame: "_top" } %>
+    </div>
+  <% end %>
+</section>

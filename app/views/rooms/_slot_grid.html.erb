@@ -1,0 +1,48 @@
+<div class="cal-wrap">
+  <table class="cal-table">
+    <thead>
+      <tr>
+        <th></th>
+        <% calendar.dates.each do |date| %>
+          <th class="<%= "is-weekend" if date.sunday? || date.saturday? %>">
+            <%= date.strftime("%a %d/%m") %>
+            <% if calendar.slot_minutes.any? { |mins| calendar.slot_for(date, mins).status == :free } %>
+              <button type="button" class="day-all" data-action="slot-picker#selectDay" data-slot-picker-date-param="<%= date.iso8601 %>">All</button>
+            <% end %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% calendar.slot_minutes.each do |minutes| %>
+        <tr>
+          <td class="hour-label"><%= format("%02d:%02d", *minutes.divmod(60)) %></td>
+          <% calendar.dates.each do |date| %>
+            <% slot = calendar.slot_for(date, minutes) %>
+            <td>
+              <% if slot.status == :free %>
+                <label class="slot is-free">
+                  <%= check_box_tag "slots[]", slot.starts_at.iso8601, false,
+                        id: "slot_#{date}_#{minutes}",
+                        class: "slot-check",
+                        aria: { label: "#{date.strftime('%a %d/%m')} #{slot.label}" },
+                        data: {
+                          date: date.iso8601,
+                          slot_picker_target: "slot",
+                          action: "change->slot-picker#refresh"
+                        } %>
+                  <span><%= slot.label %></span>
+                </label>
+              <% elsif slot.status.in?(%i[reserved occupied]) && local_assigns[:room] %>
+                <%= link_to slot.label, new_room_waitlist_entry_path(room, starts_at: slot.starts_at.iso8601, ends_at: slot.ends_at.iso8601),
+                      class: "slot is-#{slot.status}", title: "Join waitlist for this hour", data: { turbo_frame: "_top" } %>
+              <% else %>
+                <span class="slot is-<%= slot.status %>"><%= slot.label %></span>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

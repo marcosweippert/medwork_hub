@@ -1,0 +1,16 @@
+<%= form_with model: patient do |f| %>
+  <%= render "shared/errors", resource: patient %>
+  <div class="form-grid">
+    <div class="field span-2">
+      <%= f.label :professional_id, class: "field-label" %>
+      <%= f.collection_select :professional_id, Professional.includes(:user), :id, :display_name, { include_blank: "Select" }, class: "select" %>
+    </div>
+    <div class="field"><%= f.label :name, class: "field-label" %><%= f.text_field :name, class: "input", required: true %></div>
+    <div class="field"><%= f.label :contact, "Email or phone", class: "field-label" %><%= f.text_field :contact, class: "input", placeholder: "email or phone" %></div>
+    <div class="field span-2"><%= f.label :history, "Clinical notes", class: "field-label" %><%= f.text_area :history, class: "textarea", placeholder: "Relevant history, diagnosis, observations" %></div>
+    <div class="span-2 form-actions">
+      <%= f.submit class: "btn btn--primary" %>
+      <%= link_to "Cancel", patients_path, class: "btn btn--ghost" %>
+    </div>
+  </div>
+<% end %>

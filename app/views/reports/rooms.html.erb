@@ -1,0 +1,77 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Room usage</h1>
+    <p class="page-sub"><%= @from.strftime("%d/%m/%Y") %> – <%= @to.strftime("%d/%m/%Y") %> · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: rooms_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">From</label>
+    <%= date_field_tag :from, @from, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">To</label>
+    <%= date_field_tag :to, @to, class: "input" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Holds in period</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Professional</th>
+            <th>Start</th>
+            <th>Hours</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@detail_bookings).each do |booking, room| %>
+            <tr>
+              <td class="cell-name"><%= room.name %></td>
+              <td><%= booking.professional.display_name %></td>
+              <td class="data-cell-mono"><%= booking.start_time&.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="cell-num"><%= number_with_precision(booking.duration_hours, precision: 1) %></td>
+              <td><%= status_tag(booking.status) %></td>
+            </tr>
+          <% end %>
+          <% if Array(@detail_bookings).empty? %><tr><td colspan="5">No holds in this range.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th>Bookings</th>
+          <th>Hours</th>
+          <th>Avg occupancy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |row| %>
+          <tr>
+            <td class="cell-name"><%= row[:room].name %></td>
+            <td class="cell-num"><%= row[:bookings] %></td>
+            <td class="cell-num"><%= number_with_precision(row[:hours], precision: 1) %></td>
+            <td><span class="heat <%= occupancy_tone(row[:occupancy]) %>"><%= row[:occupancy] %>%</span></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

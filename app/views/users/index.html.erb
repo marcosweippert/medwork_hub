@@ -1,0 +1,51 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Users</h1>
+    <p class="page-sub">Clinic accounts. Professionals are created together with the login.</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "New user", new_user_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<%= form_with url: users_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name or email" %>
+  </div>
+  <%= submit_tag "Search", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th class="cell-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="cell-name"><%= user.display_name %></td>
+            <td class="data-cell-mono"><%= user.email %></td>
+            <td><%= status_tag(user.role) %></td>
+            <td class="cell-actions">
+              <div class="row-actions">
+                <%= action_btn "Open", user, tone: "view" %>
+                <%= action_btn "Edit", edit_user_path(user), tone: "edit" %>
+                <% unless user == current_user %>
+                  <%= action_btn "Delete", user, tone: "danger", method: :delete, confirm: "Delete this user?" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

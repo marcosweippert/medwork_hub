@@ -1,0 +1,57 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Find a slot</h1>
+    <p class="page-sub">See which rooms are free for a date and time range</p>
+  </div>
+  <%= link_to "All rooms", rooms_path, class: "btn btn--ghost" %>
+</div>
+
+<%= form_with url: availability_rooms_path, method: :get, class: "filter-bar" do %>
+  <div class="field">
+    <label class="field-label">Date</label>
+    <%= date_field_tag :date, @date, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">From</label>
+    <%= select_tag :start_hour, options_for_select(@hours.map { |h| [format("%02d:00", h), h] }, @start_hour), class: "select" %>
+  </div>
+  <div class="field">
+    <label class="field-label">To</label>
+    <%= select_tag :end_hour, options_for_select(@hours.map { |h| [format("%02d:00", h), h] }, @end_hour), class: "select" %>
+  </div>
+  <%= submit_tag "Check", class: "btn btn--primary" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th>Window</th>
+          <th>Day occupancy</th>
+          <th>Status</th>
+          <th class="cell-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @results.each do |row| %>
+          <tr>
+            <td class="cell-name"><%= row[:room].name %></td>
+            <td class="data-cell-mono"><%= format("%02d:00–%02d:00", @start_hour, @end_hour) %></td>
+            <td><span class="heat <%= occupancy_tone(row[:occupancy]) %>"><%= row[:occupancy] %>%</span></td>
+            <td><%= status_tag(row[:available] ? "active" : "occupied") %></td>
+            <td class="cell-actions">
+              <div class="row-actions">
+                <%= action_btn "Calendar", calendar_room_path(row[:room], date: @date), tone: "cal" %>
+                <% if row[:available] %>
+                  <%= action_btn "Book", new_booking_path(room_id: row[:room].id, start_time: @date.in_time_zone.change(hour: @start_hour)), tone: "pay" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

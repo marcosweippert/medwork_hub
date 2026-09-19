@@ -1,0 +1,17 @@
+Olá <%= @user.display_name %>,
+
+Sua conta no <%= @clinic %> foi criada.
+
+E-mail: <%= @user.email %>
+Senha provisória: <%= @password %>
+Perfil: <%= @user.role.to_s.titleize %>
+
+Passo a passo do primeiro acesso:
+1. Abra <%= @login_url %>
+2. Entre com o e-mail e a senha provisória
+3. No primeiro login, crie uma senha nova
+4. Depois disso, use o sistema normalmente
+
+Por segurança, não compartilhe este e-mail.
+
+<%= @clinic %>

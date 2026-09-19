@@ -1,0 +1,12 @@
+<p>Hello <%= @professional.display_name %>,</p>
+<p>
+  A slot you were waiting for is now free:
+  <strong><%= @entry.room.name %></strong>
+  on <strong><%= @entry.starts_at.strftime("%d/%m/%Y at %H:%M") %></strong>
+  until <%= @entry.ends_at.strftime("%H:%M") %>.
+</p>
+<p>Open the calendar and reserve it before someone else does.</p>
+<p><%= link_to "Open calendar", calendar_room_url(@entry.room, date: @entry.starts_at.to_date) %></p>
+<% if @whatsapp_url %>
+  <p><a href="<%= @whatsapp_url %>">Open WhatsApp</a></p>
+<% end %>

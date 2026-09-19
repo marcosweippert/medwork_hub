@@ -1,0 +1,62 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Cancellations</h1>
+    <p class="page-sub"><%= @count %> cancelled · fees <%= number_to_currency(@fee_total, precision: 0) %> · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: cancellations_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">From</label>
+    <%= date_field_tag :from, @from, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">To</label>
+    <%= date_field_tag :to, @to, class: "input" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Professional</th>
+            <th>Room</th>
+            <th>Start</th>
+            <th>Cancelled</th>
+            <th>Fee</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bookings.each do |booking| %>
+            <tr>
+              <td class="cell-name"><%= booking.professional.display_name %></td>
+              <td><%= booking.room.name %></td>
+              <td class="data-cell-mono"><%= booking.start_time&.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="data-cell-mono"><%= booking.cancelled_at&.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="cell-price"><%= number_to_currency(booking.invoice&.cancellation_fee) %></td>
+            </tr>
+          <% end %>
+          <% if @bookings.empty? %><tr><td colspan="5">No cancellations in this range.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid kpi-compact">
+  <article class="kpi-card c-danger">
+    <div class="kpi-label">Cancelled</div>
+    <div class="kpi-value"><%= @count %></div>
+  </article>
+  <article class="kpi-card">
+    <div class="kpi-label">Fees</div>
+    <div class="kpi-value"><%= number_to_currency(@fee_total, precision: 0) %></div>
+  </article>
+</section>

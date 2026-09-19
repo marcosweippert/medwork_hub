@@ -1,0 +1,64 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Professionals</h1>
+    <p class="page-sub">Overdue professionals cannot book new slots</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "New professional", new_professional_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<%= form_with url: professionals_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name, specialty or license" %>
+  </div>
+  <label class="field field-check">
+    <%= check_box_tag :delinquent, "1", params[:delinquent] == "1" %>
+    <span class="field-label" style="margin:0;">Overdue only</span>
+  </label>
+  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Practice area</th>
+          <th>Specialty</th>
+          <th>License</th>
+          <th>Phone</th>
+          <th>Patients</th>
+          <th>Bookings</th>
+          <th>Overdue</th>
+          <th>Status</th>
+          <th class="cell-actions">Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @professionals.each do |professional| %>
+          <tr>
+            <td class="cell-name" title="<%= professional.display_name %>"><%= professional.display_name %></td>
+            <td><%= professional.practice_area_labels.join(" · ").presence || "—" %></td>
+            <td><%= professional.specialty.presence || "—" %></td>
+            <td class="data-cell-mono"><%= professional.license_number.presence || "—" %></td>
+            <td class="data-cell-mono"><%= professional.contact_phone || "—" %></td>
+            <td class="cell-num"><%= @patient_counts[professional.id].to_i %></td>
+            <td class="cell-num"><%= @booking_counts[professional.id].to_i %></td>
+            <td class="cell-price"><%= number_to_currency(professional.overdue_balance, precision: 0) %></td>
+            <td><%= status_tag(professional.delinquent? ? "overdue" : "active") %></td>
+            <td class="cell-actions">
+              <%= action_btn "Open", path_with_return(professional_path(professional)), tone: "view" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @professionals.empty? %>
+          <tr><td colspan="10">No professionals match this filter.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

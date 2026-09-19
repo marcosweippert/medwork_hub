@@ -1,0 +1,127 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Invoices</h1>
+    <p class="page-sub"><%= clinic_staff? ? "Pay, cancel individual times or refund · overdue invoices block new bookings" : "Your invoices for reserved rooms" %></p>
+  </div>
+  <% if clinic_staff? %>
+    <div class="page-actions">
+      <%= link_to "Receivables", receivables_reports_path, class: "btn btn--ghost" %>
+      <%= link_to "New invoice", new_invoice_path(return_to: originating_path), class: "btn btn--primary" %>
+    </div>
+  <% end %>
+</div>
+
+<%= form_with url: invoices_path, method: :get, class: "filter-bar" do %>
+  <div class="field field-grow">
+    <label class="field-label">Search</label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Professional, room or comment" %>
+  </div>
+  <div class="field">
+    <label class="field-label">Status</label>
+    <%= select_tag :status, options_for_select([["All", ""]] + Invoice::STATUSES.map { |s| [s.titleize, s] }, params[:status]), class: "select" %>
+  </div>
+  <% if clinic_staff? %>
+    <div class="field">
+      <label class="field-label">Professional</label>
+      <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+    </div>
+  <% end %>
+  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+<% end %>
+
+<%= form_with url: bulk_invoices_path, method: :patch, data: { controller: "bulk-select" } do %>
+  <%= hidden_field_tag :return_to, originating_path %>
+  <% if clinic_staff? %>
+  <div class="bulk-bar" data-bulk-select-target="bar" hidden>
+    <strong data-bulk-select-target="count">0 selected</strong>
+    <span class="field-help">Bulk pay, cancel or refund. To drop a single 30-min time, open the invoice.</span>
+    <div class="page-actions">
+      <%= button_tag "Pay", name: "bulk_action", value: "pay", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Mark selected invoices as paid?" } %>
+      <%= button_tag "Cancel", name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Cancel selected invoices? Paid invoices are refunded according to the cancellation policy." } %>
+      <%= button_tag "Refund", name: "bulk_action", value: "refund", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Refund selected paid invoices and release remaining slots?" } %>
+    </div>
+  </div>
+  <% end %>
+
+  <section class="card">
+    <div class="table-scroll">
+      <table class="data-table data-table--invoice-index">
+        <colgroup>
+          <% if clinic_staff? %><col class="col-check"><% end %>
+          <col class="col-id">
+          <col class="col-status">
+          <col class="col-due">
+          <col class="col-pro">
+          <col class="col-room">
+          <col class="col-period">
+          <col class="col-type">
+          <col class="col-slots">
+          <col class="col-money">
+          <col class="col-open">
+        </colgroup>
+        <thead>
+          <tr>
+            <% if clinic_staff? %>
+              <th class="cell-check">
+                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all invoices">
+              </th>
+            <% end %>
+            <th class="cell-num">#</th>
+            <th class="cell-status">Status</th>
+            <th class="cell-due">Due</th>
+            <th class="cell-name">Professional</th>
+            <th class="cell-room">Room</th>
+            <th class="cell-period">Period</th>
+            <th class="cell-type">Type</th>
+            <th class="cell-num">Slots</th>
+            <th class="cell-price">Amount</th>
+            <th class="cell-actions">Open</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoices.each do |invoice| %>
+            <tr>
+              <% if clinic_staff? %>
+                <td class="cell-check">
+                  <%= check_box_tag "invoice_ids[]", invoice.id, false, class: "row-check", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, id: "invoice_#{invoice.id}", aria: { label: "Select invoice #{invoice.id}" } %>
+                </td>
+              <% end %>
+              <td class="cell-num data-cell-mono">#<%= invoice.id.to_s.rjust(4, "0") %></td>
+              <td class="cell-status"><%= status_tag(invoice.status) %></td>
+              <td class="cell-due data-cell-mono"><%= invoice.due_date&.strftime("%d/%m/%Y") || "—" %></td>
+              <td class="cell-name" title="<%= invoice.professional.display_name %>"><%= invoice.professional.display_name %></td>
+              <td class="cell-room" title="<%= invoice.room&.name %>"><%= invoice.room&.name || "—" %></td>
+              <td class="cell-period data-cell-mono">
+                <% if invoice.coverage_start && invoice.coverage_end %>
+                  <% if invoice.coverage_start.to_date == invoice.coverage_end.to_date %>
+                    <%= invoice.coverage_start.strftime("%d/%m") %>
+                    <span class="cell-period-time"><%= invoice.coverage_start.strftime("%H:%M") %>-<%= invoice.coverage_end.strftime("%H:%M") %></span>
+                  <% else %>
+                    <%= invoice.coverage_start.strftime("%d/%m") %>-<%= invoice.coverage_end.strftime("%d/%m") %>
+                  <% end %>
+                <% else %>
+                  —
+                <% end %>
+              </td>
+              <td class="cell-type"><%= invoice.billing_type_label %></td>
+              <td class="cell-num"><%= invoice.slot_count %></td>
+              <td class="cell-price">
+                <%= number_to_currency(invoice.amount) %>
+                <% if invoice.refunded_amount.positive? %>
+                  <div class="cell-refunded">−<%= number_to_currency(invoice.refunded_amount) %></div>
+                <% end %>
+              </td>
+              <td class="cell-actions">
+                <%= action_btn "Open", path_with_return(invoice_path(invoice)), tone: "view" %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @invoices.empty? %>
+            <tr><td colspan="<%= clinic_staff? ? 11 : 10 %>">No invoices match these filters.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <%= render "shared/pager" %>
+  </section>
+<% end %>

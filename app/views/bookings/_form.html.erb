@@ -1,0 +1,37 @@
+<%= form_with model: booking do |f| %>
+  <%= render "shared/errors", resource: booking %>
+  <div class="form-grid">
+    <div class="field">
+      <%= f.label :professional_id, class: "field-label" %>
+      <%= f.select :professional_id, professional_options(Professional.includes(:user, :invoices), selected: booking.professional_id), {}, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :room_id, class: "field-label" %>
+      <%= f.select :room_id, room_options(Room.for_professional(booking.professional).order(:name), selected: booking.room_id, include_blank: "Select"), {}, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :start_time, class: "field-label" %>
+      <%= f.datetime_local_field :start_time, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :end_time, class: "field-label" %>
+      <%= f.datetime_local_field :end_time, class: "input" %>
+    </div>
+    <div class="field">
+      <%= f.label :status, class: "field-label" %>
+      <%= f.select :status, Booking::STATUSES.map { |s| [s.titleize, s] }, { include_blank: "Select" }, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :billing_type, class: "field-label" %>
+      <%= f.select :billing_type, Booking::BILLING_TYPES.map { |s| [s.titleize, s] }, { include_blank: "Select" }, class: "select" %>
+    </div>
+    <div class="field">
+      <%= f.label :amount, class: "field-label" %>
+      <%= f.number_field :amount, step: 0.01, min: 0, class: "input" %>
+    </div>
+    <div class="field span-2">
+      <%= f.submit class: "btn btn--primary" %>
+      <%= link_to "Cancel", bookings_path, class: "btn btn--ghost" %>
+    </div>
+  </div>
+<% end %>

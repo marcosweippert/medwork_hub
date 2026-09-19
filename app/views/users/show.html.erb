@@ -1,0 +1,19 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @user.display_name %></h1>
+    <p class="page-sub"><%= @user.email %> · <%= @user.role.to_s.titleize %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", users_path, class: "btn btn--ghost" %>
+    <%= button_to "Resend welcome email", invite_user_path(@user), method: :post, class: "btn btn--ghost" %>
+    <%= link_to "Edit", edit_user_path(@user), class: "btn btn--primary" %>
+  </div>
+</div>
+<section class="card form-card">
+  <dl class="dl-meta">
+    <dt>Email</dt><dd><%= @user.email %></dd>
+    <dt>Role</dt><dd><%= status_tag(@user.role) %></dd>
+    <dt>Password</dt>
+    <dd><%= @user.must_change_password? ? "Temporary — change required on next login" : "Set by the user" %></dd>
+  </dl>
+</section>

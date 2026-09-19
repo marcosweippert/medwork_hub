@@ -1,0 +1,14 @@
+<p>Hello <%= @professional.display_name %>,</p>
+<p>
+  Invoice <strong>#<%= @invoice.id.to_s.rjust(4, "0") %></strong>
+  for <%= number_to_currency(@invoice.amount) %> is overdue
+  (due <%= @invoice.due_date&.strftime("%d/%m/%Y") || "—" %>).
+</p>
+<% if @pix_code.present? %>
+  <p>Pay with PIX using this code:</p>
+  <p style="font-family:monospace;word-break:break-all;"><%= @pix_code %></p>
+<% end %>
+<p><%= link_to "Open invoice", invoice_url(@invoice) %></p>
+<% if @whatsapp_url %>
+  <p><a href="<%= @whatsapp_url %>">Send WhatsApp collection message</a></p>
+<% end %>

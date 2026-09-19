@@ -1,0 +1,92 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Waitlist</h1>
+    <p class="page-sub"><%= @total %> entries · <%= @rate %>% converted to bookings · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: waitlist_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">Room</label>
+    <%= select_tag :room_id, options_from_collection_for_select(@rooms, :id, :name, params[:room_id]), include_blank: "All rooms", class: "select" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Entries</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Professional</th>
+            <th>Room</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@entries).each do |entry| %>
+            <tr>
+              <td class="cell-name"><%= entry.professional.display_name %></td>
+              <td><%= entry.room.name %></td>
+              <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="data-cell-mono"><%= entry.ends_at.strftime("%H:%M") %></td>
+              <td><%= status_tag(entry.status) %></td>
+            </tr>
+          <% end %>
+          <% if Array(@entries).empty? %><tr><td colspan="5">No waitlist rows.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid">
+  <% %w[waiting offered booked cancelled].each do |status| %>
+    <article class="kpi-card">
+      <div class="kpi-label"><%= status.titleize %></div>
+      <div class="kpi-value"><%= @by_status[status].to_i %></div>
+    </article>
+  <% end %>
+</section>
+
+<div class="grid">
+  <section class="col-5 card">
+    <div class="card-head"><h2 class="card-title">By room</h2></div>
+    <table class="table">
+      <tbody>
+        <% @by_room.sort_by { |_, count| -count }.each do |name, count| %>
+          <tr><td class="cell-name"><%= name %></td><td class="cell-num"><%= count %></td></tr>
+        <% end %>
+        <% if @by_room.empty? %><tr><td colspan="2">No waitlist rows.</td></tr><% end %>
+      </tbody>
+    </table>
+  </section>
+  <% unless analytical? %>
+    <section class="col-7 card">
+      <div class="card-head"><h2 class="card-title">Open now</h2></div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Professional</th><th>Room</th><th>Slot</th><th>Status</th></tr></thead>
+          <tbody>
+            <% @open_entries.limit(40).each do |entry| %>
+              <tr>
+                <td class="cell-name"><%= entry.professional.display_name %></td>
+                <td><%= entry.room.name %></td>
+                <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m %H:%M") %></td>
+                <td><%= status_tag(entry.status) %></td>
+              </tr>
+            <% end %>
+            <% if @open_entries.empty? %><tr><td colspan="4">No open waitlist entries.</td></tr><% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+</div>

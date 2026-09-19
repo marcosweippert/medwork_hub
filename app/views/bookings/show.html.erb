@@ -1,0 +1,113 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @booking.room.name %></h1>
+    <p class="page-sub"><%= @booking.professional.display_name %> · <%= @booking.billing_type %> · <%= number_to_currency(@booking.invoice&.amount || @booking.amount) %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Calendar", calendar_room_path(@booking.room, date: @booking.start_time), class: "btn btn--ghost" %>
+    <%= link_to "Invoice", path_with_return(invoice_path(@booking.invoice)), class: "btn btn--primary" if @booking.invoice %>
+  </div>
+</div>
+
+<div class="grid">
+  <section class="col-6 card">
+    <div class="card-head"><h2 class="card-title">Reservation</h2></div>
+    <dl class="dl-meta">
+      <dt>Status</dt><dd><%= status_tag(@booking.status) %></dd>
+      <dt>Start</dt><dd><%= @booking.start_time&.strftime("%d/%m/%Y %H:%M") %></dd>
+      <dt>End</dt><dd><%= @booking.end_time&.strftime("%d/%m/%Y %H:%M") %></dd>
+      <dt>Duration</dt><dd><%= number_with_precision(@booking.duration_hours, precision: 1) %> h</dd>
+      <% if @booking.rescheduled_from %><dt>Was</dt><dd><%= @booking.rescheduled_from.strftime("%d/%m/%Y %H:%M") %></dd><% end %>
+      <% if @booking.cancelled_at %><dt>Cancelled</dt><dd><%= @booking.cancelled_at.strftime("%d/%m/%Y %H:%M") %></dd><% end %>
+      <% if @booking.recurring? && @booking.billing_type == "monthly" %><dt>Series</dt><dd><%= @booking.series_bookings.count %> days in this month</dd><% elsif @booking.recurring? %><dt>Series</dt><dd><%= @booking.series_bookings.count %> weekly occurrences</dd><% end %>
+      <% if @booking.patient %><dt>Patient</dt><dd><%= link_to @booking.patient.name, @booking.patient %></dd><% end %>
+    </dl>
+  </section>
+
+  <section class="col-6 card">
+    <div class="card-head"><h2 class="card-title">Cancellation policy</h2></div>
+    <ul class="policy-list">
+      <% if @booking.billing_type == "monthly" %>
+        <li>Cancelling a monthly reservation releases every remaining day in the month.</li>
+        <li>Days already started are charged on a pro-rata of the monthly rate.</li>
+        <li>One extra <%= Setting.current.slot_minutes %>-minute slot is kept as a cancellation fee.</li>
+        <li>The remainder of the paid invoice is refunded and the invoice is marked refunded.</li>
+      <% else %>
+        <li>Free cancellation until <%= @policy[:free_hours] %> hours before start.</li>
+        <li>Inside that window: <%= @policy[:late_percent] %>% fee, remainder refunded.</li>
+        <li>After start: <%= @policy[:started_percent] %>% fee, no refund.</li>
+      <% end %>
+    </ul>
+    <% if clinic_staff? && @booking.cancellable? %>
+      <p class="field-help" style="margin:10px 0 8px;">
+        If cancelled now: kept <%= number_to_currency(@fee) %> · refund <%= number_to_currency(@refund) %>.
+      </p>
+      <%= form_with url: cancel_booking_path(@booking), method: :patch do %>
+        <div class="field">
+          <label class="field-label">Reason</label>
+          <%= text_field_tag :reason, nil, class: "input", placeholder: "Optional" %>
+        </div>
+        <div style="margin-top:8px;">
+          <%= submit_tag "Cancel booking", class: "btn btn--ghost btn--sm", data: { turbo_confirm: @booking.billing_type == "monthly" ? "Cancel the entire monthly reservation and refund the unused days?" : "Cancel this reservation and refund according to policy?" } %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <% if clinic_staff? && @booking.reschedulable? %>
+    <section class="col-6 card">
+      <div class="card-head"><h2 class="card-title">Reschedule</h2></div>
+      <%= form_with url: reschedule_booking_path(@booking), method: :patch, class: "form-grid" do %>
+        <div class="field">
+          <label class="field-label">New start</label>
+          <%= datetime_local_field_tag :start_time, @booking.start_time&.strftime("%Y-%m-%dT%H:%M"), class: "input" %>
+        </div>
+        <div class="field">
+          <label class="field-label">New end</label>
+          <%= datetime_local_field_tag :end_time, @booking.end_time&.strftime("%Y-%m-%dT%H:%M"), class: "input" %>
+        </div>
+        <div class="field span-2">
+          <%= submit_tag "Save new time", class: "btn btn--primary btn--sm" %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if clinic_staff? && @booking.end_time.present? && @booking.end_time <= Time.current && @booking.status.in?(%w[pending scheduled confirmed]) %>
+    <section class="col-6 card">
+      <div class="card-head"><h2 class="card-title">Complete</h2></div>
+      <p class="field-help">This slot already ended. Mark it completed to keep occupancy history without holding the room.</p>
+      <%= button_to "Mark completed", complete_booking_path(@booking), method: :patch, class: "btn btn--primary btn--sm" %>
+    </section>
+  <% end %>
+
+  <section class="col-6 card">
+    <div class="card-head"><h2 class="card-title">Appointment notes</h2></div>
+    <% if @patients.any? %>
+      <%= form_with model: [@booking, @note], class: "form-grid" do |f| %>
+        <div class="field">
+          <%= f.label :patient_id, class: "field-label" %>
+          <%= f.collection_select :patient_id, @patients, :id, :name, { include_blank: "Select patient" }, class: "select" %>
+        </div>
+        <div class="field span-2">
+          <%= f.label :body, "Note", class: "field-label" %>
+          <%= f.text_area :body, class: "textarea", rows: 3, placeholder: "Short chart for this slot" %>
+        </div>
+        <div class="field span-2">
+          <%= f.submit "Save note", class: "btn btn--primary btn--sm" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="field-help">Add a patient for <%= @booking.professional.display_name %> first.</p>
+      <%= link_to "New patient", new_patient_path(professional_id: @booking.professional_id), class: "btn btn--ghost btn--sm" %>
+    <% end %>
+    <% @notes.each do |note| %>
+      <article class="note-item">
+        <strong><%= note.patient.name %></strong>
+        <span><%= note.created_at.strftime("%d/%m %H:%M") %></span>
+        <p><%= note.body %></p>
+        <%= button_to "Remove", booking_appointment_note_path(@booking, note), method: :delete, class: "btn btn--chip btn--danger" %>
+      </article>
+    <% end %>
+  </section>
+</div>

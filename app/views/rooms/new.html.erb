@@ -1,0 +1,12 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">New room</h1>
+    <p class="page-sub">Hours, types and rates for reservations</p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Back", rooms_path, class: "btn btn--ghost" %>
+  </div>
+</div>
+<section class="card form-card--wide">
+  <%= render "form", room: @room %>
+</section>

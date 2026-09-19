@@ -1,0 +1,42 @@
+<% compact = local_assigns.fetch(:compact, false) %>
+<% show_copy = local_assigns.fetch(:copy, !compact) %>
+<% show_tabs = local_assigns.fetch(:tabs, true) %>
+<div class="email-preview<%= " email-preview--compact" if compact %>" data-controller="email-preview">
+  <% if show_tabs %>
+    <div class="email-tabs">
+      <% if email.html? %>
+        <button type="button" class="btn btn--ghost btn--sm is-active" data-email-preview-target="htmlTab" data-action="email-preview#showHtml">HTML</button>
+      <% end %>
+      <% if email.body_text.present? %>
+        <button type="button" class="btn btn--ghost btn--sm<%= " is-active" unless email.html? %>" data-email-preview-target="textTab" data-action="email-preview#showText">Text</button>
+      <% end %>
+      <% if show_copy && email.body_text.present? %>
+        <button type="button" class="btn btn--ghost btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= ERB::Util.html_escape(email.body_text) %>" data-action="clipboard#copy">Copy text</button>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if email.html? %>
+    <div data-email-preview-target="htmlPane">
+      <% if compact %>
+        <div class="email-html-preview"><%= sanitize(email.preview_html, tags: %w[p br a strong em b i ol ul li h1 h2 h3 span div], attributes: %w[href]) %></div>
+      <% else %>
+        <iframe class="email-frame" sandbox title="Email HTML" srcdoc="<%= ERB::Util.html_escape(email.body_html) %>"></iframe>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if email.body_text.present? %>
+    <div data-email-preview-target="textPane" <%= "hidden" if email.html? %>>
+      <pre class="email-text"><%= email.body_text %></pre>
+    </div>
+  <% end %>
+
+  <% if !email.html? && email.body_text.blank? %>
+    <p class="page-sub">No body stored for this message.</p>
+  <% end %>
+
+  <% if email.error_message.present? %>
+    <p class="field-help" style="margin-top:8px;color:var(--danger, #b42318)"><%= email.error_message %></p>
+  <% end %>
+</div>

@@ -1,0 +1,10 @@
+<%= form_with model: professional do |f| %>
+  <%= render "shared/errors", resource: professional %>
+  <div class="form-grid">
+    <%= render "shared/professional_fields", f: f %>
+    <div class="span-2 form-actions">
+      <%= f.submit class: "btn btn--primary" %>
+      <%= link_to "Cancel", professional_path(professional), class: "btn btn--ghost" %>
+    </div>
+  </div>
+<% end %>

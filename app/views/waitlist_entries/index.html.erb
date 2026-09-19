@@ -1,0 +1,61 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Waitlist<%= " · #{@room.name}" if @room %></h1>
+    <p class="page-sub">Queue for occupied hours. The first person is notified when a cancellation or reschedule frees the slot; staff can then reserve it here.</p>
+  </div>
+  <div class="page-actions">
+    <% if @room %>
+      <%= link_to "Join waitlist", new_room_waitlist_entry_path(@room), class: "btn btn--primary" %>
+      <%= link_to "Calendar", calendar_room_path(@room), class: "btn btn--ghost" %>
+    <% end %>
+  </div>
+</div>
+
+<%= form_with url: (@room ? room_waitlist_entries_path(@room) : waitlist_entries_path), method: :get, class: "filter-bar" do %>
+  <div class="field">
+    <label class="field-label">Status</label>
+    <%= filter_select :status, WaitlistEntry::STATUSES.map { |s| [s.titleize, s] }, selected: params[:status], include_blank: "Open" %>
+  </div>
+  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Professional</th>
+          <% unless @room %><th>Room</th><% end %>
+          <th>Slot</th>
+          <th>Status</th>
+          <th class="cell-actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @entries.each do |entry| %>
+          <tr>
+            <td class="cell-name"><%= entry.professional.display_name %></td>
+            <% unless @room %><td><%= entry.room.name %></td><% end %>
+            <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m %H:%M") %>–<%= entry.ends_at.strftime("%H:%M") %></td>
+            <td>
+              <%= status_tag(entry.status) %>
+              <% if entry.offered? && entry.notified_at %><div class="field-help" style="margin:2px 0 0;">Notified <%= entry.notified_at.strftime("%d/%m %H:%M") %></div><% end %>
+            </td>
+            <td class="cell-actions">
+              <div class="row-actions">
+                <% if entry.status.in?(%w[waiting offered]) %>
+                  <%= button_to "Reserve", convert_waitlist_entry_path(entry), method: :post, class: "btn btn--chip btn--pay", data: { turbo_confirm: "Create a reservation for this waitlist slot?" } %>
+                  <%= button_to "Remove", waitlist_entry_path(entry), method: :delete, class: "btn btn--chip btn--danger" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @entries.empty? %>
+          <tr><td colspan="5">Nobody waiting. Open a room calendar and click an occupied hour to join.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

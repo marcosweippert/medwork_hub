@@ -1,0 +1,52 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Aging</h1>
+    <p class="page-sub">Overdue invoices by days past due · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: aging_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">Professional</label>
+    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <% @groups.each do |group| %>
+    <section class="card" style="margin-bottom:12px;">
+      <div class="card-head"><h2 class="card-title"><%= group[:label] %> days</h2></div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Professional</th><th>Room</th><th>Amount</th><th>Due</th><th>Days</th></tr></thead>
+          <tbody>
+            <% group[:invoices].each do |invoice| %>
+              <tr>
+                <td class="cell-name"><%= invoice.professional.display_name %></td>
+                <td><%= invoice.room&.name || "—" %></td>
+                <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+                <td class="data-cell-mono"><%= invoice.due_date&.strftime("%d/%m/%Y") %></td>
+                <td class="cell-num"><%= (Date.current - invoice.due_date).to_i if invoice.due_date %></td>
+              </tr>
+            <% end %>
+            <% if group[:invoices].empty? %><tr><td colspan="5">None.</td></tr><% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid">
+  <% @groups.each do |group| %>
+    <article class="kpi-card">
+      <div class="kpi-label"><%= group[:label] %> days</div>
+      <div class="kpi-value"><%= number_to_currency(group[:total], precision: 0) %></div>
+      <div class="kpi-compare"><%= group[:invoices].size %> invoices</div>
+    </article>
+  <% end %>
+</section>

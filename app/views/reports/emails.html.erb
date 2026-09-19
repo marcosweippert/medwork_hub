@@ -1,0 +1,95 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Emails</h1>
+    <p class="page-sub"><%= @from.strftime("%d/%m/%Y") %> – <%= @to.strftime("%d/%m/%Y") %> · <%= @totals[:total] %> logged · <%= analytical? ? "analytical" : "synthetic" %></p>
+  </div>
+  <%= render "export" %>
+</div>
+
+<%= form_with url: emails_reports_path, method: :get, class: "filter-bar no-print" do %>
+  <%= render "view_field" %>
+  <div class="field">
+    <label class="field-label">From</label>
+    <%= date_field_tag :from, @from, class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label">To</label>
+    <%= date_field_tag :to, @to, class: "input" %>
+  </div>
+  <%= submit_tag "Apply", class: "btn btn--ghost" %>
+<% end %>
+
+<% if analytical? %>
+  <section class="card">
+    <div class="card-head"><h2 class="card-title">Emails</h2></div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Kind</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Array(@emails).each do |email| %>
+            <tr>
+              <td class="data-cell-mono"><%= email.sent_at&.strftime("%d/%m/%Y %H:%M") %></td>
+              <td class="email-item-to"><%= email.to_address %></td>
+              <td><%= email.subject %></td>
+              <td><%= email.kind_label %></td>
+              <td><%= status_tag(email.status) %></td>
+              <td class="email-item-reason" style="max-width:none;white-space:normal;"><%= email.error_message.presence || "—" %></td>
+            </tr>
+          <% end %>
+          <% if Array(@emails).empty? %><tr><td colspan="6">No emails in this range.</td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+
+<%= render "summary_head" %>
+<section class="kpi-grid kpi-compact">
+  <article class="kpi-card c-success"><div class="kpi-label">Sent</div><div class="kpi-value"><%= @totals[:sent] %></div></article>
+  <article class="kpi-card c-danger"><div class="kpi-label">Failed</div><div class="kpi-value"><%= @totals[:failed] %></div></article>
+  <article class="kpi-card c-purple"><div class="kpi-label">Returned</div><div class="kpi-value"><%= @totals[:bounced] %></div></article>
+</section>
+
+<div class="grid">
+  <section class="col-5 card">
+    <div class="card-head"><h2 class="card-title">By kind</h2></div>
+    <table class="table">
+      <tbody>
+        <% @by_kind.sort_by { |_, count| -count }.each do |kind, count| %>
+          <tr><td class="cell-name"><%= kind.to_s.humanize %></td><td class="cell-num"><%= count %></td></tr>
+        <% end %>
+        <% if @by_kind.empty? %><tr><td colspan="2">No emails in this range.</td></tr><% end %>
+      </tbody>
+    </table>
+  </section>
+  <% unless analytical? %>
+    <section class="col-7 card">
+      <div class="card-head"><h2 class="card-title">Failed and returned</h2></div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>When</th><th>To</th><th>Status</th><th>Reason</th></tr></thead>
+          <tbody>
+            <% @failed.each do |email| %>
+              <tr>
+                <td class="data-cell-mono"><%= email.sent_at&.strftime("%d/%m %H:%M") %></td>
+                <td class="email-item-to"><%= email.to_address %></td>
+                <td><%= status_tag(email.status) %></td>
+                <td class="email-item-reason" style="max-width:none;white-space:normal;"><%= email.error_message.presence || "—" %></td>
+              </tr>
+            <% end %>
+            <% if @failed.empty? %><tr><td colspan="4">No failed or returned emails in this range.</td></tr><% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+</div>

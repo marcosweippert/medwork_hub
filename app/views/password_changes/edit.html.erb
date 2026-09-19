@@ -1,0 +1,15 @@
+<h1 class="page-title">Create your password</h1>
+<p class="page-sub">This is your first access. Choose a personal password to continue.</p>
+
+<%= form_with model: @user, url: password_change_path, method: :patch do |f| %>
+  <%= render "shared/errors", resource: @user %>
+  <div class="field">
+    <%= f.label :password, "New password", class: "field-label" %>
+    <%= f.password_field :password, class: "input", autocomplete: "new-password", required: true %>
+  </div>
+  <div class="field" style="margin-top:12px;">
+    <%= f.label :password_confirmation, "Confirm password", class: "field-label" %>
+    <%= f.password_field :password_confirmation, class: "input", autocomplete: "new-password", required: true %>
+  </div>
+  <%= f.submit "Save password", class: "btn btn--primary auth-submit" %>
+<% end %>

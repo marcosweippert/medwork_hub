@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= Setting.current.clinic_name %> — Print</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <style>
+      body{margin:24px;background:#fff;color:#111;font-family:Inter,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.45}
+      .print-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #ddd}
+      .print-head strong{font-size:16px}
+      .muted,.page-sub,.field-help{color:#666;font-size:11px}
+      .page-title{margin:0 0 4px;font-size:18px}
+      .page-head{margin-bottom:16px}
+      .page-actions,.filter-bar,.no-print,.row-actions,.cell-actions{display:none !important}
+      .card{border:0;padding:0;margin:0 0 16px;background:transparent;box-shadow:none}
+      .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+      .kpi-card{border:1px solid #ddd;padding:8px 10px;border-radius:4px}
+      .kpi-label{font-size:10px;text-transform:uppercase;color:#666}
+      .kpi-value{font-size:16px;font-weight:700}
+      .grid,.col-6,.col-12{display:block;margin-bottom:16px}
+      .data-table,.table{width:100%;border-collapse:collapse}
+      .data-table th,.data-table td,.table th,.table td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;font-size:11px}
+      .heat{display:inline-block;min-width:36px;text-align:center;padding:2px 6px;border-radius:3px}
+      .heat-0{background:#f3f4f6}.heat-low{background:#d1fae5}.heat-mid{background:#fef3c7}.heat-high{background:#fee2e2}
+      .print-btn{height:32px;padding:0 14px;border:0;background:#111;color:#fff;border-radius:6px;font-weight:600;cursor:pointer}
+      .occ-bar,.stack-bar{display:none}
+      @media print{.no-print,.print-btn{display:none !important}body{margin:12px}}
+    </style>
+  </head>
+  <body>
+    <header class="print-head">
+      <div>
+        <strong><%= Setting.current.clinic_name %></strong>
+        <div class="muted">Generated <%= Time.current.strftime("%d/%m/%Y %H:%M") %></div>
+      </div>
+      <button type="button" class="print-btn no-print" onclick="window.print()">Print / PDF</button>
+    </header>
+    <%= yield %>
+  </body>
+</html>

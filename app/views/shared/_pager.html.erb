@@ -1,0 +1,16 @@
+<% if @total_count.to_i.positive? %>
+  <div class="index-meta">
+    <span>
+      <%= @total_count %>
+      <%= "record".pluralize(@total_count) %>
+      <% if @total_pages.to_i > 1 %> · page <%= @page %> of <%= @total_pages %><% end %>
+    </span>
+    <% if @total_pages.to_i > 1 %>
+      <div class="pager">
+        <% query = request.query_parameters.except("page") %>
+        <%= link_to "Prev", url_for(query.merge(page: @page - 1)), class: "pager-btn" if @page > 1 %>
+        <%= link_to "Next", url_for(query.merge(page: @page + 1)), class: "pager-btn" if @page < @total_pages %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

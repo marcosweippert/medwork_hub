@@ -1,0 +1,165 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @professional.display_name %></h1>
+    <p class="page-sub"><%= [@professional.practice_area_labels.join(" · ").presence, @professional.specialty, @professional.license_number].compact.join(" · ") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to "Edit", edit_professional_path(@professional), class: "btn btn--ghost" %>
+    <% unless @professional.delinquent? %>
+      <%= link_to "New booking", new_booking_path(professional_id: @professional.id, return_to: originating_path), class: "btn btn--primary" %>
+    <% end %>
+  </div>
+</div>
+
+<% if @professional.delinquent? %>
+  <div class="notice-banner">
+    Blocked from new reservations. Overdue total
+    <strong><%= number_to_currency(@professional.overdue_balance) %></strong>.
+    <%= link_to "Open invoices", invoices_path(professional_id: @professional.id, status: "overdue") %>
+  </div>
+<% end %>
+
+<section class="kpi-grid kpi-compact">
+  <article class="kpi-card c-danger">
+    <div class="kpi-label">Overdue</div>
+    <div class="kpi-value"><%= number_to_currency(@professional.overdue_balance, precision: 0) %></div>
+  </article>
+  <article class="kpi-card c-primary">
+    <div class="kpi-label">Patients</div>
+    <div class="kpi-value"><%= @patients.size %></div>
+  </article>
+  <article class="kpi-card c-purple">
+    <div class="kpi-label">Bookings</div>
+    <div class="kpi-value"><%= @professional.bookings.count %></div>
+  </article>
+</section>
+
+<% if @professional.bio.present? %>
+  <p class="page-sub" style="margin:-4px 0 12px;"><%= @professional.bio %></p>
+<% end %>
+
+<div class="grid">
+  <section class="col-6 card">
+    <div class="card-head">
+      <h2 class="card-title">Overdue invoices</h2>
+      <%= link_to "All", invoices_path(professional_id: @professional.id), class: "card-action" %>
+    </div>
+    <%= form_with url: bulk_invoices_path, method: :patch, data: { controller: "bulk-select" } do %>
+      <%= hidden_field_tag :return_to, originating_path %>
+      <div class="bulk-bar bulk-bar--compact" data-bulk-select-target="bar" hidden>
+        <strong data-bulk-select-target="count">0 selected</strong>
+        <div class="page-actions">
+          <%= button_tag "Pay", name: "bulk_action", value: "pay", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Mark selected invoices as paid?" } %>
+          <%= button_tag "Cancel", name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Cancel selected invoices? Paid invoices are refunded according to the cancellation policy." } %>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="cell-check">
+                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select overdue invoices" <%= "disabled" if @overdue_invoices.empty? %>>
+              </th>
+              <th>Room</th>
+              <th>Amount</th>
+              <th>Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @overdue_invoices.each do |invoice| %>
+              <tr>
+                <td class="cell-check">
+                  <%= check_box_tag "invoice_ids[]", invoice.id, false, class: "row-check", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, id: "overdue_invoice_#{invoice.id}" %>
+                </td>
+                <td class="cell-name"><%= link_to invoice.room&.name || "General", path_with_return(invoice_path(invoice)), class: "table-link" %></td>
+                <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+                <td class="data-cell-mono"><%= invoice.due_date&.strftime("%d/%m/%Y") %></td>
+              </tr>
+            <% end %>
+            <% if @overdue_invoices.empty? %>
+              <tr><td colspan="4">No overdue invoices.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="col-6 card">
+    <div class="card-head">
+      <h2 class="card-title">Patients</h2>
+      <%= link_to "All", patients_path(professional_id: @professional.id), class: "card-action" %>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @patients.first(8).each do |patient| %>
+            <tr>
+              <td class="cell-name"><%= link_to patient.name, path_with_return(patient_path(patient)), class: "table-link" %></td>
+              <td><%= patient.contact %></td>
+            </tr>
+          <% end %>
+          <% if @patients.empty? %>
+            <tr><td colspan="2">No patients.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="col-<%= @waitlist.any? ? 8 : 12 %> card">
+    <div class="card-head">
+      <h2 class="card-title">Recent bookings</h2>
+      <%= link_to "All", bookings_path(q: @professional.display_name), class: "card-action" %>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>When</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_bookings.each do |booking| %>
+            <tr>
+              <td class="cell-name"><%= link_to booking.room.name, path_with_return(booking_path(booking)), class: "table-link" %></td>
+              <td class="data-cell-mono"><%= booking.start_time&.strftime("%d/%m %H:%M") %></td>
+              <td><%= status_tag(booking.status) %></td>
+            </tr>
+          <% end %>
+          <% if @recent_bookings.empty? %>
+            <tr><td colspan="3">No bookings yet.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <% if @waitlist.any? %>
+    <section class="col-4 card">
+      <div class="card-head">
+        <h2 class="card-title">Waitlist</h2>
+        <%= link_to "All", waitlist_entries_path, class: "card-action" %>
+      </div>
+      <table class="data-table">
+        <tbody>
+          <% @waitlist.each do |entry| %>
+            <tr>
+              <td class="cell-name"><%= entry.room.name %></td>
+              <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m %H:%M") %></td>
+              <td><%= status_tag(entry.status) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </section>
+  <% end %>
+</div>

@@ -1,0 +1,8 @@
+<div class="page-actions no-print">
+  <div class="report-view-toggle" role="group" aria-label="Report type">
+    <%= link_to "Synthetic", url_for(request.query_parameters.merge(view: "summary")), class: "btn btn--ghost#{' is-active' unless analytical?}", data: { turbo: false } %>
+    <%= link_to "Analytical", url_for(request.query_parameters.merge(view: "detail")), class: "btn btn--ghost#{' is-active' if analytical?}", data: { turbo: false } %>
+  </div>
+  <%= link_to "Excel", export_xlsx_path, class: "btn btn--ghost", data: { turbo: false } %>
+  <%= link_to "PDF", export_pdf_path, class: "btn btn--primary", data: { turbo: false } %>
+</div>

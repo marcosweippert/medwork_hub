@@ -1,6 +1,9 @@
-# Frozen clinic history: 02/01/2024 – 31/08/2026
+# Compact demo data for local testing. Does not send email.
 PERIOD_START = Date.new(2024, 1, 2)
-PERIOD_END = Date.new(2026, 8, 31)
+PERIOD_END = Date.new(2026, 10, 30)
+ADMIN_EMAIL = "admin@medworkhub.com"
+ADMIN_PASSWORD = "MedWorkHub@123"
+ADMIN_DIGEST = Devise::Encryptor.digest(User, ADMIN_PASSWORD)
 PASSWORD_DIGEST = Devise::Encryptor.digest(User, "password")
 NOW = Time.current
 SMTP_KEYS = %w[
@@ -9,79 +12,74 @@ SMTP_KEYS = %w[
   welcome_email_subject welcome_email_html pix_key pix_name pix_city whatsapp_phone
 ].freeze
 
-FIRST_NAMES = %w[
-  Ana João Maria Pedro Carla Bruno Fernanda Rafael Lúcia Beatriz Thiago Camila
-  Lucas Helena Paulo Juliana André Sofia Miguel Lara Ricardo Eduardo Patrícia
-  Fábio Isabela Gustavo Amanda Henrique Nina Diego Letícia Marcelo Vitória
-  Roberto Aline Felipe Bianca Alexandre Renata Gustavo Priscila Caio Larissa
-  Daniel Vanessa Otávio Bruna Samuel Carolina Igor Natália Renan Elisa
-].freeze
-
-LAST_NAMES = %w[
-  Silva Santos Oliveira Souza Pereira Lima Costa Rodrigues Almeida Nunes
-  Ferreira Alves Barbosa Rocha Dias Castro Gomes Ribeiro Martins Carvalho
-  Araújo Fernandes Azevedo Cardoso Teixeira Duarte Vieira Lopes Freitas
-  Mendes Pires Barbosa Correia Moreira Andrade Cunha Monteiro Reis Campos
-].freeze
-
 SPECIALTIES = {
-  "medicina" => ["Cardiologist", "Dermatologist", "Pediatrician", "Orthopedist", "General practitioner", "Endocrinologist", "Neurologist", "Gynecologist"],
-  "odontologia" => ["Dentist", "Orthodontist", "Endodontist", "Periodontist"],
-  "psicologia_psiquiatria" => ["Psychologist", "Psychiatrist", "Child psychologist", "CBT specialist"],
-  "fisioterapia" => ["Physiotherapist", "Sports rehab", "Orthopedic physio"],
-  "nutricao" => ["Nutritionist", "Sports nutritionist", "Clinical nutritionist"],
+  "medicina" => ["Cardiologist", "Pediatrician"],
+  "odontologia" => ["Dentist", "Orthodontist"],
+  "psicologia_psiquiatria" => ["Psychologist", "Psychiatrist"],
+  "fisioterapia" => ["Physiotherapist", "Sports rehab"],
+  "nutricao" => ["Nutritionist", "Clinical nutritionist"],
   "fonoaudiologia" => ["Speech therapist", "Child language therapist"]
 }.freeze
 
-AREA_COUNTS = {
-  "medicina" => 110,
-  "odontologia" => 45,
-  "psicologia_psiquiatria" => 70,
-  "fisioterapia" => 35,
-  "nutricao" => 22,
-  "fonoaudiologia" => 18
-}.freeze
+DEMO_PROS = [
+  ["Dr. Ana Silva", "ana@medworkhub.com", "medicina"],
+  ["Dr. João Pereira", "joao@medworkhub.com", "medicina"],
+  ["Dra. Carla Mendes", "carla@medworkhub.com", "odontologia"],
+  ["Dr. Bruno Costa", "bruno@medworkhub.com", "odontologia"],
+  ["Dra. Fernanda Alves", "fernanda@medworkhub.com", "psicologia_psiquiatria"],
+  ["Dr. Rafael Souza", "rafael@medworkhub.com", "psicologia_psiquiatria"],
+  ["Dra. Lúcia Rocha", "lucia@medworkhub.com", "fisioterapia"],
+  ["Dr. Pedro Nunes", "pedro@medworkhub.com", "fisioterapia"],
+  ["Dra. Beatriz Lima", "beatriz@medworkhub.com", "nutricao"],
+  ["Dr. Thiago Martins", "thiago@medworkhub.com", "nutricao"],
+  ["Dra. Helena Dias", "helena@medworkhub.com", "fonoaudiologia"],
+  ["Dr. Lucas Ferreira", "lucas@medworkhub.com", "fonoaudiologia"]
+].freeze
 
 HISTORIES = [
-  "Follow-up after first consult", "Anxiety treatment", "Sleep hygiene", "Orthodontic treatment",
-  "Knee rehab", "Hypertension follow-up", "Weight management", "Acne treatment", "Speech delay",
-  "Shoulder injury", "Well-child visits", "Depression follow-up", "Family therapy", "Root canal",
-  "Post-op rehab", "Arrhythmia", "Sports nutrition", "Psoriasis", "Fluency", "ACL recovery"
+  "Follow-up after first consult", "Anxiety treatment", "Orthodontic treatment",
+  "Knee rehab", "Weight management", "Speech delay"
 ].freeze
 
 NOTE_BODIES = [
   "Session completed. Continue current plan.",
   "Patient reported improvement. Review in two weeks.",
-  "Adjusted exercises and next booking confirmed.",
-  "No adverse events. Maintain medication.",
-  "Discussed home care and return if symptoms worsen."
+  "Adjusted exercises and next booking confirmed."
 ].freeze
-
-def stamp(time)
-  time.respond_to?(:in_time_zone) ? time.in_time_zone : time
-end
-
-def full_name(index)
-  "#{FIRST_NAMES[index % FIRST_NAMES.size]} #{LAST_NAMES[(index / FIRST_NAMES.size) % LAST_NAMES.size]} #{LAST_NAMES[(index * 7) % LAST_NAMES.size]}"
-end
 
 def insert_rows(model, rows, label)
   return if rows.blank?
 
   rows.each_slice(1_000).with_index do |slice, index|
     model.insert_all(slice)
-    puts "  #{label}: #{[ (index + 1) * 1_000, rows.size ].min}/#{rows.size}"
+    puts "  #{label}: #{[(index + 1) * 1_000, rows.size].min}/#{rows.size}"
   end
 end
 
-def outcome_for(date, salt)
-  roll = (date.yday + salt) % 20
-  return :cancelled if roll.zero?
-  return :refunded if roll == 1
-  return :overdue if roll == 2
-  return :open if date > Date.new(2026, 8, 1) && roll >= 16
+def seed_date?(date)
+  return false if date.sunday?
+  return false if date.month == 12 && date.day == 25
+  return true if date.between?(Date.current - 21.days, Date.current + 21.days)
 
-  :paid
+  date.day == 15 && date.wday.between?(1, 5)
+end
+
+def outcome_for(date, salt)
+  roll = (salt * 31 + date.yday * 17 + date.year) % 100
+  outcome = if roll < 6
+              :cancelled
+            elsif roll < 11
+              :refunded
+            elsif roll < 16
+              :overdue
+            elsif roll < 20
+              :open
+            else
+              :paid
+            end
+  return :open if outcome == :overdue && date >= Date.current
+
+  outcome
 end
 
 def apply_reservation(invoice_rows, booking_rows, seq, pro, room, starts, ends, amount, billing_type, date, patients_by_pro)
@@ -150,6 +148,7 @@ def apply_reservation(invoice_rows, booking_rows, seq, pro, room, starts, ends, 
     cancellation_reason: outcome == :cancelled ? reason : nil,
     cancellation_fee: cancellation_fee,
     pix_txid: "SEED#{seq.to_s(36)}#{room.id}",
+    reminder_sent_at: created,
     created_at: created,
     updated_at: (refunded_at || cancelled_at || paid_at || created)
   }
@@ -164,6 +163,7 @@ def apply_reservation(invoice_rows, booking_rows, seq, pro, room, starts, ends, 
     cancelled_at: booking_cancelled_at,
     cancellation_reason: reason,
     patient_id: patient&.id,
+    reminder_sent_at: created,
     created_at: created,
     updated_at: (booking_cancelled_at || created)
   }
@@ -187,10 +187,10 @@ User.delete_all
 
 smtp = Setting.order(:id).first&.attributes&.slice(*SMTP_KEYS) || {}
 Setting.delete_all
-setting = Setting.create!(
+Setting.create!(
   {
     clinic_name: "MedWork Hub",
-    clinic_email: "marcos.weippert@gmail.com",
+    clinic_email: ADMIN_EMAIL,
     clinic_phone: "1130001000",
     currency: "BRL",
     slot_minutes: 30,
@@ -199,20 +199,17 @@ setting = Setting.create!(
     pix_city: smtp["pix_city"].presence || "Sao Paulo"
   }.merge(smtp.compact)
 )
-MailerConfig.reload!
-puts "Clinic settings ready. Mailer: #{MailerConfig.delivery_method} via #{MailerConfig.address.presence || 'file'}."
+puts "Clinic settings ready."
 
 rooms_data = [
-  ["Sala 01", 2, "Desk, chairs, computer", 280, 4200, 35, 8, 18, %w[medicina]],
-  ["Sala 02", 2, "Exam table, monitor", 300, 4500, 38, 8, 18, %w[medicina]],
-  ["Sala 03", 2, "Pediatric kit", 260, 3900, 32, 8, 18, %w[medicina psicologia_psiquiatria]],
-  ["Sala 04", 1, "Dental chair, sterilizer", 450, 6800, 55, 8, 18, %w[odontologia]],
-  ["Sala 05", 1, "Dental imaging", 480, 7200, 58, 8, 18, %w[odontologia]],
-  ["Sala 06", 2, "Couch, chairs, whiteboard", 220, 3300, 28, 8, 20, %w[psicologia_psiquiatria]],
-  ["Sala 07", 2, "Quiet therapy room", 230, 3400, 30, 8, 20, %w[psicologia_psiquiatria]],
-  ["Sala 08", 8, "Mats, sound system", 360, 5400, 45, 7, 21, %w[fisioterapia]],
-  ["Sala 09", 2, "Nutrition consult", 210, 3100, 26, 8, 18, %w[nutricao]],
-  ["Sala 10", 2, "Speech therapy tools", 200, 3000, 25, 8, 19, %w[fonoaudiologia]]
+  ["Sala 01", 2, "Consultório clínico", 280, 4200, 35, 8, 18, %w[medicina]],
+  ["Sala 02", 2, "Consultório compartilhado", 270, 4000, 34, 8, 19, %w[medicina psicologia_psiquiatria]],
+  ["Sala 03", 1, "Odontologia", 450, 6800, 55, 8, 18, %w[odontologia]],
+  ["Sala 04", 2, "Terapia", 220, 3300, 28, 8, 20, %w[psicologia_psiquiatria]],
+  ["Sala 05", 8, "Estúdio de fisioterapia", 360, 5400, 45, 7, 21, %w[fisioterapia]],
+  ["Sala 06", 2, "Nutrição clínica", 210, 3100, 26, 8, 18, %w[nutricao]],
+  ["Sala 07", 2, "Fonoaudiologia", 200, 3000, 25, 8, 19, %w[fonoaudiologia]],
+  ["Sala 08", 2, "Consultório misto", 250, 3700, 33, 8, 18, %w[medicina nutricao]]
 ]
 now = NOW
 Room.insert_all(
@@ -220,7 +217,7 @@ Room.insert_all(
     {
       name: name, capacity: capacity, equipment: equipment,
       daily_rate: daily, monthly_rate: monthly, hourly_rate: hourly,
-      opens_at: opens, closes_at: closes, room_types: types, closed_weekdays: [],
+      opens_at: opens, closes_at: closes, room_types: types, closed_weekdays: [0],
       created_at: now, updated_at: now
     }
   end
@@ -242,55 +239,50 @@ RoomBlock.create!(
   reason: "Christmas",
   weekdays: []
 )
-RoomBlock.create!(
-  room: rooms.find { |room| room.name == "Sala 08" },
-  starts_at: Date.new(2026, 3, 2).in_time_zone.change(hour: 8),
-  ends_at: Date.new(2026, 3, 6).in_time_zone.change(hour: 18),
-  reason: "Floor maintenance",
-  weekdays: []
-)
 
-user_rows = []
-professional_attrs = []
-index = 0
-AREA_COUNTS.each do |area, count|
-  count.times do
-    index += 1
-    name = index <= 10 ? ["Dr. Ana Silva", "Dr. João Pereira", "Dra. Carla Mendes", "Dr. Bruno Costa", "Dra. Fernanda Alves", "Dr. Rafael Souza", "Dra. Lúcia Rocha", "Dr. Pedro Nunes", "Dra. Beatriz Lima", "Dr. Thiago Martins"][index - 1] : full_name(index)
-    email = index <= 10 ? %w[ana joao carla bruno fernanda rafael lucia pedro beatriz thiago][index - 1] + "@medworkhub.com" : "pro#{index.to_s.rjust(3, '0')}@medworkhub.com"
-    specialty = SPECIALTIES[area][index % SPECIALTIES[area].size]
-    created = PERIOD_START.in_time_zone + ((index % 400).days)
-    user_rows << {
-      email: email,
-      encrypted_password: PASSWORD_DIGEST,
-      name: name,
-      role: "professional",
-      must_change_password: false,
-      created_at: created,
-      updated_at: created
-    }
-    professional_attrs << {
-      email: email,
-      specialty: specialty,
-      license_number: "#{area[0, 3].upcase}#{index.to_s.rjust(5, '0')}",
-      bio: "#{specialty} at MedWork Hub.",
-      phone: "11#{9_0000_0000 + index}",
-      practice_areas: [area],
-      created_at: created,
-      updated_at: created
-    }
-  end
+created_at = PERIOD_START.in_time_zone
+user_rows = [
+  {
+    email: ADMIN_EMAIL,
+    encrypted_password: ADMIN_DIGEST,
+    name: "Admin",
+    role: "admin",
+    must_change_password: false,
+    created_at: created_at,
+    updated_at: created_at
+  },
+  {
+    email: "staff@medworkhub.com",
+    encrypted_password: PASSWORD_DIGEST,
+    name: "Staff User",
+    role: "staff",
+    must_change_password: false,
+    created_at: created_at,
+    updated_at: created_at
+  }
+]
+
+professional_attrs = DEMO_PROS.map.with_index do |(name, email, area), index|
+  user_rows << {
+    email: email,
+    encrypted_password: PASSWORD_DIGEST,
+    name: name,
+    role: "professional",
+    must_change_password: false,
+    created_at: created_at,
+    updated_at: created_at
+  }
+  {
+    email: email,
+    specialty: SPECIALTIES[area][index % SPECIALTIES[area].size],
+    license_number: "#{area[0, 3].upcase}#{(index + 1).to_s.rjust(5, '0')}",
+    bio: "#{SPECIALTIES[area][index % SPECIALTIES[area].size]} at MedWork Hub.",
+    phone: "11#{9_0000_0000 + index + 1}",
+    practice_areas: [area],
+    created_at: created_at,
+    updated_at: created_at
+  }
 end
-
-user_rows << {
-  email: "staff@medworkhub.com",
-  encrypted_password: PASSWORD_DIGEST,
-  name: "Staff User",
-  role: "staff",
-  must_change_password: false,
-  created_at: PERIOD_START.in_time_zone,
-  updated_at: PERIOD_START.in_time_zone
-}
 
 insert_rows(User, user_rows, "Users")
 users_by_email = User.pluck(:email, :id).to_h
@@ -302,19 +294,21 @@ Professional.insert_all(
   end
 )
 professionals = Professional.includes(:user).order(:id).to_a
-pros_by_area = SPECIALTIES.keys.index_with { |area| professionals.select { |pro| pro.practice_areas.include?(area) } }
+pros_by_type = Hash.new { |hash, key| hash[key] = [] }
+professionals.each do |pro|
+  pro.allowed_room_types.each { |type| pros_by_type[type] << pro }
+end
 puts "Professionals: #{professionals.size}"
 
-patient_rows = 500.times.map do |i|
+patient_rows = 36.times.map do |i|
   pro = professionals[i % professionals.size]
-  created = PERIOD_START.in_time_zone + (i % 600).days
   {
     professional_id: pro.id,
-    name: full_name(i + 50),
+    name: ["Ana Costa", "Pedro Lima", "Maria Souza", "João Alves", "Carla Nunes", "Bruno Dias"][i % 6] + " #{i + 1}",
     contact: "11#{9_1000_0000 + i}",
     history: HISTORIES[i % HISTORIES.size],
-    created_at: created,
-    updated_at: created
+    created_at: created_at,
+    updated_at: created_at
   }
 end
 insert_rows(Patient, patient_rows, "Patients")
@@ -327,30 +321,16 @@ booking_rows = []
 seq = 0
 
 rooms.each do |room|
-  pool = room.room_types.flat_map { |type| pros_by_area[type] || [] }.uniq
+  pool = room.room_types.flat_map { |type| pros_by_type[type] }.uniq
   next if pool.empty?
 
   lunch_blocked = room.room_types.include?("odontologia")
   (PERIOD_START..PERIOD_END).each do |date|
-    next if date.sunday?
-    next if date.month == 12 && date.day == 25
-    next if room.name == "Sala 08" && date.between?(Date.new(2026, 3, 2), Date.new(2026, 3, 6))
+    next unless seed_date?(date)
 
-    open = date.saturday? ? [room.opens_at, 9].max : room.opens_at
+    open = date.saturday? ? [room.opens_at, 8].max : room.opens_at
     close = date.saturday? ? [room.closes_at, 13].min : room.closes_at
     next if close - open < 2
-    next if (date.yday + room.id) % 5 == 0
-
-    pattern = (date.yday + room.id) % 11
-    if pattern == 0 && !date.saturday?
-      pro = pool[(date.mday + room.id) % pool.size]
-      seq += 1
-      starts = date.in_time_zone.change(hour: open)
-      ends = date.in_time_zone.change(hour: close)
-      amount = room.daily_rate.to_d
-      apply_reservation(invoice_rows, booking_rows, seq, pro, room, starts, ends, amount, "daily", date, patients_by_pro)
-      next
-    end
 
     hour = open
     slot_n = 0
@@ -378,22 +358,6 @@ rooms.each do |room|
   end
 end
 
-rooms.each do |room|
-  pool = room.room_types.flat_map { |type| pros_by_area[type] || [] }.uniq
-  next if pool.empty?
-
-  month = PERIOD_START.beginning_of_month
-  while month <= PERIOD_END
-    pro = pool[month.month % pool.size]
-    seq += 1
-    starts = [month, PERIOD_START].max.in_time_zone.change(hour: room.opens_at)
-    last_day = [month.end_of_month, PERIOD_END].min
-    ends = last_day.in_time_zone.change(hour: room.closes_at)
-    apply_reservation(invoice_rows, booking_rows, seq, pro, room, starts, ends, room.monthly_rate.to_d, "monthly", month, patients_by_pro)
-    month = month.next_month
-  end
-end
-
 puts "Inserting #{invoice_rows.size} invoices and bookings..."
 invoice_rows.each_slice(1_000).with_index do |inv_slice, index|
   start = index * 1_000
@@ -405,8 +369,8 @@ invoice_rows.each_slice(1_000).with_index do |inv_slice, index|
 end
 puts "Invoices: #{Invoice.count} · Bookings: #{Booking.count}"
 
-note_source = Booking.where.not(patient_id: nil).where(status: %w[completed confirmed]).limit(800).pluck(:id, :patient_id, :start_time)
-note_rows = note_source.first(400).map.with_index do |(booking_id, patient_id, start_time), i|
+note_source = Booking.where.not(patient_id: nil).where(status: %w[completed confirmed]).limit(40).pluck(:id, :patient_id, :start_time)
+note_rows = note_source.first(20).map.with_index do |(booking_id, patient_id, start_time), i|
   {
     booking_id: booking_id,
     patient_id: patient_id,
@@ -417,7 +381,7 @@ note_rows = note_source.first(400).map.with_index do |(booking_id, patient_id, s
 end
 insert_rows(AppointmentNote, note_rows, "Notes")
 
-hold_slots = Booking.where(status: %w[pending confirmed completed]).order(:id).limit(120).pluck(:room_id, :professional_id, :start_time, :end_time)
+hold_slots = Booking.where(status: %w[pending confirmed completed]).order(:id).limit(15).pluck(:room_id, :professional_id, :start_time, :end_time)
 wait_rows = hold_slots.map.with_index do |(room_id, professional_id, starts, ends), i|
   status = %w[waiting waiting offered booked cancelled][i % 5]
   {
@@ -433,9 +397,9 @@ wait_rows = hold_slots.map.with_index do |(room_id, professional_id, starts, end
 end
 insert_rows(WaitlistEntry, wait_rows, "Waitlist")
 
-audit_rows = 250.times.map do |i|
+audit_rows = 20.times.map do |i|
   {
-    user_id: users_by_email["staff@medworkhub.com"],
+    user_id: users_by_email[ADMIN_EMAIL],
     action: %w[booking.created invoice.paid invoice.cancelled invoice.refunded waitlist.created][i % 5],
     auditable_type: %w[Booking Invoice Invoice Invoice WaitlistEntry][i % 5],
     auditable_id: i + 1,
@@ -446,43 +410,18 @@ audit_rows = 250.times.map do |i|
 end
 insert_rows(AuditEvent, audit_rows, "Audit")
 
-puts "Creating admin marcos.weippert@gmail.com and sending welcome email..."
-password = CreateUserAccount.temporary_password
-admin = User.new(
-  name: "Marcos Weippert",
-  email: "marcos.weippert@gmail.com",
-  role: "admin",
-  password: password,
-  password_confirmation: password,
-  must_change_password: true
-)
-if admin.save
-  MailerConfig.reload!
-  begin
-    ClinicMailer.welcome(admin, password).deliver_now
-    puts "Welcome email sent to marcos.weippert@gmail.com"
-    puts "Temporary password: #{password}"
-  rescue StandardError => e
-    puts "Admin created, but welcome email failed: #{e.class}: #{e.message}"
-    puts "Temporary password: #{password}"
-  end
-else
-  puts "Could not create admin: #{admin.errors.full_messages.to_sentence}"
-end
-
 paid = Invoice.where(status: "paid").count
 cancelled = Invoice.where(status: "cancelled").count
 refunded = Invoice.where(status: "refunded").count
 overdue = Invoice.where(status: "overdue").count
 open = Invoice.where(status: "open").count
-refund_total = Invoice.sum(:refunded_amount)
 
-puts "Seed complete."
-puts "Period: #{PERIOD_START} – #{PERIOD_END}"
+puts "Seed complete. No welcome email was sent."
+puts "Period samples: #{PERIOD_START} – #{PERIOD_END} (dense window around today + the 15th of each month)"
 puts "Professionals: #{Professional.count} · Patients: #{Patient.count} · Rooms: #{Room.count}"
 puts "Bookings: #{Booking.count} · Waitlist: #{WaitlistEntry.count} · Notes: #{AppointmentNote.count}"
 puts "Invoices: #{Invoice.count} (paid #{paid}, open #{open}, overdue #{overdue}, cancelled #{cancelled}, refunded #{refunded})"
-puts "Refunded amount: #{refund_total}"
-puts "Staff login: staff@medworkhub.com / password"
-puts "Admin: marcos.weippert@gmail.com (password in the welcome email)"
+puts "Admin: #{ADMIN_EMAIL} / #{ADMIN_PASSWORD}"
+puts "Staff: staff@medworkhub.com / password"
+puts "Professionals: ana@medworkhub.com … lucas@medworkhub.com / password"
 ActiveRecord::Base.logger = previous_logger

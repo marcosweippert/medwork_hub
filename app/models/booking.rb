@@ -27,6 +27,11 @@ class Booking < ApplicationRecord
   }
   scope :reserved, -> { live.joins(:invoice).where(invoices: { status: "open" }) }
   scope :occupied, -> { live.joins(:invoice).where(invoices: { status: "paid" }) }
+  scope :visible_on_calendar, lambda {
+    where.not(status: "cancelled").left_joins(:invoice).where(
+      "invoices.id IS NULL OR invoices.status IN (?)", %w[open paid]
+    )
+  }
   scope :blocking, -> { holding }
   scope :upcoming, -> { holding.where("start_time >= ?", Time.current).order(:start_time) }
   scope :series, ->(group_id) { where(recurrence_group_id: group_id) if group_id.present? }

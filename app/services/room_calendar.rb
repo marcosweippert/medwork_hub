@@ -63,7 +63,7 @@ class RoomCalendar
   end
 
   def overlapping_bookings
-    @overlapping_bookings ||= @room.bookings.holding.includes(:invoice)
+    @overlapping_bookings ||= @room.bookings.visible_on_calendar.includes(:invoice)
       .where("start_time < ? AND end_time > ?", dates.last.end_of_day, dates.first.beginning_of_day)
       .to_a
   end

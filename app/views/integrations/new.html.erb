@@ -1,0 +1,13 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("integrations.new") %></h1>
+    <p class="page-sub"><%= t("integrations.new_help") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("ui.back"), integrations_path, class: "btn btn--ghost" %>
+  </div>
+</div>
+
+<section class="card form-card">
+  <%= render "form", integration: @integration %>
+</section>

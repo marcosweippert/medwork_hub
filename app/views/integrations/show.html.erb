@@ -1,0 +1,82 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= @integration.display_name %></h1>
+    <p class="page-sub"><%= @integration.description %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("ui.back"), integrations_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.edit"), edit_integration_path(@integration), class: "btn btn--primary" %>
+    <% if @integration.settings_key.present? %>
+      <%= link_to t("integrations.configure"), settings_path(edit: @integration.settings_key), class: "btn btn--ghost" %>
+    <% elsif @integration.connected? && !@integration.required? && !@integration.form? %>
+      <%= button_to t("integrations.remove"), disconnect_integration_path(@integration), method: :patch, class: "btn btn--ghost" %>
+    <% elsif !@integration.connected? && !@integration.form? && @integration.settings_key.blank? %>
+      <%= button_to t("integrations.connect"), connect_integration_path(@integration), method: :patch, class: "btn btn--primary" %>
+    <% end %>
+    <% if @integration.deletable? %>
+      <%= button_to t("ui.delete"), integration_path(@integration), method: :delete, class: "btn btn--ghost", data: { turbo_confirm: t("integrations.confirm_delete") } %>
+    <% end %>
+  </div>
+</div>
+
+<section class="card form-card">
+  <dl class="dl-meta">
+    <dt><%= t("ui.status") %></dt>
+    <dd><%= @integration.connected? ? t("integrations.connected_badge") : t("integrations.disconnected_badge") %></dd>
+    <% if @integration.connected_at %><dt><%= t("integrations.connected_at") %></dt><dd><%= @integration.connected_at.strftime("%d/%m/%Y %H:%M") %></dd><% end %>
+    <dt><%= t("integrations.type") %></dt>
+    <dd><%= @integration.builtin? ? t("integrations.builtin") : t("integrations.optional") %></dd>
+    <dt><%= t("integrations.kind") %></dt>
+    <dd><%= t("integrations.providers.#{@integration.kind}.name") %></dd>
+    <% if @integration.webhook_url.present? %>
+      <dt><%= t("integrations.n8n.webhook_url") %></dt>
+      <dd><code><%= @integration.webhook_url %></code></dd>
+    <% end %>
+    <% if @integration.channel.present? %>
+      <dt><%= t("integrations.channel") %></dt>
+      <dd><%= @integration.channel %></dd>
+    <% end %>
+  </dl>
+  <p class="page-sub" style="margin-top:16px;"><%= @integration.help_text %></p>
+</section>
+
+<section class="card form-card" style="margin-top:16px;">
+  <h2 class="card-title"><%= t("integrations.resources_title") %></h2>
+  <p class="page-sub"><%= t("integrations.resources_help") %></p>
+  <div class="int-resources" style="margin-top:12px;">
+    <% integration_resource_links(@integration).each do |label, path| %>
+      <%= link_to label, path, class: "int-chip" %>
+    <% end %>
+    <%= link_to t("nav.audit"), audit_events_path, class: "int-chip" %>
+  </div>
+</section>
+
+<% if @integration.webhook? %>
+  <section class="card form-card" style="margin-top:16px;">
+    <h2 class="card-title"><%= t("integrations.events_title") %></h2>
+    <p class="page-sub"><%= t("integrations.n8n.events_help") %></p>
+    <ul class="policy-list" style="margin-top:12px;">
+      <% ClinicIntegration::HUB_EVENTS.each do |event| %>
+        <li><code><%= event %></code></li>
+      <% end %>
+    </ul>
+    <% if @integration.webhook_url.present? %>
+      <%= button_to t("integrations.n8n.test"), test_integration_path(@integration), method: :post, class: "btn btn--ghost", style: "margin-top:12px;" %>
+    <% end %>
+  </section>
+<% end %>
+
+<% if @integration.kind == "n8n" %>
+  <section class="card form-card" style="margin-top:16px;">
+    <h2 class="card-title"><%= t("integrations.n8n.hub_api") %></h2>
+    <p class="page-sub"><%= t("integrations.n8n.hub_api_help") %></p>
+    <ol class="policy-list" style="margin-top:12px;">
+      <li><%= t("integrations.n8n.step_key") %> <%= link_to t("nav.api_keys"), api_keys_path %>.</li>
+      <li><%= t("integrations.n8n.step_node") %></li>
+      <li><code>GET <%= request.base_url %><%= api_v1_status_path %></code></li>
+      <li><code>Authorization: Bearer mwh_…</code> <%= t("integrations.n8n.or_header") %> <code>X-Api-Key</code></li>
+    </ol>
+    <p class="page-sub" style="margin-top:12px;"><%= t("integrations.n8n.import_help") %></p>
+    <p class="page-sub"><a href="/n8n/medwork-hub-events.json" download><%= t("integrations.n8n.import_file") %></a></p>
+  </section>
+<% end %>

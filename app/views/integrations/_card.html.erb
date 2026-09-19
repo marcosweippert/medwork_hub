@@ -1,0 +1,39 @@
+<article class="card int-card">
+  <div class="int-card-head">
+    <span class="int-mark int-mark--<%= integration.kind %>"><%= integration.display_name.to_s.first %></span>
+    <div>
+      <h2 class="card-title"><%= integration.display_name %></h2>
+      <% if integration.connected? %>
+        <span class="tag t-active"><%= t("integrations.connected_badge") %></span>
+      <% else %>
+        <span class="tag t-old"><%= t("integrations.disconnected_badge") %></span>
+      <% end %>
+    </div>
+  </div>
+  <p class="page-sub"><%= integration.description %></p>
+  <% if integration.connected? %>
+    <div class="int-resources">
+      <% integration_resource_links(integration).each do |label, path| %>
+        <%= link_to label, path, class: "int-chip" %>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="form-actions" style="margin-top:14px;border:0;padding:0;">
+    <%= link_to t("integrations.details"), integration_path(integration), class: "btn btn--ghost btn--sm" %>
+    <%= link_to t("ui.edit"), edit_integration_path(integration), class: "btn btn--ghost btn--sm" %>
+    <% if integration.form? %>
+      <%= link_to t("integrations.configure"), edit_integration_path(integration), class: "btn btn--primary btn--sm" %>
+    <% elsif integration.settings_key.present? %>
+      <%= link_to t("integrations.configure"), settings_path(edit: integration.settings_key), class: "btn btn--primary btn--sm" %>
+    <% elsif integration.connected? %>
+      <% unless integration.required? %>
+        <%= button_to t("integrations.remove"), disconnect_integration_path(integration), method: :patch, class: "btn btn--ghost btn--sm" %>
+      <% end %>
+    <% else %>
+      <%= button_to t("integrations.connect"), connect_integration_path(integration), method: :patch, class: "btn btn--primary btn--sm" %>
+    <% end %>
+    <% if integration.deletable? %>
+      <%= button_to t("ui.delete"), integration_path(integration), method: :delete, class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("integrations.confirm_delete") } %>
+    <% end %>
+  </div>
+</article>

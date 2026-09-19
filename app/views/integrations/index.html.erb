@@ -1,0 +1,50 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("integrations.title") %></h1>
+    <p class="page-sub"><%= t("integrations.subtitle") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("nav.api_keys"), api_keys_path, class: "btn btn--ghost" %>
+    <%= link_to t("integrations.new"), new_integration_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<h2 class="int-section-title"><%= t("integrations.installed") %></h2>
+<div class="int-grid">
+  <% @integrations.each do |integration| %>
+    <%= render "integrations/card", integration: integration %>
+  <% end %>
+</div>
+
+<h2 class="int-section-title"><%= t("integrations.catalog") %></h2>
+<p class="page-sub" style="margin-bottom:12px;"><%= t("integrations.catalog_help") %></p>
+<div class="int-grid">
+  <% @available_kinds.each do |kind| %>
+    <article class="card int-card">
+      <div class="int-card-head">
+        <span class="int-mark int-mark--<%= kind %>"><%= t("integrations.providers.#{kind}.name").first %></span>
+        <div>
+          <h2 class="card-title"><%= t("integrations.providers.#{kind}.name") %></h2>
+          <span class="tag t-old"><%= t("integrations.available_badge") %></span>
+        </div>
+      </div>
+      <p class="page-sub"><%= t("integrations.providers.#{kind}.body") %></p>
+      <div class="form-actions" style="margin-top:14px;border:0;padding:0;">
+        <%= link_to t("integrations.add"), new_integration_path(kind: kind), class: "btn btn--primary btn--sm" %>
+      </div>
+    </article>
+  <% end %>
+  <article class="card int-card">
+    <div class="int-card-head">
+      <span class="int-mark int-mark--custom">+</span>
+      <div>
+        <h2 class="card-title"><%= t("integrations.providers.custom.name") %></h2>
+        <span class="tag t-info"><%= t("integrations.optional") %></span>
+      </div>
+    </div>
+    <p class="page-sub"><%= t("integrations.providers.custom.body") %></p>
+    <div class="form-actions" style="margin-top:14px;border:0;padding:0;">
+      <%= link_to t("integrations.add"), new_integration_path(kind: "custom"), class: "btn btn--primary btn--sm" %>
+    </div>
+  </article>
+</div>

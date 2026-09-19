@@ -1,9 +1,0 @@
-<%= form_with model: dashboard do |f| %>
-  <%= render "shared/errors", resource: dashboard %>
-  <div class="form-grid">
-    <div class="field"><%= f.label :name, class: "field-label" %><%= f.text_field :name, class: "input" %></div>
-    <div class="field"><%= f.label :layout, class: "field-label" %><%= f.text_field :layout, class: "input" %></div>
-    <div class="field span-2"><%= f.label :description, class: "field-label" %><%= f.text_area :description, class: "textarea" %></div>
-    <div class="field span-2"><%= f.submit class: "btn btn--primary" %> <%= link_to "Cancel", root_path, class: "btn btn--ghost" %></div>
-  </div>
-<% end %>

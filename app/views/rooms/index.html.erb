@@ -1,12 +1,12 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Rooms</h1>
-    <p class="page-sub"><%= @total_count %> rooms · occupancy from today through <%= @occupancy_days.last.strftime("%d/%m") %></p>
+    <h1 class="page-title"><%= t("rooms.title") %></h1>
+    <p class="page-sub"><%= @total_count %> <%= t("rooms.title").downcase %> · <%= t("dashboards.occupancy") %> <%= t("rooms.today").downcase %>–<%= @occupancy_days.last.strftime("%d/%m") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Find slot", availability_rooms_path, class: "btn btn--ghost" %>
+    <%= link_to t("rooms.find_slot"), availability_rooms_path, class: "btn btn--ghost" %>
     <% if clinic_staff? %>
-      <%= link_to "New room", new_room_path, class: "btn btn--primary" %>
+      <%= link_to t("rooms.new"), new_room_path, class: "btn btn--primary" %>
     <% end %>
   </div>
 </div>
@@ -24,16 +24,16 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Room</th>
-          <th class="cell-room-type">Type</th>
+          <th>Sala</th>
+          <th class="cell-room-type">Tipo</th>
           <th class="cell-actions"></th>
-          <th class="data-cell-mono">Hours</th>
+          <th class="data-cell-mono">Horário</th>
           <th class="cell-num">Cap</th>
-          <th class="cell-price">Daily</th>
+          <th class="cell-price">Diária</th>
           <th class="cell-price">30 min</th>
-          <th class="cell-price">Monthly</th>
+          <th class="cell-price">Mensal</th>
           <% @occupancy_days.each_with_index do |day, index| %>
-            <th class="occ-day"><%= index.zero? ? "Today #{day.strftime('%d/%m')}" : day.strftime("%a %d/%m") %></th>
+            <th class="occ-day"><%= index.zero? ? "#{t("rooms.today")} #{day.strftime('%d/%m')}" : day.strftime("%a %d/%m") %></th>
           <% end %>
         </tr>
       </thead>
@@ -44,7 +44,7 @@
             <td class="cell-room-type" title="<%= room.types_label %>"><%= room.types_label.presence || "—" %></td>
             <td class="cell-actions">
               <div class="row-actions">
-                <%= action_btn "Calendar", calendar_room_path(room), tone: "cal" %>
+                <%= action_btn t("rooms.calendar"), calendar_room_path(room), tone: "cal" %>
               </div>
             </td>
             <td class="data-cell-mono"><%= format("%02d:00–%02d:00", room.opens_at, room.closes_at) %></td>

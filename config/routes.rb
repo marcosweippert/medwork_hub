@@ -86,5 +86,4 @@ Rails.application.routes.draw do
   resource :settings, only: %i[show edit update]
 
   root "dashboards#index"
-  resources :dashboards
 end

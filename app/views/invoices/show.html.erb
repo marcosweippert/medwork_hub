@@ -13,7 +13,7 @@
     <% if clinic_staff? %>
       <%= link_to "Edit", path_with_return(edit_invoice_path(@invoice)), class: "btn btn--ghost" %>
       <% if @invoice.payable? %>
-        <%= button_to "Mark paid", pay_invoice_path(@invoice), method: :patch, class: "btn btn--primary", params: { return_to: originating_path } %>
+        <%= button_to t("invoices.mark_paid"), pay_invoice_path(@invoice), method: :patch, class: "btn btn--primary", params: { return_to: originating_path } %>
       <% end %>
       <% if @invoice.payable? || @invoice.refundable? %>
         <%= button_to "Cancel invoice", cancel_invoice_path(@invoice), method: :patch, class: "btn btn--ghost", params: { return_to: originating_path }, data: { turbo_confirm: @invoice.payable? ? "Cancel this invoice and release slots?" : "Cancel this paid invoice and refund according to the cancellation policy?" } %>
@@ -124,7 +124,7 @@
           <div class="bulk-bar" data-bulk-select-target="bar" hidden>
             <strong data-bulk-select-target="count">0 selected</strong>
             <span class="field-help">Only checked times are cancelled and refunded.</span>
-            <%= submit_tag "Cancel selected times", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Cancel the selected times and refund according to the cancellation policy?" } %>
+            <%= submit_tag t("invoices.cancel_selected"), class: "btn btn--primary btn--sm", data: { turbo_confirm: "Cancelar os horários selecionados e estornar conforme a política de cancelamento?" } %>
           </div>
           <%= table %>
         <% end %>

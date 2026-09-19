@@ -3,7 +3,7 @@
     <button type="button" class="hamburger" data-action="sidebar#toggle" aria-label="Open menu">
       <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </button>
-    <%= link_to "Workspace", signed_in_home_path %>
+    <%= link_to t("nav.workspace"), signed_in_home_path %>
     <span class="sep">/</span>
     <span class="current"><%= page_heading %></span>
   </div>

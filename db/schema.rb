@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_09_19_150000) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -86,14 +86,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_150000) do
     t.index ["professional_id"], name: "index_bookings_on_professional_id"
     t.index ["recurrence_group_id"], name: "index_bookings_on_recurrence_group_id"
     t.index ["room_id"], name: "index_bookings_on_room_id"
-  end
-
-  create_table "dashboards", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.string "layout"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "invoices", force: :cascade do |t|

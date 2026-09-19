@@ -1,34 +1,95 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  nav:
+    workspace: Workspace
+    dashboard: Dashboard
+    rooms: Rooms
+    bookings: Bookings
+    waitlist: Waitlist
+    professionals: Professionals
+    patients: Patients
+    reports: Reports
+    invoices: Invoices
+    settings: Settings
+    users: Users
+    emails: Emails
+    audit: Audit log
+    finance: Finance
+    admin: Admin
+    log_out: Log out
+  helpers:
+    page:
+      dashboards: Dashboard
+      professionals: Professionals
+      patients: Patients
+      bookings: Bookings
+      rooms: Rooms
+      invoices: Invoices
+      reports: Reports
+      users: Users
+      settings: Settings
+      waitlist_entries: Waitlist
+      room_blocks: Room blocks
+      audit_events: Audit log
+      outbound_emails: Emails
+      calendar: "%{base} calendar"
+      welcome_email: Welcome email
+      new: "New %{base}"
+      edit: "Edit %{base}"
+    select_professional: Select professional
+    select_room: Select room
+    professional_overdue: "%{name} (overdue)"
+    all: All
+  statuses:
+    pending: Reserved
+    confirmed: Occupied
+    bounced: Returned
+  dashboards:
+    title: Dashboard
+    occupancy: occupancy
+    open: open
+    rooms: Rooms
+    new_booking: New booking
+    paid_month: Paid this month
+    refunded: refunded
+    occupancy_today: Occupancy today
+    active_holds: Active holds
+    receivables: Receivables
+    overdue: overdue
+    rooms_today: Rooms today
+    manage: Manage
+    upcoming: Upcoming
+    all: All
+    professional: Professional
+    room: Room
+    when: When
+    actions: Actions
+    delinquent:
+      one: "%{count} professional with overdue invoices cannot create new reservations:"
+      other: "%{count} professionals with overdue invoices cannot create new reservations:"
+    open_receivables: Open receivables
+  rooms:
+    title: Rooms
+    new: New room
+    find_slot: Find slot
+    search: Search
+    search_placeholder: Name or equipment
+    calendar: Calendar
+    today: Today
+  sessions:
+    welcome: Welcome back
+    subtitle: Sign in with your clinic account to continue.
+    email: Email
+    password: Password
+    remember: Keep me signed in on this device
+    submit: Sign in
+    tagline: Room scheduling, invoices and PIX checkout for the clinic team.
+    hold: Hold rooms and confirm occupancy
+    overdue: Track overdue invoices in one place
+    bulk: Pay, cancel or refund in bulk
+    staff_only: Staff access only
+  invoices:
+    mark_paid: Mark paid
+    cancel_selected: Cancel selected times
   number:
     currency:
       format:

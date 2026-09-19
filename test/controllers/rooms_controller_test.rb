@@ -8,20 +8,22 @@ class RoomsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "calendar starts on sunday and exposes 30 minute checkboxes" do
-    get calendar_room_path(@room, date: "2026-08-28")
-    assert_response :success
-    assert_match "Sun 23/08", response.body
-    assert_match "09:30", response.body
-    assert_select "input[name='slots[]']"
+    travel_to Time.zone.local(2026, 8, 22, 7, 0, 0) do
+      get calendar_room_path(@room, date: "2026-08-28")
+      assert_response :success
+      assert_match "23/08", response.body
+      assert_match "09:30", response.body
+      assert_select "input[name='slots[]']"
+    end
   end
 
   test "index lists occupancy days, rates and a calendar action" do
     get rooms_path
     assert_response :success
-    assert_match "Today", response.body
-    assert_match "Daily", response.body
+    assert_match "Hoje", response.body
+    assert_match "Diária", response.body
     assert_match "30 min", response.body
-    assert_match "Monthly", response.body
-    assert_select "a", text: "Calendar"
+    assert_match "Mensal", response.body
+    assert_select "a", text: "Calendário"
   end
 end

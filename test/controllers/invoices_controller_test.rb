@@ -5,7 +5,7 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(name: "Admin", email: "inv-#{SecureRandom.hex(4)}@example.com", password: "password", role: "admin")
     sign_in @user
     @pro_user = User.create!(name: "Dr Flow", email: "pro-#{SecureRandom.hex(4)}@example.com", password: "password", role: "professional")
-    @professional = Professional.create!(user: @pro_user, specialty: "Psychology")
+    @professional = Professional.create!(user: @pro_user, specialty: "Psychology", practice_areas: %w[psicologia_psiquiatria])
     @invoice = Invoice.create!(professional: @professional, amount: 80, status: "overdue", due_date: Date.current - 1)
     @other = Invoice.create!(professional: @professional, amount: 40, status: "open", due_date: Date.current)
   end
@@ -40,7 +40,7 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
       amount: 40
     )
 
-    assert_difference -> { @other.reload.refunded_amount.to_d } do
+    assert_difference -> { @other.reload.refunded_amount.to_d }, 40 do
       patch cancel_invoice_path(@other)
     end
     assert_redirected_to invoice_path(@other)

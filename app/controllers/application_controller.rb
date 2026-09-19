@@ -26,7 +26,6 @@ class ApplicationController < ActionController::Base
 
   def run_operational_jobs
     Invoice.expire_overdue!
-    ReminderDispatch.call unless Rails.env.test?
   rescue StandardError => e
     Rails.logger.warn("Operational jobs failed: #{e.class}: #{e.message}")
   end

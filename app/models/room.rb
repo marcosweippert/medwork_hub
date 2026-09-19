@@ -39,7 +39,20 @@ class Room < ApplicationRecord
   def schedule_for(date)
     return if Array(closed_weekdays).map(&:to_i).include?(date.wday)
 
-    [opens_at, closes_at]
+    setting = Setting.current
+    if date.sunday?
+      return if setting.sunday_closed
+
+      [opens_at, closes_at]
+    elsif date.saturday?
+      open = [opens_at.to_i, setting.saturday_opens_at.to_i].max
+      close = [closes_at.to_i, setting.saturday_closes_at.to_i].min
+      return if close <= open
+
+      [open, close]
+    else
+      [opens_at, closes_at]
+    end
   end
 
   def working_hours_on(date)
@@ -68,7 +81,7 @@ class Room < ApplicationRecord
     day_end = date.in_time_zone.change(hour: close)
     return 100 if blocked?(day_start, day_end)
 
-    busy_hours = bookings.holding.where("start_time < ? AND end_time > ?", day_end, day_start).to_a.sum do |booking|
+    busy_hours = bookings.visible_on_calendar.where("start_time < ? AND end_time > ?", day_end, day_start).to_a.sum do |booking|
       overlap_start = [booking.start_time, day_start].max
       overlap_end = [booking.end_time, day_end].min
       [(overlap_end - overlap_start) / 1.hour, 0].max

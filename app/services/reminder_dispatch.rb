@@ -1,7 +1,7 @@
 class ReminderDispatch
   WINDOW = (23.hours)..(25.hours)
-  MAX_PER_RUN = 5
-  MIN_INTERVAL = 15.minutes
+  MAX_PER_RUN = 50
+  MIN_INTERVAL = 10.minutes
   DEMO_EMAIL_SUFFIX = "@medworkhub.com"
 
   def self.call

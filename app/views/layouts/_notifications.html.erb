@@ -1,0 +1,31 @@
+<div class="notice-wrap" data-controller="notifications">
+  <button type="button" class="icon-btn" data-action="notifications#toggle" aria-label="<%= t("notifications.title") %>">
+    <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+    <% if unread_notifications_count.positive? %>
+      <span class="count danger"><%= unread_notifications_count > 9 ? "9+" : unread_notifications_count %></span>
+    <% end %>
+  </button>
+  <div class="notice-panel" hidden data-notifications-target="panel">
+    <div class="notice-panel-head">
+      <strong><%= t("notifications.title") %></strong>
+      <% if unread_notifications_count.positive? %>
+        <%= button_to t("notifications.mark_all"), mark_all_notifications_path, method: :patch, class: "btn btn--ghost btn--sm" %>
+      <% end %>
+    </div>
+    <% notifications = Array(@header_notifications) %>
+    <% if notifications.any? %>
+      <% notifications.each do |item| %>
+        <%= link_to notification_path(item), class: "notice-item #{ "is-unread" if item.unread? }" do %>
+          <span class="notice-item-title"><%= item.title %></span>
+          <span class="notice-item-body"><%= item.body %></span>
+          <span class="notice-item-meta">
+            <%= [item.actor&.display_name, item.created_at&.strftime("%d/%m %H:%M")].compact.join(" · ") %>
+          </span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="notice-empty"><%= t("notifications.empty") %></p>
+    <% end %>
+    <%= link_to t("notifications.see_all"), notifications_path, class: "notice-all" %>
+  </div>
+</div>

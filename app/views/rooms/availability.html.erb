@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Find a slot</h1>
+    <h1 class="page-title"><%= t("rooms.find_slot") %></h1>
     <p class="page-sub">See which rooms are free for a date and time range</p>
   </div>
   <%= link_to "All rooms", rooms_path, class: "btn btn--ghost" %>
@@ -43,7 +43,7 @@
             <td><%= status_tag(row[:available] ? "active" : "occupied") %></td>
             <td class="cell-actions">
               <div class="row-actions">
-                <%= action_btn "Calendar", calendar_room_path(row[:room], date: @date), tone: "cal" %>
+                <%= action_btn t("ui.calendar"), calendar_room_path(row[:room], date: @date), tone: "cal" %>
                 <% if row[:available] %>
                   <%= action_btn "Book", new_booking_path(room_id: row[:room].id, start_time: @date.in_time_zone.change(hour: @start_hour)), tone: "pay" %>
                 <% end %>

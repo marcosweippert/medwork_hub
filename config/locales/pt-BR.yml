@@ -9,7 +9,13 @@ pt-BR:
     patients: Pacientes
     reports: Relatórios
     invoices: Faturas
+    tickets: Chamados
+    billing: Cobrança
+    transactions: Transações
+    profile: Perfil
     settings: Configurações
+    integrations: Integrações
+    api_keys: Chaves de API
     users: Usuários
     emails: E-mails
     audit: Auditoria
@@ -24,9 +30,15 @@ pt-BR:
       bookings: Agendamentos
       rooms: Salas
       invoices: Faturas
+      tickets: Chamados
+      billings: Cobrança
+      transactions: Transações
+      profiles: Perfil
       reports: Relatórios
       users: Usuários
       settings: Configurações
+      integrations: Integrações
+      api_keys: Chaves de API
       waitlist_entries: Lista de espera
       room_blocks: Bloqueios
       audit_events: Auditoria
@@ -35,6 +47,10 @@ pt-BR:
       welcome_email: E-mail de boas-vindas
       new: "Novo(a) %{base}"
       edit: "Editar %{base}"
+    heading:
+      integrations:
+        new: Nova integração
+        edit: Editar integração
     select_professional: Selecione o profissional
     select_room: Selecione a sala
     professional_overdue: "%{name} (em atraso)"
@@ -55,33 +71,83 @@ pt-BR:
     waiting: Na fila
     offered: Ofertado
     booked: Reservado
+    hourly: Por hora
+    monthly: Mensal
     sent: Enviado
     failed: Falhou
     blocked: Bloqueado
+    in_progress: Em andamento
+    resolved: Resolvido
+    closed: Encerrado
+    low: Baixa
+    medium: Média
+    high: Alta
+    urgent: Urgente
+    created: Criado
+    updated: Atualizado
+    deleted: Excluído
+    active: Ativo
+    paused: Pausado
+    billing: Financeiro
+    rooms: Salas
+    bookings: Agendamentos
+    technical: Técnico
+    other: Outro
   dashboards:
     title: Painel
     occupancy: ocupação
     open: em aberto
     rooms: Salas
     new_booking: Novo agendamento
+    find_slot: Buscar horário
+    quick_actions: Ações rápidas
+    summary: Resumo
+    featured_rooms: Salas em destaque
+    next_session: Próximo horário
+    see_calendar: Ver calendário
+    see_details: Ver detalhes
+    my_account: Minha conta
+    other_options: Outras opções
+    help: Central de ajuda
+    open_receivables: Ver faturas
+    subtitle: "Hoje a ocupação está em %{occupancy}% nas %{rooms} salas."
+    metrics: Indicadores
+    shortcuts: Atalhos
     paid_month: Recebido no mês
+    vs_last_month: vs. mês anterior
+    recent_transactions: Transações recentes
+    all: Ver todas
     refunded: estornado
     occupancy_today: Ocupação hoje
     active_holds: Reservas ativas
     receivables: A receber
     overdue: em atraso
     rooms_today: Salas hoje
+    rooms_count:
+      one: "%{count} sala"
+      other: "%{count} salas"
+    upcoming_count:
+      one: "%{count} próximo nesta lista"
+      other: "%{count} próximos nesta lista"
     manage: Gerenciar
-    upcoming: Próximos
-    all: Todos
+    upcoming: Agenda
+    attention: Faturas em aberto
+    all: Ver tudo
     professional: Profissional
     room: Sala
     when: Quando
     actions: Ações
+    good_morning: "Bom dia, %{name}"
+    good_afternoon: "Boa tarde, %{name}"
+    good_evening: "Boa noite, %{name}"
+    empty_rooms: Nenhuma sala cadastrada.
+    empty_upcoming: Nenhum horário à frente.
+    empty_invoices: Nenhuma fatura em aberto.
+    search_placeholder: Buscar faturas
+    featured_rooms: Salas em destaque
     delinquent:
       one: "%{count} profissional com faturas em atraso não pode criar novas reservas:"
       other: "%{count} profissionais com faturas em atraso não podem criar novas reservas:"
-    open_receivables: Abrir a receber
   rooms:
     title: Salas
     new: Nova sala
@@ -105,9 +171,167 @@ pt-BR:
   invoices:
     mark_paid: Marcar como paga
     cancel_selected: Cancelar horários selecionados
+  tickets:
+    new: Novo chamado
+    opened: Chamado aberto.
+    updated: Chamado atualizado.
+    replied: Resposta enviada.
+    staff_only: Só a equipe da clínica pode alterar o chamado.
+    open_queue: Chamados abertos
+    sla_breached: SLA vencido
+    sla_met: Concluído
+    sla_late: "Vencido em %{time}"
+    sla_until: "Até %{time}"
+    reply: Responder
+    internal: Nota interna
+    assign: Responsável
+    requester: Solicitante
+    empty: Nenhum chamado.
+    clear: Limpar
+    filter: Filtrar
+    all: Todos os chamados
+    total: Total de chamados
+    pending: Chamados pendentes
+    solved: Chamados resolvidos
+    closed: Chamados encerrados
+    create: Criar chamado
+    filters: Filtros
+    export: Exportar CSV
+    show_only: "Mostrar:"
+    tab_all: Todos
+    tab_pending: Pendentes
+    tab_solved: Resolvidos
+    tab_closed: Encerrados
+    col_id: ID
+    requested_by: Solicitante
+    agent: Agente
+    actions: Ações
+    mark_solved: Marcar como resolvido
+    archive: Arquivar
+    confirm_resolve: Marcar os chamados selecionados como resolvidos?
+    confirm_close: Encerrar os chamados selecionados?
+    bulk_resolved: Chamados marcados como resolvidos.
+    bulk_closed: Chamados encerrados.
+    body: Descrição
+    subject: Assunto
+    priority: Prioridade
+    category: Categoria
+    status: Status
+    sla: SLA
+    thread: Conversa
+    submit: Abrir chamado
+    sla_policy: "SLA: urgente %{urgent}h · alta %{high}h · média %{medium}h · baixa %{low}h"
+    save: Salvar
+    queue_help: Fila, SLA e conversa com a clínica
+    search_placeholder: Assunto, texto ou solicitante
+    unassigned: Sem responsável
+    mine: Meus
+    take: Assumir
+    taken: Você assumiu este chamado.
+    reopen: Reabrir
+    reopened: Chamado reaberto.
+    details: Detalhes
+    opened_at: Aberto em
+    first_response: Primeira resposta
+    reply_placeholder: Escreva a mensagem…
+    subject_placeholder: Resumo do problema
+    body_placeholder: Conte o que aconteceu e o que já tentou.
+    locked: Este chamado está encerrado ou resolvido. Reabra para enviar mensagens.
+    staff_team: Equipe da clínica
+    reply_title: Resposta
+  notifications:
+    title: Notificações
+    subtitle: Chamados novos e mensagens da conversa.
+    empty: Nenhuma notificação.
+    mark_all: Marcar todas como lidas
+    marked_all: Notificações marcadas como lidas.
+    see_all: Ver todas
+    unread: Não lida
+    read: Lida
+    ticket_opened_title: Novo chamado
+    ticket_message_title: Nova mensagem no seu chamado
+    ticket_message_staff_title: Nova mensagem no chamado
+  settings:
+    subtitle: Cada bloco tem a própria edição. Salve só o que mudou.
+    saved: Configurações do bloco salvas.
+    clinic:
+      title: Clínica
+      name: Nome
+      email: E-mail
+      phone: Telefone
+      currency: Moeda
+      slot: Faixa de horário
+      week: Semana começa
+      week_sunday: Domingo
+      week_monday: Segunda
+      logo: Logo
+      logo_help: PNG, JPG ou WebP até 2 MB. Aparece ao lado do nome da clínica na barra lateral.
+      logo_remove: Remover logo atual
+      logo_invalid: precisa ser PNG, JPG ou WebP
+      logo_too_large: deve ter no máximo 2 MB
+    policy:
+      title: Horários e política
+      hours: Expediente
+      hours_help: Cada sala usa o próprio horário de abertura e fechamento. Sábado também. Domingo segue a opção abaixo.
+      saturday: Sábado
+      sunday: Domingo
+      sat_open: Sábado abre
+      sat_close: Sábado fecha
+      sunday_closed: Domingo fechado
+      free_cancel: Cancelamento grátis (horas)
+      late_fee: Taxa atrasada
+      after_start: Depois do início
+    mail:
+      title: Envio de e-mail
+      method: Método
+      address: Servidor SMTP
+      port: Porta
+      domain: Domínio
+      user: Usuário
+      password: Senha
+      password_saved: Salva (oculta)
+      password_missing: Não definida
+      password_kept: Salva — deixe em branco para manter
+      password_new: Senha de app
+      auth: Autenticação
+      from: Remetente
+      host: Host dos links
+      host_port: Porta dos links
+      protocol: Protocolo
+      auto: Automático
+    pix:
+      title: PIX e WhatsApp
+      key: Chave PIX
+      receiver: Recebedor
+      city: Cidade
+      missing: Não configurada
+    tickets:
+      title: Manutenção de chamados
+      help: SLA, prioridade padrão e quem recebe aviso de chamado novo ou de mensagem.
+      sla_urgent: SLA urgente (horas)
+      sla_high: SLA alta (horas)
+      sla_medium: SLA média (horas)
+      sla_low: SLA baixa (horas)
+      sla_warn: Avisar quando faltar (horas)
+      default_priority: Prioridade padrão
+      default_assignee: Responsável padrão
+      no_assignee: Sem responsável
+      auto_close: Fechar resolvidos após (dias)
+      auto_close_help: Use 0 para não fechar automaticamente.
+      auto_close_after: "%{days} dias"
+      notify_staff: Avisar equipe de chamado novo e de mensagem do usuário
+      notify_requester: Avisar o usuário quando a equipe responder
+      on: Ativo
+      off: Desligado
   date:
     day_names: [Domingo, Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira, Sábado]
     abbr_day_names: [Dom, Seg, Ter, Qua, Qui, Sex, Sáb]
+    month_names: [~, Janeiro, Fevereiro, Março, Abril, Maio, Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro]
+    abbr_month_names: [~, Jan, Fev, Mar, Abr, Mai, Jun, Jul, Ago, Set, Out, Nov, Dez]
+    formats:
+      default: "%d/%m/%Y"
+      long: "%d de %B de %Y"
+      short: "%d de %b"
   number:
     currency:
       format:

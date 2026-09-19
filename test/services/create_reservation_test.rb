@@ -37,10 +37,21 @@ class CreateReservationTest < ActiveSupport::TestCase
     end
   end
 
-  test "rejects saturday slots after clinic saturday closing time" do
+  test "accepts saturday slots until the room closing time" do
     travel_to Time.zone.local(2026, 8, 28, 7, 0, 0) do
       saturday = Date.new(2026, 8, 29)
       slots = [Time.zone.local(saturday.year, saturday.month, saturday.day, 14, 0).iso8601]
+
+      result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
+
+      assert result.success?, result.error
+    end
+  end
+
+  test "rejects slots after the room closing time" do
+    travel_to Time.zone.local(2026, 8, 28, 7, 0, 0) do
+      saturday = Date.new(2026, 8, 29)
+      slots = [Time.zone.local(saturday.year, saturday.month, saturday.day, 18, 0).iso8601]
 
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 

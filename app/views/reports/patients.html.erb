@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Patients</h1>
+    <h1 class="page-title"><%= t("patients.title") %></h1>
     <p class="page-sub"><%= @total_patients %> patients · <%= @with_bookings %> with bookings · <%= @notes %> notes · <%= analytical? ? "analytical" : "synthetic" %></p>
   </div>
   <%= render "export" %>
@@ -10,7 +10,7 @@
   <%= render "view_field" %>
   <div class="field">
     <label class="field-label">Professional</label>
-    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+    <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: t("ui.all"), class: "select" %>
   </div>
   <%= submit_tag "Apply", class: "btn btn--ghost" %>
 <% end %>

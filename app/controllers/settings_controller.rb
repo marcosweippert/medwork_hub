@@ -1,23 +1,49 @@
 class SettingsController < ApplicationController
+  SECTIONS = {
+    "clinic" => %i[clinic_name clinic_email clinic_phone currency slot_minutes week_starts_on logo],
+    "policy" => %i[free_cancel_hours late_cancel_percent started_cancel_percent saturday_opens_at saturday_closes_at sunday_closed],
+    "mail" => %i[smtp_address smtp_port smtp_domain smtp_username smtp_authentication smtp_enable_starttls mailer_from mailer_host mailer_port mailer_protocol],
+    "pix" => %i[pix_key pix_name pix_city whatsapp_phone],
+    "tickets" => %i[
+      ticket_sla_urgent ticket_sla_high ticket_sla_medium ticket_sla_low ticket_sla_warn_hours
+      ticket_default_priority ticket_notify_staff ticket_notify_requester ticket_default_assignee_id ticket_auto_close_days
+    ]
+  }.freeze
+
   before_action :require_admin
   before_action :set_setting
 
-  def show; end
+  def show
+    @edit_section = params[:edit].to_s
+    @edit_section = nil unless SECTIONS.key?(@edit_section)
+    hydrate_smtp_defaults if @edit_section == "mail"
+  end
 
   def edit
-    hydrate_smtp_defaults
+    redirect_to settings_path(edit: params[:section].presence || "clinic")
   end
 
   def update
-    if @setting.update(setting_params.except(:smtp_password))
-      @setting.assign_smtp_password(params.dig(:setting, :smtp_password))
-      @setting.save!
-      @setting.sync_env_file!
-      MailerConfig.reload!
-      redirect_to settings_path, notice: "Settings saved."
+    @edit_section = params[:section].to_s
+    @edit_section = "clinic" unless SECTIONS.key?(@edit_section)
+    attrs = section_params(@edit_section)
+    attrs[:ticket_default_assignee_id] = nil if attrs[:ticket_default_assignee_id].blank?
+    attrs.delete(:logo) if attrs[:logo].blank?
+
+    if @setting.update(attrs)
+      if @edit_section == "clinic" && params[:remove_logo] == "1" && params.dig(:setting, :logo).blank?
+        @setting.logo.purge
+      end
+      if @edit_section == "mail"
+        @setting.assign_smtp_password(params.dig(:setting, :smtp_password))
+        @setting.save!
+        @setting.sync_env_file!
+        MailerConfig.reload!
+      end
+      redirect_to settings_path, notice: t("settings.saved")
     else
-      hydrate_smtp_defaults
-      render :edit, status: :unprocessable_entity
+      hydrate_smtp_defaults if @edit_section == "mail"
+      render :show, status: :unprocessable_entity
     end
   end
 
@@ -39,13 +65,8 @@ class SettingsController < ApplicationController
     @setting.mailer_protocol = MailerConfig.url_options[:protocol] if @setting.mailer_protocol.blank?
   end
 
-  def setting_params
-    params.require(:setting).permit(
-      :clinic_name, :clinic_email, :clinic_phone, :currency, :slot_minutes,
-      :free_cancel_hours, :late_cancel_percent, :started_cancel_percent, :week_starts_on,
-      :pix_key, :pix_name, :pix_city, :whatsapp_phone,
-      :smtp_address, :smtp_port, :smtp_domain, :smtp_username, :smtp_authentication,
-      :smtp_enable_starttls, :mailer_from, :mailer_host, :mailer_port, :mailer_protocol
-    )
+  def section_params(section)
+    allowed = SECTIONS.fetch(section)
+    params.require(:setting).permit(*allowed)
   end
 end

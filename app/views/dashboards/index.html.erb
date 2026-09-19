@@ -1,126 +1,86 @@
-<div class="page-head">
-  <div>
-    <h1 class="page-title"><%= t("dashboards.title") %></h1>
-    <p class="page-sub"><%= Date.current.strftime("%d/%m/%Y") %> · <%= t("dashboards.occupancy") %> <%= @occupancy_today %>% · <%= t("dashboards.open") %> <%= number_to_currency(@open_amount) %></p>
+<section class="invoice-hero">
+  <div class="page-head" style="margin:0;">
+    <div>
+      <p class="page-sub"><%= Date.current.strftime("%d/%m/%Y") %></p>
+      <h1 class="page-title"><%= dashboard_greeting %></h1>
+    </div>
+    <div class="page-actions">
+      <%= link_to t("dashboards.new_booking"), new_booking_path, class: "btn btn--primary" %>
+      <%= link_to t("tickets.create"), new_ticket_path, class: "btn btn--ghost" %>
+    </div>
   </div>
-  <div class="page-actions">
-    <%= link_to t("dashboards.rooms"), rooms_path, class: "btn btn--ghost" %>
-    <%= link_to t("dashboards.new_booking"), new_booking_path, class: "btn btn--primary" %>
-  </div>
-</div>
-
-<% if @delinquents.any? %>
-  <div class="notice-banner">
-    <strong><%= @delinquents.size %></strong>
-    <%= t("dashboards.delinquent", count: @delinquents.size) %>
-    <%= @delinquents.map(&:display_name).to_sentence %>.
-    <%= link_to t("dashboards.open_receivables"), receivables_reports_path, class: "table-link" %>
-  </div>
-<% end %>
-
-<section class="kpi-grid" aria-label="Key metrics">
-  <article class="kpi-card c-success">
-    <div class="kpi-label"><%= t("dashboards.paid_month") %></div>
-    <div class="kpi-value"><%= number_to_currency(@revenue_month, precision: 0) %></div>
-    <div class="kpi-compare"><%= number_to_currency(@refunded_month, precision: 0) %> <%= t("dashboards.refunded") %></div>
-  </article>
-  <article class="kpi-card c-primary">
-    <div class="kpi-label"><%= t("dashboards.occupancy_today") %></div>
-    <div class="kpi-value"><%= @occupancy_today %><sup>%</sup></div>
-  </article>
-  <article class="kpi-card c-purple">
-    <div class="kpi-label"><%= t("dashboards.active_holds") %></div>
-    <div class="kpi-value"><%= @metrics[:bookings] %></div>
-  </article>
-  <article class="kpi-card c-danger">
-    <div class="kpi-label"><%= t("dashboards.receivables") %></div>
-    <div class="kpi-value"><%= number_to_currency(@open_amount, precision: 0) %></div>
-    <div class="kpi-compare"><%= @financial_summary[:overdue] %> <%= t("dashboards.overdue") %></div>
-  </article>
 </section>
 
-<div class="grid">
-  <section class="col-6 card">
-    <div class="card-head">
-      <h2 class="card-title"><%= t("dashboards.rooms_today") %></h2>
-      <%= link_to t("dashboards.manage"), rooms_path, class: "card-action" %>
-    </div>
-    <% @rooms.each do |room| %>
-      <% occ = room.occupancy_on(Date.current) %>
-      <div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
-          <strong><%= room.name %></strong>
-          <span class="mono"><%= occ %>%</span>
-        </div>
-        <div class="occ-bar"><span class="<%= occupancy_tone(occ) %>" style="width: <%= occ %>%"></span></div>
-      </div>
-    <% end %>
-  </section>
+<div class="fin-kpis">
+  <%= link_to revenue_reports_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("dashboards.paid_month") %></p>
+    <strong><%= number_to_currency(@revenue_month, precision: 0) %></strong>
+    <p class="delta"><%= @revenue_delta.to_f >= 0 ? "+" : "" %><%= @revenue_delta %>% <%= t("dashboards.vs_last_month") %></p>
+  <% end %>
+  <%= link_to invoices_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("dashboards.receivables") %></p>
+    <strong><%= number_to_currency(@open_amount, precision: 0) %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= t("dashboards.open_receivables") %></p>
+  <% end %>
+  <%= link_to invoices_path(status: "overdue"), class: "fin-kpi" do %>
+    <p class="label"><%= t("dashboards.overdue").capitalize %></p>
+    <strong><%= @overdue_count %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= t("nav.invoices") %></p>
+  <% end %>
+  <%= link_to tickets_path(tab: "pending"), class: "fin-kpi" do %>
+    <p class="label"><%= t("tickets.open_queue") %></p>
+    <strong><%= @open_tickets %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= t("tickets.sla_breached") %>: <%= @breached_tickets %></p>
+  <% end %>
+</div>
 
-  <section class="col-6 card">
+<div class="grid">
+  <section class="col-8 card">
     <div class="card-head">
-      <h2 class="card-title"><%= t("dashboards.upcoming") %></h2>
-      <%= link_to t("dashboards.all"), bookings_path, class: "card-action" %>
+      <h2 class="card-title"><%= t("dashboards.recent_transactions") %></h2>
+      <%= link_to t("dashboards.all"), invoices_path, class: "card-action" %>
     </div>
     <div class="table-scroll">
       <table class="data-table">
         <thead>
           <tr>
-            <th><%= t("dashboards.professional") %></th>
-            <th><%= t("dashboards.room") %></th>
-            <th><%= t("dashboards.when") %></th>
-            <th class="cell-actions"><%= t("dashboards.actions") %></th>
+            <th><%= t("transactions.order") %></th>
+            <th><%= t("ui.professional") %></th>
+            <th class="cell-price"><%= t("transactions.amount") %></th>
+            <th><%= t("transactions.date") %></th>
+            <th><%= t("ui.status") %></th>
           </tr>
         </thead>
         <tbody>
-          <% @upcoming_bookings.each do |booking| %>
+          <% @recent_payments.each do |invoice| %>
             <tr>
-              <td class="cell-name"><%= booking.professional.display_name %></td>
-              <td><%= booking.room.name %></td>
-              <td class="cell-date"><%= booking.start_time&.strftime("%d/%m %H:%M") %></td>
-              <td class="cell-actions">
-                <div class="row-actions">
-                  <%= action_btn "View", path_with_return(booking_path(booking)), tone: "view" %>
-                </div>
-              </td>
+              <td class="data-cell-mono"><%= link_to "##{invoice.id.to_s.rjust(4, "0")}", invoice_path(invoice), class: "table-link" %></td>
+              <td class="cell-name"><%= invoice.professional.display_name %></td>
+              <td class="cell-price"><%= number_to_currency(invoice.collected_amount) %></td>
+              <td class="data-cell-mono"><%= invoice.paid_at&.strftime("%d/%m/%Y") %></td>
+              <td><%= status_tag(invoice.status) %></td>
             </tr>
           <% end %>
-          <% if @upcoming_bookings.empty? %>
-            <tr><td colspan="4">No upcoming holds.</td></tr>
+          <% if @recent_payments.empty? %>
+            <tr><td colspan="5"><%= t("dashboards.empty_upcoming") %></td></tr>
           <% end %>
         </tbody>
       </table>
     </div>
   </section>
-
-  <section class="col-12 card">
+  <section class="col-4 card">
     <div class="card-head">
-      <h2 class="card-title">Recent invoices</h2>
-      <%= link_to "All", invoices_path, class: "card-action" %>
+      <h2 class="card-title"><%= t("dashboards.featured_rooms") %></h2>
+      <%= link_to t("dashboards.all"), rooms_path, class: "card-action" %>
     </div>
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead><tr><th>Professional</th><th>Room</th><th>Amount</th><th>Status</th><th>Due</th><th class="cell-actions">Actions</th></tr></thead>
-        <tbody>
-          <% @recent_invoices.each do |invoice| %>
-            <tr>
-              <td class="cell-name"><%= invoice.professional.display_name %></td>
-              <td><%= invoice.room&.name || "—" %></td>
-              <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
-              <td><%= status_tag(invoice.status) %></td>
-              <td class="cell-date"><%= invoice.due_date&.strftime("%d/%m/%Y") %></td>
-              <td class="cell-actions">
-                <div class="row-actions">
-                  <%= action_btn "View", path_with_return(invoice_path(invoice)), tone: "view" %>
-                  <% if invoice.payable? %>
-                    <%= action_btn "Pay", pay_invoice_path(invoice), tone: "pay", method: :patch, params: { return_to: originating_path } %>
-                  <% end %>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    <% @hot_rooms.each do |room, occ| %>
+      <%= link_to calendar_room_path(room), class: "hz-widget", style: "margin-bottom:8px;box-shadow:none;background:var(--bg-muted);" do %>
+        <div>
+          <strong style="font-size:15px;"><%= room.name %></strong>
+          <p><%= room.types_label %></p>
+        </div>
+        <strong><%= occ %>%</strong>
+      <% end %>
+    <% end %>
   </section>
 </div>

@@ -1,0 +1,65 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("billing.title") %></h1>
+    <p class="page-sub"><%= t("billing.subtitle") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("nav.invoices"), invoices_path, class: "btn btn--ghost" %>
+    <%= link_to t("invoices.new"), new_invoice_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<div class="fin-kpis">
+  <div class="fin-kpi">
+    <p class="label"><%= t("billing.plan") %></p>
+    <strong><%= @setting.clinic_name %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= t("billing.clinic_plan") %></p>
+  </div>
+  <div class="fin-kpi">
+    <p class="label"><%= t("billing.paid_month") %></p>
+    <strong><%= number_to_currency(@paid_month, precision: 0) %></strong>
+  </div>
+  <div class="fin-kpi">
+    <p class="label"><%= t("billing.open") %></p>
+    <strong><%= number_to_currency(@open_amount, precision: 0) %></strong>
+  </div>
+  <div class="fin-kpi">
+    <p class="label">PIX</p>
+    <strong style="font-size:16px;"><%= @setting.pix_key.presence || "—" %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= @setting.pix_name.presence %></p>
+  </div>
+</div>
+
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("billing.next_invoice") %></h2>
+    <%= link_to t("dashboards.all"), invoices_path, class: "card-action" %>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><%= t("transactions.order") %></th>
+          <th><%= t("ui.professional") %></th>
+          <th><%= t("ui.room") %></th>
+          <th class="cell-price"><%= t("transactions.amount") %></th>
+          <th><%= t("ui.status") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr>
+            <td class="data-cell-mono"><%= link_to "##{invoice.id.to_s.rjust(4, "0")}", invoice_path(invoice), class: "table-link" %></td>
+            <td class="cell-name"><%= invoice.professional.display_name %></td>
+            <td><%= invoice.room&.name || "—" %></td>
+            <td class="cell-price"><%= number_to_currency(invoice.amount) %></td>
+            <td><%= status_tag(invoice.status) %></td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr><td colspan="5"><%= t("transactions.empty") %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

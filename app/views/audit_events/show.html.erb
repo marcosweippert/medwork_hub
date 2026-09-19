@@ -1,34 +1,61 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title"><%= @event.action.tr("._", " ") %></h1>
-    <p class="page-sub"><%= @event.actor_name %> · <%= @event.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+    <h1 class="page-title"><%= audit_action_title(@event) %></h1>
+    <p class="page-sub"><%= @event.actor_name %> · <%= @event.created_at.strftime("%d/%m/%Y %H:%M:%S") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", audit_events_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), audit_events_path, class: "btn btn--ghost" %>
     <% if (path = auditable_path_for(@event)) %>
-      <%= link_to "Open record", path, class: "btn btn--primary" %>
+      <%= link_to t("audit.open_record"), path, class: "btn btn--primary" %>
     <% end %>
-    <%= button_to "Delete", audit_event_path(@event), method: :delete, class: "btn btn--ghost", data: { turbo_confirm: "Remove this event from the log?" } %>
+    <%= button_to t("ui.delete"), audit_event_path(@event), method: :delete, class: "btn btn--ghost", data: { turbo_confirm: t("audit.confirm_delete") } %>
   </div>
 </div>
 
 <section class="card form-card form-card--wide">
   <dl class="dl-meta">
-    <dt>When</dt><dd><%= @event.created_at.strftime("%d/%m/%Y %H:%M:%S") %></dd>
-    <dt>User</dt><dd><%= @event.user ? link_to(@event.actor_name, @event.user) : @event.actor_name %></dd>
-    <dt>Action</dt><dd><%= @event.action %></dd>
-    <dt>Status</dt><dd><%= status_tag(@event.verb) %></dd>
-    <dt>Record</dt>
+    <dt><%= t("ui.when") %></dt><dd><%= @event.created_at.strftime("%d/%m/%Y %H:%M:%S") %></dd>
+    <dt><%= t("audit.actor") %></dt>
     <dd>
-      <%= @event.record_name %>
+      <%= @event.user ? link_to(@event.actor_name, @event.user) : @event.actor_name %>
+      <% if @event.actor_email.present? %> · <%= @event.actor_email %><% end %>
+    </dd>
+    <dt><%= t("audit.action") %></dt><dd><code><%= @event.action %></code></dd>
+    <dt><%= t("ui.status") %></dt><dd><%= status_tag(@event.verb) %></dd>
+    <dt><%= t("audit.record") %></dt>
+    <dd>
+      <%= audit_resource_label(@event) %> #<%= @event.auditable_id || "—" %>
+      · <%= @event.record_label %>
       <% if (path = auditable_path_for(@event)) %>
-        · <%= link_to "Open", path %>
+        · <%= link_to t("ui.open"), path %>
       <% end %>
     </dd>
   </dl>
 </section>
 
 <section class="card form-card form-card--wide">
-  <div class="card-head"><h2 class="card-title">Changed fields</h2></div>
-  <pre class="email-text"><%= JSON.pretty_generate(@event.parsed_details) %></pre>
+  <div class="card-head"><h2 class="card-title"><%= t("audit.changed_fields") %></h2></div>
+  <% entries = @event.change_entries %>
+  <% if entries.any? %>
+    <table class="audit-changes">
+      <thead>
+        <tr>
+          <th><%= t("audit.field") %></th>
+          <th><%= t("audit.before") %></th>
+          <th><%= t("audit.after") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% entries.each do |entry| %>
+          <tr>
+            <th><%= audit_field_label(entry[:field]) %></th>
+            <td><%= format_audit_value(entry[:from]) %></td>
+            <td><%= format_audit_value(entry[:to]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="page-sub"><%= t("audit.no_field_changes") %></p>
+  <% end %>
 </section>

@@ -11,7 +11,7 @@
         <button type="button" class="btn btn--ghost btn--sm<%= " is-active" unless email.html? %>" data-email-preview-target="textTab" data-action="email-preview#showText">Text</button>
       <% end %>
       <% if show_copy && email.body_text.present? %>
-        <button type="button" class="btn btn--ghost btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= ERB::Util.html_escape(email.body_text) %>" data-action="clipboard#copy">Copy text</button>
+        <button type="button" class="btn btn--ghost btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= ERB::Util.html_escape(email.body_text) %>" data-clipboard-copied-value="<%= t("ui.copied") %>" data-clipboard-failed-value="<%= t("ui.copy_failed") %>" data-action="clipboard#copy"><%= t("ui.copy") %></button>
       <% end %>
     </div>
   <% end %>

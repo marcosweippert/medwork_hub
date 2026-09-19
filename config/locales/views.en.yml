@@ -1,0 +1,531 @@
+en:
+  ui:
+    back: Back
+    cancel: Cancel
+    save: Save
+    search: Search
+    filter: Filter
+    open: Open
+    edit: Edit
+    delete: Delete
+    copy: Copy
+    copied: Copied
+    copy_failed: Copy failed
+    "yes": Yes
+    "no": No
+    all: All
+    actions: Actions
+    name: Name
+    email: Email
+    role: Role
+    status: Status
+    professional: Professional
+    room: Room
+    calendar: Calendar
+    prev: Prev
+    next: Next
+    records:
+      one: "%{count} record"
+      other: "%{count} records"
+    page_of: "page %{page} of %{pages}"
+    password: Password
+    available: Available
+    reserved: Reserved
+    occupied: Occupied
+    blocked: Blocked
+    closed: Closed
+    past: Past
+    selected: Selected
+    waitlist: Waitlist
+    selection: Selection
+    today: Today
+    upcoming: Upcoming
+    when: When
+    day: Day
+    month: Month
+    daily: Daily
+    monthly: Monthly
+    all_rooms: All rooms
+    menu: Menu
+    toggle_theme: Toggle theme
+  helpers:
+    heading:
+      users:
+        new: New user
+        edit: Edit user
+      professionals:
+        new: New professional
+        edit: Edit professional
+      patients:
+        new: New patient
+        edit: Edit patient
+      rooms:
+        new: New room
+        edit: Edit room
+      bookings:
+        new: New booking
+        edit: Edit booking
+      invoices:
+        new: New invoice
+        edit: Edit invoice
+      tickets:
+        new: New ticket
+      notifications:
+        index: Notifications
+      settings:
+        edit: Edit settings
+      outbound_emails:
+        new: Compose email
+      waitlist_entries:
+        new: Join waitlist
+      password_changes:
+        edit: Create your password
+  users:
+    title: Users
+    subtitle: Clinic accounts. Professionals are created together with the login.
+    new: New user
+    created: "User created. A welcome email with a temporary password was sent to %{email}."
+    updated: User updated.
+    invited: "A new temporary password was emailed to %{email}."
+    deleted: User deleted.
+    cannot_delete_self: You cannot delete your own account.
+    search_placeholder: Name or email
+    password_help: A temporary password is emailed to the user. They must change it on first login.
+    new_subtitle: Name, email and role only. A welcome email is sent with a temporary password.
+    confirm_delete: Delete this user?
+  calendar:
+    waitlist_count: "Waitlist (%{count})"
+    waitlist_hint: Click free (green) hours to book. Reserved or occupied hours open the waitlist. Free cancellation until %{hours}h before start.
+    occupied_waitlist: Occupied · waitlist
+    join_waitlist: Join waitlist for this hour
+    professional: Professional
+    repeat_weekly: Repeat weekly
+    this_week: This week only
+    weeks: "%{count} weeks"
+    reserve_slots: Reserve slots
+    reserve_day: Reserve day
+    reserve_month: Reserve month
+    only_free_days: only fully free days
+    no_free_days: No fully free days ahead. Use <strong>All</strong> on the calendar to select the remaining slots.
+    all_day: All
+    hours: every day unless this room marks a weekday as closed
+    month_help: "Pro-rata: monthly / 30 × remaining days, minus occupied 30-min slots"
+    pick_room: Select a professional and a compatible room to load the weekly calendar.
+    reserve_hours: Reserve selected hours
+    new_booking_help: Rooms follow the professional’s practice area. Pick a room, then hours on the calendar.
+  bookings:
+    title: Bookings
+    subtitle: Holds, occupied slots and cancellations
+    new: New booking
+    search_placeholder: Professional or room
+    type: Type
+    amount: Amount
+    empty: No bookings match this filter.
+    cancel: Cancel
+    cancel_booking: Cancel booking
+    save_time: Save new time
+    save_note: Save note
+  invoices:
+    title: Invoices
+    subtitle_staff: Pay, cancel individual times or refund · overdue invoices block new bookings
+    subtitle_pro: Your invoices for reserved rooms
+    new: New invoice
+    receivables: Receivables
+    search_placeholder: Professional, room or comment
+    due_from: Due from
+    due_to: Due to
+    kpi_total: Total
+    kpi_paid: Paid
+    kpi_overdue: Overdue
+    kpi_open: Outstanding
+    confirm_cancel_selected: Cancel selected invoices? Paid invoices are refunded according to the cancellation policy.
+    open_invoice: "Invoice #%{number}"
+  professionals:
+    title: Professionals
+    subtitle: Overdue professionals cannot book new slots
+    new: New professional
+    search_placeholder: Name, specialty or license
+    create: Create professional
+    created: "Professional created. A welcome email with a temporary password was sent to %{email}."
+    new_help: Creates the login and the professional profile together. A temporary password is emailed.
+    practice_area: Practice area
+    practice_area_help: This controls which rooms the professional can reserve.
+    specialty: Specialty / title
+    specialty_placeholder: Cardiologist, pediatrician, CBT…
+    phone: WhatsApp / phone
+    bio_placeholder: Short professional profile
+  patients:
+    title: Patients
+    subtitle: Linked to a professional
+    new: New patient
+    search_placeholder: Name, contact or professional
+  reports:
+    title: Reports
+    subtitle: Open a report to filter, switch synthetic or analytical view, and export
+    search_placeholder: Occupancy, waitlist, emails
+    occupancy: Occupancy
+    revenue: Revenue
+    professionals: Professionals
+    receivables: Receivables
+    bookings: Bookings
+    cancellations: Cancellations
+    aging: Aging
+    rooms: Room usage
+    forecast: Occupancy forecast
+    peak_hours: Peak hours
+    blocks: Room blocks
+    waitlist: Waitlist
+    patients: Patients
+    emails: Emails
+    activity: Activity
+  rooms:
+    search_label: Search
+  statuses:
+    admin: Admin
+    staff: Staff
+    professional: Professional
+    today: Today
+    upcoming: Upcoming
+  access:
+    admin_only: Only admins can access this area.
+    staff_only: You do not have access to this area.
+  waitlist:
+    title: Waitlist
+    subtitle: Queue for occupied hours. Staff can reserve the slot here.
+    join: Join waitlist
+    search_placeholder: Professional or room
+    open_only: Open
+    from: From
+    to: To
+    slot: Slot
+    reserve: Reserve
+    remove: Remove
+    confirm_reserve: Reserve the selected slots and create invoices?
+    confirm_remove: Remove the selected entries from the waitlist?
+    empty: Nobody waiting. Open a room calendar and click an occupied hour to join.
+    reserved: Waitlist slot reserved. An invoice was created.
+    bulk_reserved:
+      one: "%{count} slot reserved."
+      other: "%{count} slots reserved."
+    bulk_cancelled:
+      one: "%{count} entry removed."
+      other: "%{count} entries removed."
+    notified: "Notified %{time}"
+    delinquent: This professional has overdue invoices and cannot reserve.
+    incompatible: This professional cannot reserve this room type.
+  billing:
+    title: Billing
+    subtitle: Clinic plan, PIX and recent invoices
+    plan: Plan
+    clinic_plan: Clinic
+    next_invoice: Upcoming invoices
+    paid_month: Paid this month
+    open: Outstanding
+  transactions:
+    title: Transactions
+    subtitle: Clinic payments and invoices
+    order: Order
+    amount: Amount
+    date: Date
+    empty: No transactions.
+  profiles:
+    title: Profile
+    subtitle: Your account details
+    updated: Profile updated.
+    password_help: Leave blank to keep the current password.
+    confirm: Confirm password
+  emails:
+    inbox: Outbox
+    compose: Compose
+    welcome: Welcome
+    folders: Folders
+    all: All
+    sent: Sent
+    failed: Failed
+    bounced: Returned
+    details: Details
+    empty: No emails.
+    when: When
+    to: To
+    subject: Subject
+    kind: Kind
+    open: Open
+    resend: Resend
+    download: Download
+    delete: Delete
+    forward: Forward
+    from: From
+    user: User
+    reason: Reason
+    send_copy: Send a copy to
+    untitled: Untitled
+  settings:
+    account: Account
+    clinic_nav: Clinic
+    policy_nav: Policy
+    mail_nav: Email
+    pix_nav: PIX
+    tickets_nav: Tickets
+  integrations:
+    title: Integrations
+    subtitle: Connect email, PIX, WhatsApp, and clinic apps — or add your own webhook.
+    new: New integration
+    new_help: Pick an app, name it, and optionally save a webhook URL to receive Hub events.
+    edit: Edit integration
+    add: Add
+    installed: Connected apps
+    catalog: Available apps
+    catalog_help: Add an app to the clinic. Webhook-based apps receive booking, invoice, and ticket events.
+    details: Details
+    configure: Configure
+    connect: Connect
+    remove: Remove
+    enabled: Active
+    kind: App
+    notes: Notes
+    notes_placeholder: Channel, environment, who owns this connection…
+    channel: Channel or destination
+    channel_placeholder: "#recepção, @financeiro…"
+    webhook_help: When saved and active, the Hub POSTs JSON events to this URL.
+    resources_title: Resources
+    resources_help: Shortcuts for this connection inside the Hub.
+    events_title: Hub events
+    created: "%{name} added."
+    updated: "%{name} updated."
+    deleted: "%{name} removed."
+    connected: "%{name} connected."
+    disconnected: "%{name} disconnected."
+    connected_badge: Connected
+    disconnected_badge: Not connected
+    available_badge: Available
+    connected_at: Connected at
+    type: Type
+    builtin: Built-in
+    optional: Optional
+    required: This integration is part of the clinic and cannot be turned off.
+    unknown: Integration not found.
+    confirm_delete: Remove this integration?
+    resources:
+      mail_settings: Email settings
+      outbound_emails: Outbound email
+      email_report: Email report
+      pix_settings: PIX settings
+      whatsapp_settings: WhatsApp number
+      invoices: Invoices
+      receivables: Receivables
+      room_calendar: Room calendar
+      availability: Availability
+      waitlist: Waitlist
+      blocks: Room blocks
+      api_keys: API keys
+      workflow: n8n workflow
+      tickets: Tickets
+      bookings: Bookings
+      professionals: Professionals
+      reports: Reports
+      patients: Patients
+    providers:
+      smtp:
+        name: SMTP
+        body: Send invoices, invites, and notices from the clinic mailbox.
+        help: Set server, sender, and password in Settings → Email.
+      pix:
+        name: PIX
+        body: Generate instant invoice charges with the clinic PIX key.
+        help: Enter key, name, and city in Settings → PIX.
+      whatsapp:
+        name: WhatsApp
+        body: Share the invoice PIX code from the clinic WhatsApp number.
+        help: The number lives with the PIX settings.
+      calendar:
+        name: Calendar
+        body: Room slot grid, bookings, and waitlist.
+        help: Always on. Hours come from each room and clinic policy.
+      webhooks:
+        name: Webhooks
+        body: Push booking and invoice events to your own endpoint.
+        help: Save a POST URL. The Hub sends event, clinic, occurred_at, and data.
+      zapier:
+        name: Zapier
+        body: Pipe bookings and invoices into spreadsheets and other apps.
+        help: Use a Catch Hook URL and a Hub API key if Zapier needs to read the Hub.
+      google_calendar:
+        name: Google Calendar
+        body: Mirror room bookings onto the professional’s calendar.
+        help: Mark as active while you connect the professional calendars.
+      slack:
+        name: Slack
+        body: Notify the team about new tickets, bookings, and paid invoices.
+        help: Paste an Incoming Webhook URL or route through n8n.
+      n8n:
+        name: n8n
+        body: Trigger automations on new bookings, paid invoices, and tickets.
+        help: Save the workflow webhook URL. The n8n API key is optional and only used to test the connection.
+      make:
+        name: Make
+        body: Build scenarios from Hub events without writing code.
+        help: Paste a Make custom webhook URL.
+      discord:
+        name: Discord
+        body: Post clinic events to a Discord channel.
+        help: Use a Discord webhook URL for the channel.
+      telegram:
+        name: Telegram
+        body: Send booking and ticket alerts to a Telegram chat or group.
+        help: Paste a bot webhook or n8n Telegram webhook URL.
+      microsoft_teams:
+        name: Microsoft Teams
+        body: Notify a Teams channel when invoices are paid or tickets open.
+        help: Paste an Incoming Webhook connector URL.
+      google_sheets:
+        name: Google Sheets
+        body: Append rows for bookings and payments.
+        help: Use a webhook (n8n/Make) that writes to the spreadsheet.
+      notion:
+        name: Notion
+        body: Log tickets and bookings in a Notion database.
+        help: Paste the automation webhook that creates Notion pages.
+      twilio:
+        name: Twilio
+        body: SMS reminders for waitlist offers and upcoming bookings.
+        help: Save the webhook that talks to Twilio, or route through n8n.
+      outlook:
+        name: Outlook Calendar
+        body: Mirror bookings onto Outlook/Microsoft 365 calendars.
+        help: Mark as active while calendar sync is configured.
+      custom:
+        name: Custom webhook
+        body: Any extra endpoint that should receive the same Hub events.
+        help: Name it however you like. You can add more than one.
+    n8n:
+      setup: n8n connection
+      setup_help: The usual path is an n8n Webhook node. The n8n public API JWT does not belong in git — keep it in n8n, or paste it here only to test the API.
+      webhook_url: Webhook URL
+      webhook_help: In n8n, add a Webhook node (POST), activate the workflow, and paste the production URL.
+      api_base_url: n8n URL
+      api_token: n8n API key
+      token_set: Key already saved. Leave blank to keep it.
+      token_placeholder: Paste a new key only to replace it
+      api_help: Optional. X-N8N-API-KEY header, only for the Test button against the n8n API.
+      saved: n8n settings saved.
+      test: Test connection
+      test_ok_webhook: Webhook responded.
+      test_ok_api: API responded.
+      test_failed: "Could not reach the endpoint: %{error}"
+      missing_config: Enter a webhook URL, or the n8n URL plus API key.
+      hub_api: n8n calling the Hub
+      hub_api_help: Create an API key named n8n and use it in an HTTP Request node.
+      step_key: Generate an mwh_ key in
+      step_node: In n8n, add an HTTP Request node with GET.
+      or_header: or
+      events_help: "The Hub POSTs JSON on these events when a webhook URL is saved:"
+      import_help: "In n8n: editor ⋯ menu → Import from File. Then activate the workflow and attach Slack/email to the Pronto node."
+      import_file: Download MedWork Hub workflow (JSON)
+  api_keys:
+    title: API keys
+    subtitle: Generate tokens for external systems. The full value is shown only once.
+    generate: Generate key
+    generate_help: Name the platform and optionally set a renewal date.
+    platform: Platform
+    platform_placeholder: Zapier, internal app…
+    key: Key
+    renewal: Renewal
+    toggle: Active
+    edit: Edit key
+    empty: No keys yet.
+    created: Key created. Copy it now — it will not be shown again.
+    updated: Key updated.
+    deleted: Key deleted.
+    enabled: Key enabled.
+    disabled: Key disabled.
+    regenerated: New key generated. Copy it now.
+    copy_now: "Key for %{name}"
+    regenerate: Regenerate
+    activate_all: Activate selected
+    deactivate_all: Deactivate selected
+    delete_all: Delete selected
+    confirm_delete: Delete this key?
+    confirm_delete_all: Delete the selected keys?
+    confirm_regenerate: Regenerating invalidates the current key. Continue?
+    bulk_activated: Keys activated.
+    bulk_deactivated: Keys deactivated.
+    bulk_deleted: Keys deleted.
+  audit:
+    subtitle: History of creates, updates, and deletes in the clinic.
+    export_xlsx: Download Excel
+    search_placeholder: Action, user, record, or field
+    action: Action
+    actor: User
+    record: Record
+    record_type: Type
+    record_id: ID
+    changes: Changes
+    details: Details
+    hide: Hide
+    open_record: Open record
+    field: Field
+    before: Before
+    after: After
+    changed_fields: Changed fields
+    from: From
+    to: To
+    empty: No events match these filters.
+    system: System
+    no_field_changes: No field details.
+    bulk_help: Delete only removes log rows, not clinic records.
+    confirm_delete: Remove this event from the log?
+    confirm_bulk_delete: Remove the selected audit events?
+    deleted: Event removed from the log.
+    choose_action: Choose a bulk action.
+    select_event: "Select event %{id}"
+    action_title: "%{verb} %{resource}"
+    fields_count:
+      one: "%{count} field"
+      other: "%{count} fields"
+    bulk_deleted:
+      one: "%{count} event removed."
+      other: "%{count} events removed."
+    verbs:
+      created: Created
+      updated: Updated
+      deleted: Deleted
+    resources:
+      booking: booking
+      invoice: invoice
+      user: user
+      professional: professional
+      room: room
+      patient: patient
+      ticket: ticket
+      ticket_comment: comment
+      waitlist_entry: waitlist
+      room_block: block
+      appointment_note: note
+      api_key: API key
+      clinic_integration: integration
+      outbound_email: email
+      setting: settings
+    fields:
+      status: Status
+      amount: Amount
+      name: Name
+      email: Email
+      role: Role
+      start_time: Start
+      end_time: End
+      due_date: Due date
+      subject: Subject
+      body: Message
+      priority: Priority
+      category: Category
+      assignee_id: Assignee
+      professional_id: Professional
+      room_id: Room
+      patient_id: Patient
+      invoice_id: Invoice
+      user_id: User
+      enabled: Enabled
+      provider: Provider
+      action: Action
+      details: Details
+      id: ID

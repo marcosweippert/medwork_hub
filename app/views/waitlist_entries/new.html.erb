@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Join waitlist</h1>
+    <h1 class="page-title"><%= t("helpers.heading.waitlist_entries.new") %></h1>
     <p class="page-sub"><%= @room.name %> · you will be notified if this slot opens</p>
   </div>
   <div class="page-actions">
-    <%= link_to "Calendar", calendar_room_path(@room), class: "btn btn--ghost" %>
+    <%= link_to t("ui.calendar"), calendar_room_path(@room), class: "btn btn--ghost" %>
   </div>
 </div>
 

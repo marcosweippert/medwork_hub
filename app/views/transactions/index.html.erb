@@ -1,0 +1,51 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("transactions.title") %></h1>
+    <p class="page-sub"><%= t("transactions.subtitle") %></p>
+  </div>
+  <div class="page-actions">
+    <%= link_to t("nav.billing"), billing_path, class: "btn btn--ghost" %>
+    <%= link_to t("nav.invoices"), invoices_path, class: "btn btn--primary" %>
+  </div>
+</div>
+
+<%= form_with url: transactions_path, method: :get, class: "filter-bar" do %>
+  <div class="field">
+    <label class="field-label"><%= t("ui.status") %></label>
+    <%= select_tag :status, options_for_select([[t("ui.all"), ""]] + Invoice::STATUSES.map { |s| [t("statuses.#{s}", default: s.humanize), s] }, params[:status]), class: "select" %>
+  </div>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
+<% end %>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><%= t("transactions.order") %></th>
+          <th><%= t("ui.professional") %></th>
+          <th><%= t("ui.room") %></th>
+          <th class="cell-price"><%= t("transactions.amount") %></th>
+          <th><%= t("transactions.date") %></th>
+          <th><%= t("ui.status") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr>
+            <td class="data-cell-mono"><%= link_to "##{invoice.id.to_s.rjust(4, "0")}", invoice_path(invoice), class: "table-link" %></td>
+            <td class="cell-name"><%= invoice.professional.display_name %></td>
+            <td><%= invoice.room&.name || "—" %></td>
+            <td class="cell-price"><%= number_to_currency(invoice.collected_amount.positive? ? invoice.collected_amount : invoice.amount) %></td>
+            <td class="data-cell-mono"><%= (invoice.paid_at || invoice.created_at).strftime("%d/%m/%Y") %></td>
+            <td><%= status_tag(invoice.status) %></td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr><td colspan="6"><%= t("transactions.empty") %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= render "shared/pager" %>
+</section>

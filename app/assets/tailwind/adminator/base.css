@@ -17,14 +17,14 @@ img, svg { display: block; max-width: 100%; }
 input, textarea { font: inherit; color: inherit; }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-feature-settings: 'cv11', 'ss01', 'ss03';
-  font-weight: 400;
+  font-family: "Plus Jakarta Sans", "DM Sans", Inter, system-ui, sans-serif;
+  font-feature-settings: "kern";
+  font-weight: 500;
   background: var(--bg-body);
   color: var(--t-base);
-  font-size: 13px;
-  line-height: 1.45;
-  letter-spacing: -0.003em;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.3px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   transition: background-color 280ms ease, color 280ms ease;

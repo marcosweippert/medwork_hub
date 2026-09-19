@@ -1,31 +1,31 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Bookings</h1>
-    <p class="page-sub">Holds, occupied slots and cancellations</p>
+    <h1 class="page-title"><%= t("bookings.title") %></h1>
+    <p class="page-sub"><%= t("bookings.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "New booking", new_booking_path, class: "btn btn--primary" %>
+    <%= link_to t("bookings.new"), new_booking_path, class: "btn btn--primary" %>
   </div>
 </div>
 
 <%= form_with url: bookings_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Professional or room" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("bookings.search_placeholder") %>
   </div>
   <div class="field">
-    <label class="field-label">When</label>
-    <%= select_tag :when, options_for_select([["All", ""], ["Today", "today"], ["Upcoming", "upcoming"]], params[:when]), class: "select" %>
+    <label class="field-label"><%= t("ui.when") %></label>
+    <%= select_tag :when, options_for_select([[t("ui.all"), ""], [t("ui.today"), "today"], [t("ui.upcoming"), "upcoming"]], params[:when]), class: "select" %>
   </div>
   <div class="field">
-    <label class="field-label">Status</label>
-    <%= select_tag :status, options_for_select([["All", ""]] + Booking::STATUSES.map { |s| [s.titleize, s] }, params[:status]), class: "select" %>
+    <label class="field-label"><%= t("ui.status") %></label>
+    <%= select_tag :status, options_for_select([[t("ui.all"), ""]] + Booking::STATUSES.map { |s| [t("statuses.#{s}", default: s.humanize), s] }, params[:status]), class: "select" %>
   </div>
   <div class="field">
-    <label class="field-label">Room</label>
-    <%= select_tag :room_id, options_from_collection_for_select(@rooms, :id, :name, params[:room_id]), include_blank: "All", class: "select" %>
+    <label class="field-label"><%= t("ui.room") %></label>
+    <%= select_tag :room_id, options_from_collection_for_select(@rooms, :id, :name, params[:room_id]), include_blank: t("ui.all"), class: "select" %>
   </div>
-  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">
@@ -43,14 +43,14 @@
       </colgroup>
       <thead>
         <tr>
-          <th class="cell-status">Status</th>
-          <th class="cell-when">When</th>
-          <th class="cell-name">Professional</th>
-          <th class="cell-room">Room</th>
-          <th class="cell-type">Type</th>
-          <th class="cell-price">Amount</th>
-          <th class="cell-invoice">Invoice</th>
-          <th class="cell-actions">Actions</th>
+          <th class="cell-status"><%= t("ui.status") %></th>
+          <th class="cell-when"><%= t("ui.when") %></th>
+          <th class="cell-name"><%= t("ui.professional") %></th>
+          <th class="cell-room"><%= t("ui.room") %></th>
+          <th class="cell-type"><%= t("bookings.type") %></th>
+          <th class="cell-price"><%= t("bookings.amount") %></th>
+          <th class="cell-invoice"><%= t("nav.invoices") %></th>
+          <th class="cell-actions"><%= t("ui.actions") %></th>
         </tr>
       </thead>
       <tbody>
@@ -72,33 +72,22 @@
             </td>
             <td class="cell-name" title="<%= booking.professional.display_name %>"><%= booking.professional.display_name %></td>
             <td class="cell-room" title="<%= booking.room.name %>"><%= booking.room.name %></td>
-            <td class="cell-type"><%= booking.billing_type.to_s.titleize %></td>
+            <td class="cell-type"><%= t("statuses.#{booking.billing_type}", default: booking.billing_type.to_s.humanize) %></td>
             <td class="cell-price"><%= number_to_currency(amount) %></td>
             <td class="cell-invoice">
               <% if booking.invoice %>
-                <%= link_to "##{booking.invoice.id.to_s.rjust(4, "0")}", path_with_return(invoice_path(booking.invoice)), class: "table-link data-cell-mono", title: booking.invoice.status.to_s.titleize %>
+                <%= link_to "##{booking.invoice.id.to_s.rjust(4, "0")}", path_with_return(invoice_path(booking.invoice)), class: "table-link data-cell-mono" %>
               <% else %>
                 —
               <% end %>
             </td>
             <td class="cell-actions">
-              <div class="row-actions">
-                <%= action_btn "Open", path_with_return(booking_path(booking)), tone: "view" %>
-                <%= action_btn "Calendar", calendar_room_path(booking.room, date: booking.start_time.to_date), tone: "cal" %>
-                <% if clinic_staff? && booking.cancellable? %>
-                  <% confirm = if booking.billing_type == "monthly"
-                                 "Cancel the entire monthly reservation? Days already started plus one 30-min slot are kept; the rest is refunded and remaining days are released."
-                               else
-                                 "Cancel this booking and refund according to the cancellation policy?"
-                               end %>
-                  <%= action_btn "Cancel", cancel_booking_path(booking), tone: "danger", method: :patch, confirm: confirm, params: { return_to: originating_path } %>
-                <% end %>
-              </div>
+              <%= action_btn t("ui.open"), path_with_return(booking_path(booking)), tone: "view" %>
             </td>
           </tr>
         <% end %>
         <% if @bookings.empty? %>
-          <tr><td colspan="8">No bookings match this filter.</td></tr>
+          <tr><td colspan="8"><%= t("bookings.empty") %></td></tr>
         <% end %>
       </tbody>
     </table>

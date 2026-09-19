@@ -1,0 +1,120 @@
+<nav class="fb-crumb" aria-label="breadcrumb">
+  <%= link_to t("nav.dashboard"), signed_in_home_path %>
+  <span>/</span>
+  <%= link_to t("nav.tickets"), tickets_path %>
+  <span>/</span>
+  <span class="is-current"><%= t("tickets.reply") %></span>
+</nav>
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("tickets.reply") %></h1>
+  </div>
+</div>
+
+<div class="ticket-show">
+  <section class="card ticket-main">
+    <div class="ta-ticket-head">
+      <div>
+        <h2 class="card-title">Ticket #<%= @ticket.id %> — <%= @ticket.subject %></h2>
+        <p class="page-sub"><%= l(@ticket.created_at, format: :short) rescue @ticket.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+      </div>
+      <div class="ticket-hero-tags">
+        <%= status_tag(@ticket.status) %>
+        <%= status_tag(@ticket.priority) %>
+        <span class="<%= sla_class(@ticket) %>"><%= @ticket.sla_label %></span>
+      </div>
+    </div>
+
+    <div class="ticket-thread">
+      <article class="ticket-msg is-opener">
+        <div class="ticket-msg-head">
+          <span class="fb-avatar"><%= @ticket.user.initials %></span>
+          <div>
+            <strong><%= @ticket.user.display_name %></strong>
+            <div class="page-sub"><%= @ticket.user.email %></div>
+          </div>
+          <span class="page-sub" style="margin-left:auto;"><%= @ticket.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+        </div>
+        <%= simple_format(@ticket.body) %>
+      </article>
+      <% @comments.each do |comment| %>
+        <article class="ticket-msg <%= "is-staff" if comment.user.clinic_staff? %> <%= "is-internal" if comment.internal? %>">
+          <div class="ticket-msg-head">
+            <span class="fb-avatar"><%= comment.user.initials %></span>
+            <div>
+              <strong><%= comment.user.display_name %></strong>
+              <div class="page-sub"><%= comment.user.clinic_staff? ? t("tickets.staff_team") : comment.user.email %></div>
+            </div>
+            <% if comment.internal? %><span class="tag t-old"><%= t("tickets.internal") %></span><% end %>
+            <span class="page-sub" style="margin-left:auto;"><%= comment.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+          </div>
+          <%= simple_format(comment.body) %>
+        </article>
+      <% end %>
+    </div>
+
+    <% if @ticket.accepts_replies? %>
+      <%= form_with model: @comment, url: comment_ticket_path(@ticket), class: "ticket-composer" do |f| %>
+        <% if @comment.errors.any? %>
+          <div class="alert alert-danger"><%= @comment.errors.full_messages.to_sentence %></div>
+        <% end %>
+        <%= f.text_area :body, class: "input", rows: 4, placeholder: t("tickets.reply_placeholder") %>
+        <div class="form-actions">
+          <% if clinic_staff? %>
+            <label class="field-check">
+              <%= f.check_box :internal %>
+              <span><%= t("tickets.internal") %></span>
+            </label>
+          <% end %>
+          <%= f.submit t("tickets.reply"), class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="notice-banner"><%= t("tickets.locked") %></div>
+    <% end %>
+  </section>
+
+  <aside class="ticket-aside">
+    <section class="card">
+      <h2 class="card-title"><%= t("tickets.details") %></h2>
+      <dl class="dl-meta" style="margin-top:12px;">
+        <dt><%= t("tickets.requester") %></dt><dd><%= @ticket.user.display_name %></dd>
+        <dt><%= t("sessions.email") %></dt><dd><%= @ticket.user.email %></dd>
+        <dt><%= t("tickets.col_id") %></dt><dd>#<%= @ticket.id %></dd>
+        <dt><%= t("tickets.category") %></dt><dd><%= t("statuses.#{@ticket.category}", default: @ticket.category.humanize) %></dd>
+        <dt><%= t("tickets.assign") %></dt><dd><%= @ticket.assignee&.display_name || t("tickets.unassigned") %></dd>
+        <dt><%= t("tickets.opened_at") %></dt><dd><%= @ticket.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
+        <% if @ticket.first_response_at %><dt><%= t("tickets.first_response") %></dt><dd><%= @ticket.first_response_at.strftime("%d/%m/%Y %H:%M") %></dd><% end %>
+      </dl>
+      <% if clinic_staff? %>
+        <div class="form-actions" style="margin-top:14px;">
+          <% if @ticket.assignee_id != current_user.id && @ticket.open? %>
+            <%= button_to t("tickets.take"), take_ticket_path(@ticket), method: :patch, class: "btn btn--primary btn--sm" %>
+          <% end %>
+          <% if @ticket.status.in?(%w[resolved closed]) %>
+            <%= button_to t("tickets.reopen"), reopen_ticket_path(@ticket), method: :patch, class: "btn btn--ghost btn--sm" %>
+          <% end %>
+        </div>
+        <%= form_with model: @ticket, method: :patch, class: "ticket-staff-form" do |f| %>
+          <div class="field">
+            <%= f.label :status, t("tickets.status"), class: "field-label" %>
+            <%= f.select :status, ticket_status_options, {}, class: "select" %>
+          </div>
+          <div class="field">
+            <%= f.label :priority, t("tickets.priority"), class: "field-label" %>
+            <%= f.select :priority, ticket_priority_options, {}, class: "select" %>
+          </div>
+          <div class="field">
+            <%= f.label :category, t("tickets.category"), class: "field-label" %>
+            <%= f.select :category, ticket_category_options, {}, class: "select" %>
+          </div>
+          <div class="field">
+            <%= f.label :assignee_id, t("tickets.assign"), class: "field-label" %>
+            <%= f.collection_select :assignee_id, staff_assignees, :id, :display_name, { include_blank: t("tickets.unassigned") }, class: "select" %>
+          </div>
+          <%= f.submit t("tickets.save"), class: "btn btn--primary" %>
+        <% end %>
+      <% end %>
+    </section>
+  </aside>
+</div>

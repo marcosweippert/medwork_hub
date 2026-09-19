@@ -4,7 +4,7 @@
     <p class="page-sub"><%= @booking.professional.display_name %> · <%= @booking.billing_type %> · <%= number_to_currency(@booking.invoice&.amount || @booking.amount) %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Calendar", calendar_room_path(@booking.room, date: @booking.start_time), class: "btn btn--ghost" %>
+    <%= link_to t("ui.calendar"), calendar_room_path(@booking.room, date: @booking.start_time), class: "btn btn--ghost" %>
     <%= link_to "Invoice", path_with_return(invoice_path(@booking.invoice)), class: "btn btn--primary" if @booking.invoice %>
   </div>
 </div>
@@ -99,7 +99,7 @@
       <% end %>
     <% else %>
       <p class="field-help">Add a patient for <%= @booking.professional.display_name %> first.</p>
-      <%= link_to "New patient", new_patient_path(professional_id: @booking.professional_id), class: "btn btn--ghost btn--sm" %>
+      <%= link_to t("patients.new"), new_patient_path(professional_id: @booking.professional_id), class: "btn btn--ghost btn--sm" %>
     <% end %>
     <% @notes.each do |note| %>
       <article class="note-item">

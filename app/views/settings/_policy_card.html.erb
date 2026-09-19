@@ -1,0 +1,34 @@
+<section class="col-6 card <%= "is-editing" if settings_editing?("policy") %>">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("settings.policy.title") %></h2>
+    <% unless settings_editing?("policy") %>
+      <%= link_to t("ui.edit"), settings_path(edit: "policy"), class: "btn btn--ghost btn--sm" %>
+    <% end %>
+  </div>
+  <% if settings_editing?("policy") %>
+    <%= form_with model: @setting, url: settings_path, method: :patch, class: "form-grid" do |f| %>
+      <%= hidden_field_tag :section, "policy" %>
+      <div class="field"><%= f.label :free_cancel_hours, t("settings.policy.free_cancel"), class: "field-label" %><%= f.number_field :free_cancel_hours, min: 0, class: "input" %></div>
+      <div class="field"><%= f.label :late_cancel_percent, t("settings.policy.late_fee"), class: "field-label" %><%= f.number_field :late_cancel_percent, min: 0, max: 100, class: "input" %></div>
+      <div class="field"><%= f.label :started_cancel_percent, t("settings.policy.after_start"), class: "field-label" %><%= f.number_field :started_cancel_percent, min: 0, max: 100, class: "input" %></div>
+      <div class="field"><%= f.label :saturday_opens_at, t("settings.policy.sat_open"), class: "field-label" %><%= f.number_field :saturday_opens_at, min: 0, max: 23, class: "input" %></div>
+      <div class="field"><%= f.label :saturday_closes_at, t("settings.policy.sat_close"), class: "field-label" %><%= f.number_field :saturday_closes_at, min: 0, max: 23, class: "input" %></div>
+      <div class="field">
+        <label class="field-label"><%= f.check_box :sunday_closed %> <%= t("settings.policy.sunday_closed") %></label>
+      </div>
+      <div class="field span-2 form-actions">
+        <%= f.submit t("ui.save"), class: "btn btn--primary btn--sm" %>
+        <%= link_to t("ui.cancel"), settings_path, class: "btn btn--ghost btn--sm" %>
+      </div>
+    <% end %>
+  <% else %>
+    <dl class="dl-meta">
+      <dt><%= t("settings.policy.hours") %></dt><dd><%= t("settings.policy.hours_help") %></dd>
+      <dt><%= t("settings.policy.saturday") %></dt><dd><%= format("%02d:00–%02d:00", @setting.saturday_opens_at, @setting.saturday_closes_at) %></dd>
+      <dt><%= t("settings.policy.sunday") %></dt><dd><%= @setting.sunday_closed? ? t("ui.closed") : t("ui.open") %></dd>
+      <dt><%= t("settings.policy.free_cancel") %></dt><dd><%= @setting.free_cancel_hours %>h</dd>
+      <dt><%= t("settings.policy.late_fee") %></dt><dd><%= @setting.late_cancel_percent %>%</dd>
+      <dt><%= t("settings.policy.after_start") %></dt><dd><%= @setting.started_cancel_percent %>%</dd>
+    </dl>
+  <% end %>
+</section>

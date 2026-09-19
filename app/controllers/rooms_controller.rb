@@ -46,7 +46,7 @@ class RoomsController < ApplicationController
     @professionals = if professional_user?
                        Array(current_professional)
                      else
-                       Professional.includes(:user, :invoices).select { |professional| professional.can_reserve?(@room) }
+                       Professional.for_room_select(@room)
                      end
     @free_days = @room.upcoming_free_days(from: Date.current, limit: 12)
     waitlist = @room.waitlist_entries.waiting

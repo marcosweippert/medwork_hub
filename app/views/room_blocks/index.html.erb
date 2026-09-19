@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Room blocks</h1>
+    <h1 class="page-title"><%= t("reports.blocks") %></h1>
     <p class="page-sub">Maintenance, holidays and clinic-wide closures</p>
   </div>
 </div>
@@ -10,7 +10,7 @@
   <%= form_with model: @block, url: room_blocks_path, class: "form-grid" do |f| %>
     <div class="field">
       <%= f.label :room_id, class: "field-label" %>
-      <%= f.collection_select :room_id, @rooms, :id, :name, { include_blank: "All rooms" }, class: "select" %>
+      <%= f.collection_select :room_id, @rooms, :id, :name, { include_blank: t("ui.all_rooms") }, class: "select" %>
     </div>
     <div class="field">
       <%= f.label :starts_at, class: "field-label" %>

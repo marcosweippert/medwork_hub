@@ -9,6 +9,10 @@ module ActiveSupport
 
     # Fixtures are empty placeholders; tests build their own records.
     # fixtures :all
+
+    teardown do
+      ActiveSupport::IsolatedExecutionState[:clinic_setting] = nil
+    end
   end
 end
 

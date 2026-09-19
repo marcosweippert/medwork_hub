@@ -1,19 +1,30 @@
 class ApplicationController < ActionController::Base
   include Paginatable
   include Returnable
+  prepend_before_action :reset_clinic_setting
   before_action :authenticate_user!, unless: :devise_controller?
+  before_action :set_locale
   before_action :set_current_user
   before_action :set_clinic_name, if: :devise_controller?
   before_action :require_password_change, if: :user_signed_in?
   before_action :run_operational_jobs, unless: :devise_controller?
-  helper_method :admin_user?, :professional_user?, :clinic_staff?, :current_professional, :signed_in_home_path
+  before_action :load_header_notifications, if: :user_signed_in?
+  helper_method :admin_user?, :professional_user?, :clinic_staff?, :current_professional, :signed_in_home_path, :unread_notifications_count, :clinic_setting
 
   layout :app_layout
 
   private
 
+  def reset_clinic_setting
+    Setting.reset_current!
+  end
+
   def app_layout
     user_signed_in? ? "application" : "session"
+  end
+
+  def set_locale
+    I18n.locale = :"pt-BR"
   end
 
   def set_current_user
@@ -25,7 +36,10 @@ class ApplicationController < ActionController::Base
   end
 
   def run_operational_jobs
+    return unless Rails.cache.write("invoice_expire_overdue", true, expires_in: 5.minutes, unless_exist: true)
+
     Invoice.expire_overdue!
+    Ticket.auto_close_stale!
   rescue StandardError => e
     Rails.logger.warn("Operational jobs failed: #{e.class}: #{e.message}")
   end
@@ -42,8 +56,23 @@ class ApplicationController < ActionController::Base
     current_user&.clinic_staff?
   end
 
+  def clinic_setting
+    Setting.current
+  end
+
   def current_professional
     current_user&.professional
+  end
+
+  def load_header_notifications
+    return if devise_controller?
+
+    @header_notifications = current_user.notifications.includes(:actor).newest.limit(8)
+    @unread_notifications_count = current_user.notifications.unread.count
+  end
+
+  def unread_notifications_count
+    @unread_notifications_count.to_i
   end
 
   def signed_in_home_path
@@ -59,13 +88,13 @@ class ApplicationController < ActionController::Base
   def require_admin
     return if admin_user?
 
-    redirect_to signed_in_home_path, alert: "Only admins can access this area."
+    redirect_to signed_in_home_path, alert: t("access.admin_only")
   end
 
   def require_clinic_staff
     return if clinic_staff?
 
-    redirect_to signed_in_home_path, alert: "You do not have access to this area."
+    redirect_to signed_in_home_path, alert: t("access.staff_only")
   end
 
   def accessible_rooms

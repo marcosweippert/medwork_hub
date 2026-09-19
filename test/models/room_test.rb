@@ -6,16 +6,16 @@ class RoomTest < ActiveSupport::TestCase
     @room = Room.create!(name: "Consult", capacity: 2, daily_rate: 280, monthly_rate: 4200, hourly_rate: 40, opens_at: 8, closes_at: 18)
   end
 
-  test "weekdays use room hours, saturday uses clinic hours, sunday is closed" do
+  test "open days use room hours and sunday follows the clinic closed flag" do
     friday = Date.new(2026, 8, 28)
     saturday = Date.new(2026, 8, 29)
     sunday = Date.new(2026, 8, 30)
 
     assert_equal [8, 18], @room.schedule_for(friday)
-    assert_equal [9, 12], @room.schedule_for(saturday)
+    assert_equal [8, 18], @room.schedule_for(saturday)
     assert_nil @room.schedule_for(sunday)
     assert_equal 10, @room.working_hours_on(friday)
-    assert_equal 3, @room.working_hours_on(saturday)
+    assert_equal 10, @room.working_hours_on(saturday)
     assert_equal 0, @room.working_hours_on(sunday)
   end
 
@@ -33,6 +33,20 @@ class RoomTest < ActiveSupport::TestCase
 
     assert_nil @room.schedule_for(friday)
     assert_equal 0, @room.working_hours_on(friday)
+  end
+
+  test "upcoming free days scans the window with a handful of queries" do
+    travel_to Time.zone.local(2026, 8, 24, 7, 0, 0) do
+      queries = 0
+      counter = lambda { |*_args| queries += 1 }
+      days = nil
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+        days = @room.upcoming_free_days(from: Date.new(2026, 8, 24), limit: 3)
+      end
+
+      assert_operator days.size, :>=, 1
+      assert_operator queries, :<, 12
+    end
   end
 
   test "paid completed bookings count toward occupancy" do

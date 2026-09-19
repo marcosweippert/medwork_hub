@@ -16,6 +16,14 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "paid", @invoice.reload.status
   end
 
+  test "filters invoices by due date range" do
+    get invoices_path, params: { from: Date.current.to_s, to: Date.current.to_s }
+
+    assert_response :success
+    assert_includes response.body, "invoice_#{@other.id}"
+    assert_not_includes response.body, "invoice_#{@invoice.id}"
+  end
+
   test "pays selected invoices in bulk" do
     patch bulk_invoices_path, params: {
       invoice_ids: [@invoice.id, @other.id],
@@ -25,6 +33,26 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to invoices_path
     assert_equal "paid", @invoice.reload.status
     assert_equal "paid", @other.reload.status
+  end
+
+  test "header select all pays every invoice matching the filter, not only the current page" do
+    extra = 21.times.map do |index|
+      Invoice.create!(professional: @professional, amount: 10 + index, status: "open", due_date: Date.current)
+    end
+    paid = Invoice.create!(professional: @professional, amount: 99, status: "paid", paid_at: Time.current, due_date: Date.current)
+
+    patch bulk_invoices_path, params: {
+      select_matching: "1",
+      status: "open",
+      bulk_action: "pay",
+      return_to: invoices_path(status: "open")
+    }
+
+    assert_redirected_to invoices_path(status: "open")
+    assert_equal "paid", @other.reload.status
+    extra.each { |invoice| assert_equal "paid", invoice.reload.status }
+    assert_equal "overdue", @invoice.reload.status
+    assert_equal "paid", paid.reload.status
   end
 
   test "cancels a paid invoice and refunds according to policy" do

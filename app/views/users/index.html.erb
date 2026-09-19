@@ -1,19 +1,19 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Users</h1>
-    <p class="page-sub">Clinic accounts. Professionals are created together with the login.</p>
+    <h1 class="page-title"><%= t("users.title") %></h1>
+    <p class="page-sub"><%= t("users.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "New user", new_user_path, class: "btn btn--primary" %>
+    <%= link_to t("users.new"), new_user_path, class: "btn btn--primary", data: { turbo: false } %>
   </div>
 </div>
 
 <%= form_with url: users_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name or email" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("users.search_placeholder") %>
   </div>
-  <%= submit_tag "Search", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.search"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">
@@ -21,10 +21,10 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th class="cell-actions">Actions</th>
+          <th><%= t("ui.name") %></th>
+          <th><%= t("ui.email") %></th>
+          <th><%= t("ui.role") %></th>
+          <th class="cell-actions"><%= t("ui.actions") %></th>
         </tr>
       </thead>
       <tbody>
@@ -35,10 +35,10 @@
             <td><%= status_tag(user.role) %></td>
             <td class="cell-actions">
               <div class="row-actions">
-                <%= action_btn "Open", user, tone: "view" %>
-                <%= action_btn "Edit", edit_user_path(user), tone: "edit" %>
-                <% unless user == current_user %>
-                  <%= action_btn "Delete", user, tone: "danger", method: :delete, confirm: "Delete this user?" %>
+                <%= action_btn t("ui.open"), user, tone: "view" %>
+                <%= action_btn t("ui.edit"), edit_user_path(user), tone: "edit" %>
+                <% if admin_user? && user != current_user %>
+                  <%= action_btn t("ui.delete"), user, tone: "danger", method: :delete, confirm: t("users.confirm_delete") %>
                 <% end %>
               </div>
             </td>

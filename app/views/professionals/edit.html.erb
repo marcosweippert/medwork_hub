@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Edit professional</h1>
+    <h1 class="page-title"><%= t("helpers.heading.professionals.edit") %></h1>
     <p class="page-sub"><%= @professional.display_name %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", professional_path(@professional), class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), professional_path(@professional), class: "btn btn--ghost" %>
   </div>
 </div>
 <section class="card form-card">

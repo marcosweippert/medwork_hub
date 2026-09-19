@@ -3,17 +3,18 @@
     <div class="card-head" style="margin-top:4px;">
       <h2 class="card-title"><%= @selected_room.name %> · <%= @selected_room.types_label %></h2>
       <div class="page-actions">
-        <%= link_to "Prev", calendar_bookings_path(room_id: @selected_room.id, professional_id: params[:professional_id], date: @date - 7), class: "btn btn--ghost btn--sm" %>
-        <%= link_to "Next", calendar_bookings_path(room_id: @selected_room.id, professional_id: params[:professional_id], date: @date + 7), class: "btn btn--ghost btn--sm" %>
+        <%= link_to t("ui.prev"), calendar_bookings_path(room_id: @selected_room.id, professional_id: params[:professional_id], date: @date - 7), class: "btn btn--ghost btn--sm" %>
+        <%= link_to t("ui.next"), calendar_bookings_path(room_id: @selected_room.id, professional_id: params[:professional_id], date: @date + 7), class: "btn btn--ghost btn--sm" %>
       </div>
     </div>
     <p class="field-help" style="margin:0 0 10px;">
       <%= number_to_currency(@selected_room.slot_price) %> / <%= Setting.current.slot_minutes %> min ·
-      hours <%= format("%02d:00", @selected_room.opens_at) %>–<%= format("%02d:00", @selected_room.closes_at) %> every day.
-      Green hours are free. Click a reserved or occupied hour to join the waitlist.
+      <%= format("%02d:00", @selected_room.opens_at) %>–<%= format("%02d:00", @selected_room.closes_at) %>
+      <%= t("calendar.hours") %>
+      <%= t("calendar.waitlist_hint", hours: clinic_policy[:free_hours]) %>
     </p>
     <%= render "rooms/slot_grid", calendar: @calendar, room: @selected_room %>
   <% else %>
-    <p class="field-help" style="margin:8px 0;">Select a professional and a compatible room to load the weekly calendar.</p>
+    <p class="field-help" style="margin:8px 0;"><%= t("calendar.pick_room") %></p>
   <% end %>
 <% end %>

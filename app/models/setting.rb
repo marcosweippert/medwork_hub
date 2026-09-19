@@ -11,17 +11,48 @@ class Setting < ApplicationRecord
   validates :smtp_authentication, inclusion: { in: %w[plain login cram_md5] }, allow_blank: true
   validates :pix_name, length: { maximum: 25 }, allow_blank: true
   validates :pix_city, length: { maximum: 15 }, allow_blank: true
+  validates :ticket_sla_urgent, :ticket_sla_high, :ticket_sla_medium, :ticket_sla_low, :ticket_sla_warn_hours,
+            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 168 }
+  validates :ticket_default_priority, inclusion: { in: %w[low medium high urgent] }
+  validates :ticket_auto_close_days, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 365 }
+  belongs_to :ticket_default_assignee, class_name: "User", optional: true
+  has_one_attached :logo
   validate :saturday_closes_after_opens
   validate :pix_key_format
+  validate :acceptable_logo
   before_validation :normalize_pix_key
   before_validation :normalize_smtp_blanks
+  after_commit :reset_current_cache
 
   def self.current
-    order(:id).first || create!(clinic_name: "MedWork Hub")
+    ActiveSupport::IsolatedExecutionState[:clinic_setting] ||= order(:id).first || create!(clinic_name: "MedWork Hub")
+  end
+
+  def self.reset_current!
+    ActiveSupport::IsolatedExecutionState.delete(:clinic_setting)
   end
 
   def week_start_symbol
     week_starts_on.to_s == "monday" ? :monday : :sunday
+  end
+
+  def ticket_sla_hours_for(priority)
+    case priority.to_s
+    when "urgent" then ticket_sla_urgent.to_i
+    when "high" then ticket_sla_high.to_i
+    when "low" then ticket_sla_low.to_i
+    else ticket_sla_medium.to_i
+    end
+  end
+
+  def ticket_sla_policy
+    I18n.t(
+      "tickets.sla_policy",
+      urgent: ticket_sla_urgent,
+      high: ticket_sla_high,
+      medium: ticket_sla_medium,
+      low: ticket_sla_low
+    )
   end
 
   def pix_configured?
@@ -75,5 +106,20 @@ class Setting < ApplicationRecord
     return if PixKey.valid?(pix_key)
 
     errors.add(:pix_key, "must be a CPF, CNPJ, email, +55 phone or random key")
+  end
+
+  def acceptable_logo
+    return unless logo.attached?
+
+    unless logo.content_type.in?(%w[image/png image/jpeg image/jpg image/webp])
+      errors.add(:logo, I18n.t("settings.clinic.logo_invalid"))
+    end
+    return unless logo.byte_size > 2.megabytes
+
+    errors.add(:logo, I18n.t("settings.clinic.logo_too_large"))
+  end
+
+  def reset_current_cache
+    self.class.reset_current!
   end
 end

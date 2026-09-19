@@ -1,5 +1,8 @@
 module ApplicationHelper
   def page_heading
+    heading_key = "helpers.heading.#{controller_name}.#{action_name}"
+    return t(heading_key) if I18n.exists?(heading_key)
+
     base = t("helpers.page.#{controller_name}", default: controller_name.humanize)
     return t("helpers.page.calendar", base: base) if action_name == "calendar"
     return t("helpers.page.welcome_email") if action_name == "edit_welcome"
@@ -7,9 +10,18 @@ module ApplicationHelper
     case action_name
     when "new" then t("helpers.page.new", base: base)
     when "edit" then t("helpers.page.edit", base: base)
-    when "show" then base
     else base
     end
+  end
+
+  def suppress_duplicate_title?
+    return false if controller_name == "dashboards"
+
+    action_name.in?(%w[index new edit])
+  end
+
+  def settings_editing?(section)
+    @edit_section.to_s == section.to_s
   end
 
   def status_tag(status)
@@ -18,6 +30,13 @@ module ApplicationHelper
     mapping = {
       "refunded" => "t-used",
       "open" => "t-old",
+      "in_progress" => "t-info",
+      "resolved" => "t-active",
+      "closed" => "t-used",
+      "low" => "t-info",
+      "medium" => "t-old",
+      "high" => "t-unavail",
+      "urgent" => "t-unavail",
       "paid" => "t-active",
       "overdue" => "t-unavail",
       "cancelled" => "t-used",
@@ -177,6 +196,11 @@ module ApplicationHelper
     when "Professional" then professional_path(event.auditable_id)
     when "Room" then room_path(event.auditable_id)
     when "Patient" then patient_path(event.auditable_id)
+    when "Ticket" then ticket_path(event.auditable_id)
+    when "ApiKey" then api_keys_path
+    when "ClinicIntegration"
+      provider = event.auditable.try(:provider)
+      provider.present? ? integration_path(provider) : integrations_path
     when "WaitlistEntry" then waitlist_entries_path
     when "RoomBlock" then room_blocks_path
     when "AppointmentNote"

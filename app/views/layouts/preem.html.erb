@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title>MedWork Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap">
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="preem-app" data-controller="sidebar theme">
+    <div class="drawer-backdrop" data-action="click->sidebar#close"></div>
+    <%= render "layouts/preem_sidebar" %>
+    <div class="preem-main">
+      <header class="preem-nav">
+        <div class="preem-nav-left">
+          <button type="button" class="preem-hamburger" data-action="sidebar#toggle" aria-label="Menu">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </button>
+          <strong class="preem-page-title"><%= t("dashboards.title") %></strong>
+          <%= link_to t("nav.rooms"), rooms_path %>
+          <%= link_to t("nav.bookings"), bookings_path %>
+        </div>
+        <div class="preem-nav-right">
+          <span><%= t("dashboards.my_account") %></span>
+          <div class="preem-profile">
+            <span class="preem-avatar"><%= current_user&.initials || "MW" %></span>
+            <%= button_to t("nav.log_out"), destroy_user_session_path, method: :delete, class: "preem-profile-exit" %>
+          </div>
+        </div>
+      </header>
+      <main class="preem-content">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

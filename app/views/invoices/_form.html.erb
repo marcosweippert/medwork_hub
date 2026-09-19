@@ -28,7 +28,7 @@
     <div class="span-2 form-actions">
       <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
       <%= f.submit class: "btn btn--primary" %>
-      <%= link_to "Cancel", back_path(invoices_path), class: "btn btn--ghost" %>
+      <%= link_to t("ui.cancel"), back_path(invoices_path), class: "btn btn--ghost" %>
     </div>
   </div>
 <% end %>

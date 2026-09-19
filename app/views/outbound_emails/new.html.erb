@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Compose email</h1>
+    <h1 class="page-title"><%= t("helpers.heading.outbound_emails.new") %></h1>
     <p class="page-sub">Send a message through the clinic SMTP and keep it in the sent log</p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", outbound_emails_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), outbound_emails_path, class: "btn btn--ghost" %>
   </div>
 </div>
 
@@ -24,7 +24,7 @@
     </div>
     <div class="span-2 form-actions">
       <%= submit_tag "Send", class: "btn btn--primary" %>
-      <%= link_to "Cancel", outbound_emails_path, class: "btn btn--ghost" %>
+      <%= link_to t("ui.cancel"), outbound_emails_path, class: "btn btn--ghost" %>
     </div>
   <% end %>
 </section>

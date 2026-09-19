@@ -5,9 +5,9 @@
         <th></th>
         <% calendar.dates.each do |date| %>
           <th class="<%= "is-weekend" if date.sunday? || date.saturday? %>">
-            <%= date.strftime("%a %d/%m") %>
+            <%= l(date, format: "%a %d/%m") %>
             <% if calendar.slot_minutes.any? { |mins| calendar.slot_for(date, mins).status == :free } %>
-              <button type="button" class="day-all" data-action="slot-picker#selectDay" data-slot-picker-date-param="<%= date.iso8601 %>">All</button>
+              <button type="button" class="day-all" data-action="slot-picker#selectDay" data-slot-picker-date-param="<%= date.iso8601 %>"><%= t("calendar.all_day") %></button>
             <% end %>
           </th>
         <% end %>
@@ -21,23 +21,23 @@
             <% slot = calendar.slot_for(date, minutes) %>
             <td>
               <% if slot.status == :free %>
-                <label class="slot is-free">
+                <label class="slot is-free" data-action="click->slot-picker#pick">
                   <%= check_box_tag "slots[]", slot.starts_at.iso8601, false,
                         id: "slot_#{date}_#{minutes}",
                         class: "slot-check",
-                        aria: { label: "#{date.strftime('%a %d/%m')} #{slot.label}" },
+                        tabindex: -1,
+                        aria: { label: "#{l(date, format: '%a %d/%m')} #{slot.label}" },
                         data: {
                           date: date.iso8601,
-                          slot_picker_target: "slot",
-                          action: "change->slot-picker#refresh"
+                          slot_picker_target: "slot"
                         } %>
                   <span><%= slot.label %></span>
                 </label>
               <% elsif slot.status.in?(%i[reserved occupied]) && local_assigns[:room] %>
                 <%= link_to slot.label, new_room_waitlist_entry_path(room, starts_at: slot.starts_at.iso8601, ends_at: slot.ends_at.iso8601),
-                      class: "slot is-#{slot.status}", title: "Join waitlist for this hour", data: { turbo_frame: "_top" } %>
+                      class: "slot is-#{slot.status}", title: t("calendar.join_waitlist"), data: { turbo_frame: "_top" } %>
               <% else %>
-                <span class="slot is-<%= slot.status %>"><%= slot.label %></span>
+                <span class="slot is-<%= slot.status %>" title="<%= t("ui.#{slot.status}", default: slot.status.to_s) %>"><%= slot.label %></span>
               <% end %>
             </td>
           <% end %>

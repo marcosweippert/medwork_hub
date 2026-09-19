@@ -1,0 +1,38 @@
+<aside class="preem-sidebar" data-sidebar-target="aside">
+  <div class="preem-sidebar-head">
+    <%= link_to signed_in_home_path, class: "preem-brand" do %>
+      MedWork
+    <% end %>
+    <div class="preem-sidebar-meta">
+      <span class="preem-premium"><%= current_user&.role.to_s.titleize %> ✓</span>
+      <span class="preem-switch"><%= current_user&.display_name %></span>
+    </div>
+  </div>
+
+  <div class="preem-sidebar-slide">
+    <nav class="preem-list">
+      <%= link_to t("nav.dashboard"), root_path, class: ("is-active" if current_page?(root_path)) %>
+      <%= link_to t("nav.rooms"), rooms_path %>
+      <%= link_to t("nav.bookings"), bookings_path %>
+      <%= link_to t("nav.waitlist"), waitlist_entries_path %>
+      <%= link_to t("nav.professionals"), professionals_path %>
+      <%= link_to t("nav.patients"), patients_path %>
+      <%= link_to t("nav.reports"), reports_path %>
+      <%= link_to t("nav.invoices"), invoices_path %>
+    </nav>
+
+    <nav class="preem-list preem-list--sub">
+      <div class="preem-list-label"><%= t("dashboards.other_options") %></div>
+      <% if admin_user? %>
+        <%= link_to t("nav.settings"), settings_path, class: "preem-indent" %>
+        <%= link_to t("nav.integrations"), integrations_path, class: "preem-indent" %>
+        <%= link_to t("nav.api_keys"), api_keys_path, class: "preem-indent" %>
+        <%= link_to t("nav.users"), users_path, class: "preem-indent" %>
+        <%= link_to t("nav.emails"), outbound_emails_path, class: "preem-indent" %>
+      <% end %>
+      <%= button_to t("nav.log_out"), destroy_user_session_path, method: :delete, class: "preem-indent preem-signout" %>
+    </nav>
+  </div>
+
+  <%= link_to t("dashboards.help"), reports_path, class: "preem-help" %>
+</aside>

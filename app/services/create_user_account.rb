@@ -33,11 +33,17 @@ class CreateUserAccount
     user.build_professional(professional_attrs) if user.role == "professional"
 
     if user.save
-      ClinicMailer.welcome(user, password).deliver_now
+      self.class.deliver_welcome(user, password)
       Result.new(ok: true, user: user)
     else
       Result.new(ok: false, user: user)
     end
+  end
+
+  def self.deliver_welcome(user, password)
+    ClinicMailer.welcome(user, password).deliver_now
+  rescue StandardError => e
+    Rails.logger.error("Welcome email failed for #{user.email}: #{e.class}: #{e.message}")
   end
 
   private

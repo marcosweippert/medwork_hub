@@ -1,0 +1,44 @@
+<section class="col-6 card <%= "is-editing" if settings_editing?("tickets") %>">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("settings.tickets.title") %></h2>
+    <% unless settings_editing?("tickets") %>
+      <%= link_to t("ui.edit"), settings_path(edit: "tickets"), class: "btn btn--ghost btn--sm" %>
+    <% end %>
+  </div>
+  <% if settings_editing?("tickets") %>
+    <%= form_with model: @setting, url: settings_path, method: :patch, class: "form-grid" do |f| %>
+      <%= hidden_field_tag :section, "tickets" %>
+      <div class="field"><%= f.label :ticket_sla_urgent, t("settings.tickets.sla_urgent"), class: "field-label" %><%= f.number_field :ticket_sla_urgent, min: 1, max: 168, class: "input" %></div>
+      <div class="field"><%= f.label :ticket_sla_high, t("settings.tickets.sla_high"), class: "field-label" %><%= f.number_field :ticket_sla_high, min: 1, max: 168, class: "input" %></div>
+      <div class="field"><%= f.label :ticket_sla_medium, t("settings.tickets.sla_medium"), class: "field-label" %><%= f.number_field :ticket_sla_medium, min: 1, max: 168, class: "input" %></div>
+      <div class="field"><%= f.label :ticket_sla_low, t("settings.tickets.sla_low"), class: "field-label" %><%= f.number_field :ticket_sla_low, min: 1, max: 168, class: "input" %></div>
+      <div class="field"><%= f.label :ticket_sla_warn_hours, t("settings.tickets.sla_warn"), class: "field-label" %><%= f.number_field :ticket_sla_warn_hours, min: 1, max: 168, class: "input" %></div>
+      <div class="field"><%= f.label :ticket_default_priority, t("settings.tickets.default_priority"), class: "field-label" %><%= f.select :ticket_default_priority, Ticket::PRIORITIES.map { |priority| [t("statuses.#{priority}", default: priority.humanize), priority] }, {}, class: "select" %></div>
+      <div class="field">
+        <%= f.label :ticket_default_assignee_id, t("settings.tickets.default_assignee"), class: "field-label" %>
+        <%= f.collection_select :ticket_default_assignee_id, User.where(role: %w[admin staff]).order(:name), :id, :display_name, { include_blank: t("settings.tickets.no_assignee") }, class: "select" %>
+      </div>
+      <div class="field">
+        <%= f.label :ticket_auto_close_days, t("settings.tickets.auto_close"), class: "field-label" %>
+        <%= f.number_field :ticket_auto_close_days, min: 0, max: 365, class: "input" %>
+        <p class="field-help"><%= t("settings.tickets.auto_close_help") %></p>
+      </div>
+      <div class="field"><label class="field-label"><%= f.check_box :ticket_notify_staff %> <%= t("settings.tickets.notify_staff") %></label></div>
+      <div class="field"><label class="field-label"><%= f.check_box :ticket_notify_requester %> <%= t("settings.tickets.notify_requester") %></label></div>
+      <div class="field span-2 form-actions">
+        <%= f.submit t("ui.save"), class: "btn btn--primary btn--sm" %>
+        <%= link_to t("ui.cancel"), settings_path, class: "btn btn--ghost btn--sm" %>
+      </div>
+    <% end %>
+  <% else %>
+    <dl class="dl-meta">
+      <dt><%= t("tickets.sla") %></dt><dd><%= @setting.ticket_sla_policy %></dd>
+      <dt><%= t("settings.tickets.sla_warn") %></dt><dd><%= @setting.ticket_sla_warn_hours %>h</dd>
+      <dt><%= t("settings.tickets.default_priority") %></dt><dd><%= t("statuses.#{@setting.ticket_default_priority}", default: @setting.ticket_default_priority.to_s.humanize) %></dd>
+      <dt><%= t("settings.tickets.default_assignee") %></dt><dd><%= @setting.ticket_default_assignee&.display_name || t("settings.tickets.no_assignee") %></dd>
+      <dt><%= t("settings.tickets.auto_close") %></dt><dd><%= @setting.ticket_auto_close_days.to_i.positive? ? t("settings.tickets.auto_close_after", days: @setting.ticket_auto_close_days) : t("settings.tickets.off") %></dd>
+      <dt><%= t("settings.tickets.notify_staff") %></dt><dd><%= @setting.ticket_notify_staff? ? t("settings.tickets.on") : t("settings.tickets.off") %></dd>
+      <dt><%= t("settings.tickets.notify_requester") %></dt><dd><%= @setting.ticket_notify_requester? ? t("settings.tickets.on") : t("settings.tickets.off") %></dd>
+    </dl>
+  <% end %>
+</section>

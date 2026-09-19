@@ -1,0 +1,39 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title"><%= t("notifications.title") %></h1>
+    <p class="page-sub"><%= t("notifications.subtitle") %></p>
+  </div>
+  <div class="page-actions">
+    <% if unread_notifications_count.positive? %>
+      <%= button_to t("notifications.mark_all"), mark_all_notifications_path, method: :patch, class: "btn btn--ghost" %>
+    <% end %>
+  </div>
+</div>
+
+<section class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th><%= t("notifications.title") %></th>
+        <th><%= t("ui.when") %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @notifications.each do |item| %>
+        <tr class="<%= "is-unread" if item.unread? %>">
+          <td>
+            <div class="cell-name"><%= link_to item.title, notification_path(item), class: "table-link" %></div>
+            <div class="field-help"><%= item.body %></div>
+          </td>
+          <td class="data-cell-mono"><%= item.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+          <td><%= item.unread? ? t("notifications.unread") : t("notifications.read") %></td>
+        </tr>
+      <% end %>
+      <% if @notifications.empty? %>
+        <tr><td colspan="3"><%= t("notifications.empty") %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+  <%= render "shared/pager" %>
+</section>

@@ -1,6 +1,8 @@
 class Booking < ApplicationRecord
   include Auditable
 
+  after_commit :notify_n8n_created, on: :create
+
   belongs_to :professional
   belongs_to :room
   belongs_to :invoice, optional: true
@@ -141,5 +143,17 @@ class Booking < ApplicationRecord
     return if professional.can_reserve?(room)
 
     errors.add(:base, "This professional cannot reserve this room type")
+  end
+
+  def notify_n8n_created
+    NotifyN8n.event("booking.created", {
+      id: id,
+      status: status,
+      start_time: start_time&.iso8601,
+      end_time: end_time&.iso8601,
+      room: room&.name,
+      professional: professional&.display_name,
+      invoice_id: invoice_id
+    })
   end
 end

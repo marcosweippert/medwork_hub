@@ -28,6 +28,14 @@ class Invoice < ApplicationRecord
         booking.update_columns(status: conflict.exists? ? "cancelled" : "confirmed")
       end
     end
+    NotifyN8n.event("invoice.paid", {
+      id: id,
+      amount: amount.to_s,
+      professional: professional&.display_name,
+      room: room&.name,
+      due_date: due_date&.iso8601
+    })
+    self
   end
 
   def mark_overdue_if_needed!

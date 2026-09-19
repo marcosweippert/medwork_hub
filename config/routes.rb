@@ -14,6 +14,9 @@ Rails.application.routes.draw do
     resources :room_blocks, only: %i[create destroy]
   end
   resources :waitlist_entries, only: %i[index destroy] do
+    collection do
+      patch :bulk
+    end
     member do
       post :convert
     end
@@ -77,6 +80,23 @@ Rails.application.routes.draw do
   get "reports/emails", to: "reports#emails", as: :emails_reports
   get "reports/activity", to: "reports#activity", as: :activity_reports
   resources :patients
+  resources :tickets, only: %i[index show new create update] do
+    collection do
+      patch :bulk
+      get :export
+    end
+    member do
+      post :comment
+      patch :take
+      patch :reopen
+      patch :resolve
+    end
+  end
+  resources :notifications, only: %i[index show] do
+    collection do
+      patch :mark_all
+    end
+  end
   resources :users do
     member do
       post :invite
@@ -84,6 +104,30 @@ Rails.application.routes.draw do
   end
   resource :password_change, only: %i[edit update]
   resource :settings, only: %i[show edit update]
+  resource :billing, only: :show, controller: "billings"
+  resources :transactions, only: :index
+  resource :profile, only: %i[show update], controller: "profiles"
+  resources :integrations, param: :provider do
+    member do
+      patch :connect
+      patch :disconnect
+      post :test
+    end
+  end
+  resources :api_keys, only: %i[index create edit update destroy] do
+    collection do
+      patch :bulk
+    end
+    member do
+      patch :regenerate
+      patch :toggle
+    end
+  end
+  namespace :api do
+    namespace :v1 do
+      get :status, to: "status#show"
+    end
+  end
 
   root "dashboards#index"
 end

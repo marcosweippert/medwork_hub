@@ -1,0 +1,31 @@
+<section class="col-6 card <%= "is-editing" if settings_editing?("pix") %>">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("settings.pix.title") %></h2>
+    <% unless settings_editing?("pix") %>
+      <%= link_to t("ui.edit"), settings_path(edit: "pix"), class: "btn btn--ghost btn--sm" %>
+    <% end %>
+  </div>
+  <% if settings_editing?("pix") %>
+    <%= form_with model: @setting, url: settings_path, method: :patch, class: "form-grid" do |f| %>
+      <%= hidden_field_tag :section, "pix" %>
+      <div class="field span-2">
+        <%= f.label :pix_key, t("settings.pix.key"), class: "field-label" %>
+        <%= f.text_field :pix_key, class: "input", placeholder: "CPF, CNPJ, e-mail, +5511999998888 ou UUID" %>
+      </div>
+      <div class="field"><%= f.label :pix_name, t("settings.pix.receiver"), class: "field-label" %><%= f.text_field :pix_name, class: "input", maxlength: 25 %></div>
+      <div class="field"><%= f.label :pix_city, t("settings.pix.city"), class: "field-label" %><%= f.text_field :pix_city, class: "input", maxlength: 15 %></div>
+      <div class="field span-2"><%= f.label :whatsapp_phone, "WhatsApp", class: "field-label" %><%= f.text_field :whatsapp_phone, class: "input", placeholder: "11999998888" %></div>
+      <div class="field span-2 form-actions">
+        <%= f.submit t("ui.save"), class: "btn btn--primary btn--sm" %>
+        <%= link_to t("ui.cancel"), settings_path, class: "btn btn--ghost btn--sm" %>
+      </div>
+    <% end %>
+  <% else %>
+    <dl class="dl-meta">
+      <dt><%= t("settings.pix.key") %></dt><dd><%= @setting.pix_key.presence || t("settings.pix.missing") %></dd>
+      <dt><%= t("settings.pix.receiver") %></dt><dd><%= @setting.pix_name.presence || "—" %></dd>
+      <dt><%= t("settings.pix.city") %></dt><dd><%= @setting.pix_city.presence || "—" %></dd>
+      <dt>WhatsApp</dt><dd><%= @setting.whatsapp_phone.presence || "—" %></dd>
+    </dl>
+  <% end %>
+</section>

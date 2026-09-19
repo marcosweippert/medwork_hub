@@ -1,23 +1,23 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Professionals</h1>
-    <p class="page-sub">Overdue professionals cannot book new slots</p>
+    <h1 class="page-title"><%= t("professionals.title") %></h1>
+    <p class="page-sub"><%= t("professionals.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "New professional", new_professional_path, class: "btn btn--primary" %>
+    <%= link_to t("professionals.new"), new_professional_path, class: "btn btn--primary" %>
   </div>
 </div>
 
 <%= form_with url: professionals_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name, specialty or license" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("professionals.search_placeholder") %>
   </div>
   <label class="field field-check">
     <%= check_box_tag :delinquent, "1", params[:delinquent] == "1" %>
     <span class="field-label" style="margin:0;">Overdue only</span>
   </label>
-  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">
@@ -50,7 +50,7 @@
             <td class="cell-price"><%= number_to_currency(professional.overdue_balance, precision: 0) %></td>
             <td><%= status_tag(professional.delinquent? ? "overdue" : "active") %></td>
             <td class="cell-actions">
-              <%= action_btn "Open", path_with_return(professional_path(professional)), tone: "view" %>
+              <%= action_btn t("ui.open"), path_with_return(professional_path(professional)), tone: "view" %>
             </td>
           </tr>
         <% end %>

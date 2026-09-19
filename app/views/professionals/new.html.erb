@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">New professional</h1>
-    <p class="page-sub">Creates the login and the professional profile together. A temporary password is emailed.</p>
+    <h1 class="page-title"><%= t("professionals.new") %></h1>
+    <p class="page-sub"><%= t("professionals.new_help") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", professionals_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), professionals_path, class: "btn btn--ghost" %>
   </div>
 </div>
 
@@ -21,15 +21,15 @@
         <%= f.email_field :email, class: "input" %>
       </div>
       <div class="field span-2">
-        <span class="field-label">Password</span>
-        <p class="field-help">A temporary password is emailed. The professional must change it on first login.</p>
+        <span class="field-label"><%= t("ui.password") %></span>
+        <p class="field-help"><%= t("users.password_help") %></p>
       </div>
       <%= f.fields_for :professional do |professional_fields| %>
         <%= render "shared/professional_fields", f: professional_fields %>
       <% end %>
       <div class="span-2 form-actions">
-        <%= f.submit "Create professional", class: "btn btn--primary" %>
-        <%= link_to "Cancel", professionals_path, class: "btn btn--ghost" %>
+        <%= f.submit t("professionals.create"), class: "btn btn--primary" %>
+        <%= link_to t("ui.cancel"), professionals_path, class: "btn btn--ghost" %>
       </div>
     </div>
   <% end %>

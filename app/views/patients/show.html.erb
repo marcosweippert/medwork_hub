@@ -4,7 +4,7 @@
     <p class="page-sub"><%= @patient.contact.presence || "No contact" %> · <%= @patient.professional.display_name %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Edit", edit_patient_path(@patient), class: "btn btn--ghost" %>
+    <%= link_to t("ui.edit"), edit_patient_path(@patient), class: "btn btn--ghost" %>
     <%= link_to "Professional", @patient.professional, class: "btn btn--primary" %>
   </div>
 </div>

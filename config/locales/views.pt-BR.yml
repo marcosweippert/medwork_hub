@@ -1,0 +1,532 @@
+pt-BR:
+  ui:
+    back: Voltar
+    cancel: Cancelar
+    save: Salvar
+    search: Buscar
+    filter: Filtrar
+    open: Abrir
+    edit: Editar
+    delete: Excluir
+    copy: Copiar
+    copied: Copiado
+    copy_failed: Falha ao copiar
+    "yes": Sim
+    "no": Não
+    all: Todos
+    actions: Ações
+    name: Nome
+    email: E-mail
+    role: Perfil
+    status: Status
+    professional: Profissional
+    room: Sala
+    calendar: Calendário
+    prev: Anterior
+    next: Próxima
+    records:
+      one: "%{count} registro"
+      other: "%{count} registros"
+    page_of: "página %{page} de %{pages}"
+    password: Senha
+    available: Livre
+    reserved: Reservado
+    occupied: Ocupado
+    blocked: Bloqueado
+    closed: Fechado
+    past: Passado
+    selected: Selecionado
+    waitlist: Lista de espera
+    selection: Seleção
+    today: Hoje
+    upcoming: Próximos
+    when: Quando
+    day: Dia
+    month: Mês
+    daily: Diária
+    monthly: Mensal
+    all_rooms: Todas as salas
+    menu: Menu
+    toggle_theme: Alternar tema
+  helpers:
+    heading:
+      users:
+        new: Novo usuário
+        edit: Editar usuário
+      professionals:
+        new: Novo profissional
+        edit: Editar profissional
+      patients:
+        new: Novo paciente
+        edit: Editar paciente
+      rooms:
+        new: Nova sala
+        edit: Editar sala
+      bookings:
+        new: Novo agendamento
+        edit: Editar agendamento
+      invoices:
+        new: Nova fatura
+        edit: Editar fatura
+      tickets:
+        new: Novo chamado
+      notifications:
+        index: Notificações
+      settings:
+        edit: Editar configurações
+      outbound_emails:
+        new: Novo e-mail
+      waitlist_entries:
+        new: Entrar na lista de espera
+      password_changes:
+        edit: Criar senha
+  users:
+    title: Usuários
+    subtitle: Contas da clínica. Profissionais nascem junto com o login.
+    new: Novo usuário
+    created: "Usuário criado. Um e-mail de boas-vindas com senha temporária foi enviado para %{email}."
+    updated: Usuário atualizado.
+    invited: "Uma nova senha temporária foi enviada para %{email}."
+    deleted: Usuário excluído.
+    cannot_delete_self: Você não pode excluir a própria conta.
+    search_placeholder: Nome ou e-mail
+    password_help: Uma senha temporária é enviada por e-mail. A pessoa troca no primeiro acesso.
+    new_subtitle: Nome, e-mail e perfil. Um e-mail de boas-vindas leva a senha temporária.
+    confirm_delete: Excluir este usuário?
+  calendar:
+    waitlist_count: "Lista de espera (%{count})"
+    waitlist_hint: Clique nos horários livres (verde) para reservar. Horários reservados ou ocupados abrem a lista de espera. Cancelamento gratuito até %{hours}h antes.
+    occupied_waitlist: Ocupado · lista de espera
+    join_waitlist: Entrar na lista de espera neste horário
+    professional: Profissional
+    repeat_weekly: Repetir semanalmente
+    this_week: Só esta semana
+    weeks: "%{count} semanas"
+    reserve_slots: Reservar horários
+    reserve_day: Reservar dia
+    reserve_month: Reservar mês
+    only_free_days: apenas dias totalmente livres
+    no_free_days: Nenhum dia inteiro livre. Use <strong>Todos</strong> no calendário para marcar os horários restantes.
+    all_day: Todos
+    hours: toda semana, salvo se o dia estiver fechado
+    month_help: "Pró-rata: mensal / 30 × dias restantes, menos faixas de 30 min ocupadas"
+    pick_room: Selecione o profissional e uma sala compatível para carregar o calendário da semana.
+    reserve_hours: Reservar horários selecionados
+    new_booking_help: A sala segue a área de atuação do profissional. Escolha a sala e depois os horários.
+  bookings:
+    title: Agendamentos
+    subtitle: Reservas, ocupação e cancelamentos
+    new: Novo agendamento
+    search_placeholder: Profissional ou sala
+    type: Tipo
+    amount: Valor
+    empty: Nenhum agendamento com este filtro.
+    cancel: Cancelar
+    cancel_booking: Cancelar agendamento
+    save_time: Salvar novo horário
+    save_note: Salvar nota
+  invoices:
+    title: Faturas
+    subtitle_staff: Pague, cancele horários ou estorne · faturas em atraso bloqueiam novas reservas
+    subtitle_pro: Suas faturas das salas reservadas
+    new: Nova fatura
+    receivables: A receber
+    search_placeholder: Profissional, sala ou comentário
+    due_from: Vencimento de
+    due_to: Vencimento até
+    kpi_total: Total
+    kpi_paid: Pagas
+    kpi_overdue: Em atraso
+    kpi_open: A receber
+    confirm_cancel_selected: Cancelar as faturas selecionadas? As pagas são estornadas conforme a política.
+    open_invoice: "Fatura #%{number}"
+  professionals:
+    title: Profissionais
+    subtitle: Profissionais em atraso não conseguem reservar novos horários
+    new: Novo profissional
+    search_placeholder: Nome, especialidade ou registro
+    create: Criar profissional
+    created: "Profissional criado. Um e-mail de boas-vindas com senha temporária foi enviado para %{email}."
+    new_help: Cria o login e o perfil juntos. A senha temporária vai por e-mail.
+    practice_area: Área de atuação
+    practice_area_help: Define quais salas o profissional pode reservar.
+    specialty: Especialidade / título
+    specialty_placeholder: Cardiologista, pediatra, TCC…
+    phone: WhatsApp / telefone
+    bio_placeholder: Perfil profissional resumido
+  patients:
+    title: Pacientes
+    subtitle: Vinculados a um profissional
+    new: Novo paciente
+    search_placeholder: Nome, contato ou profissional
+  reports:
+    title: Relatórios
+    subtitle: Abra um relatório para filtrar, mudar a visão e exportar
+    search_placeholder: Ocupação, lista de espera, e-mails
+    occupancy: Ocupação
+    revenue: Receita
+    professionals: Profissionais
+    receivables: A receber
+    bookings: Agendamentos
+    cancellations: Cancelamentos
+    aging: Aging
+    rooms: Uso das salas
+    forecast: Previsão de ocupação
+    peak_hours: Horários de pico
+    blocks: Bloqueios
+    waitlist: Lista de espera
+    patients: Pacientes
+    emails: E-mails
+    activity: Atividade
+  rooms:
+    search_label: Buscar
+    hours_range: "%{open}–%{close}"
+  statuses:
+    admin: Admin
+    staff: Equipe
+    professional: Profissional
+    today: Hoje
+    upcoming: Próximos
+  access:
+    admin_only: Só administradores acessam esta área.
+    staff_only: Você não tem acesso a esta área.
+  waitlist:
+    title: Lista de espera
+    subtitle: Fila para horários ocupados. A equipe pode reservar o horário aqui.
+    join: Entrar na lista
+    search_placeholder: Profissional ou sala
+    open_only: Abertos
+    from: De
+    to: Até
+    slot: Horário
+    reserve: Reservar
+    remove: Remover
+    confirm_reserve: Reservar os selecionados e gerar fatura?
+    confirm_remove: Remover os selecionados da lista?
+    empty: Ninguém na fila. Abra o calendário de uma sala e clique em um horário ocupado.
+    reserved: Horário da lista reservado. Uma fatura foi criada.
+    bulk_reserved:
+      one: "%{count} horário reservado."
+      other: "%{count} horários reservados."
+    bulk_cancelled:
+      one: "%{count} item removido."
+      other: "%{count} itens removidos."
+    notified: "Avisado em %{time}"
+    delinquent: Este profissional tem faturas em atraso e não pode reservar.
+    incompatible: Este profissional não pode reservar este tipo de sala.
+  billing:
+    title: Cobrança
+    subtitle: Plano da clínica, PIX e faturas recentes
+    plan: Plano
+    clinic_plan: Clínica
+    next_invoice: Próximas faturas
+    paid_month: Recebido no mês
+    open: Em aberto
+  transactions:
+    title: Transações
+    subtitle: Pagamentos e faturas da clínica
+    order: Pedido
+    amount: Valor
+    date: Data
+    empty: Nenhuma transação.
+  profiles:
+    title: Perfil
+    subtitle: Seus dados de acesso
+    updated: Perfil atualizado.
+    password_help: Deixe em branco para manter a senha atual.
+    confirm: Confirmar senha
+  emails:
+    inbox: Caixa de saída
+    compose: Escrever
+    welcome: Boas-vindas
+    folders: Pastas
+    all: Todos
+    sent: Enviados
+    failed: Falhas
+    bounced: Devolvidos
+    details: Detalhes
+    empty: Nenhum e-mail.
+    when: Quando
+    to: Para
+    subject: Assunto
+    kind: Tipo
+    open: Abrir
+    resend: Reenviar
+    download: Baixar
+    delete: Excluir
+    forward: Encaminhar
+    from: De
+    user: Usuário
+    reason: Motivo
+    send_copy: Enviar cópia para
+    untitled: Sem assunto
+  settings:
+    account: Conta
+    clinic_nav: Clínica
+    policy_nav: Política
+    mail_nav: E-mail
+    pix_nav: PIX
+    tickets_nav: Chamados
+  integrations:
+    title: Integrações
+    subtitle: Conecte e-mail, PIX, WhatsApp e apps da clínica — ou adicione um webhook próprio.
+    new: Nova integração
+    new_help: Escolha o aplicativo, dê um nome e, se quiser, salve a URL do webhook para receber eventos do Hub.
+    edit: Editar integração
+    add: Adicionar
+    installed: Aplicativos da clínica
+    catalog: Aplicativos disponíveis
+    catalog_help: Inclua um app na clínica. Os que têm webhook recebem eventos de reserva, fatura e chamado.
+    details: Detalhes
+    configure: Configurar
+    connect: Conectar
+    remove: Remover
+    enabled: Ativo
+    kind: Aplicativo
+    notes: Observações
+    notes_placeholder: Canal, ambiente, quem responde por esta conexão…
+    channel: Canal ou destino
+    channel_placeholder: "#recepção, @financeiro…"
+    webhook_help: Com URL salva e integração ativa, o Hub envia POST JSON para este endereço.
+    resources_title: Recursos
+    resources_help: Atalhos deste aplicativo dentro do Hub.
+    events_title: Eventos do Hub
+    created: "%{name} adicionada."
+    updated: "%{name} atualizada."
+    deleted: "%{name} excluída."
+    connected: "%{name} conectado."
+    disconnected: "%{name} desconectado."
+    connected_badge: Conectado
+    disconnected_badge: Não conectado
+    available_badge: Disponível
+    connected_at: Conectado em
+    type: Tipo
+    builtin: Nativo
+    optional: Opcional
+    required: Esta integração faz parte da clínica e não pode ser desligada.
+    unknown: Integração não encontrada.
+    confirm_delete: Excluir esta integração?
+    resources:
+      mail_settings: Configurações de e-mail
+      outbound_emails: E-mails enviados
+      email_report: Relatório de e-mails
+      pix_settings: Configurações de PIX
+      whatsapp_settings: Número do WhatsApp
+      invoices: Faturas
+      receivables: Recebíveis
+      room_calendar: Calendário das salas
+      availability: Disponibilidade
+      waitlist: Lista de espera
+      blocks: Bloqueios
+      api_keys: Chaves de API
+      workflow: Fluxo n8n
+      tickets: Chamados
+      bookings: Reservas
+      professionals: Profissionais
+      reports: Relatórios
+      patients: Pacientes
+    providers:
+      smtp:
+        name: SMTP
+        body: Envio de faturas, convites e avisos pela conta de e-mail da clínica.
+        help: Configure servidor, remetente e senha em Configurações → E-mail.
+      pix:
+        name: PIX
+        body: Gera cobrança instantânea nas faturas com a chave da clínica.
+        help: Informe chave, nome e cidade em Configurações → PIX.
+      whatsapp:
+        name: WhatsApp
+        body: Compartilha o código PIX da fatura pelo WhatsApp da clínica.
+        help: O número fica junto das configurações de PIX.
+      calendar:
+        name: Calendário
+        body: Grade de horários, reservas e lista de espera das salas.
+        help: Sempre ativo. Horários vêm de cada sala e da política da clínica.
+      webhooks:
+        name: Webhooks
+        body: Recebe eventos de reserva e fatura em um endpoint seu.
+        help: Salve uma URL POST. O Hub envia event, clinic, occurred_at e data.
+      zapier:
+        name: Zapier
+        body: Encadeia reservas e faturas com planilhas e outros apps.
+        help: Use a URL Catch Hook e, se o Zapier for ler o Hub, uma chave de API.
+      google_calendar:
+        name: Google Calendar
+        body: Espelha reservas da sala na agenda do profissional.
+        help: Marque como ativo enquanto as agendas dos profissionais são ligadas.
+      slack:
+        name: Slack
+        body: Avisa a equipe sobre chamados, reservas e faturas pagas.
+        help: Cole a URL de Incoming Webhook ou encaminhe pelo n8n.
+      n8n:
+        name: n8n
+        body: Dispara automações quando houver reserva, fatura paga ou chamado novo.
+        help: Salve a URL do webhook do fluxo. A chave da API do n8n é opcional e só serve para testar a conexão.
+      make:
+        name: Make
+        body: Monta cenários a partir dos eventos do Hub, sem código.
+        help: Cole a URL de webhook customizado do Make.
+      discord:
+        name: Discord
+        body: Publica eventos da clínica em um canal do Discord.
+        help: Use a URL de webhook do canal.
+      telegram:
+        name: Telegram
+        body: Envia alertas de reserva e chamado para um chat ou grupo.
+        help: Cole o webhook do bot ou o webhook do n8n para o Telegram.
+      microsoft_teams:
+        name: Microsoft Teams
+        body: Avisa um canal do Teams quando a fatura é paga ou o chamado abre.
+        help: Cole a URL do conector Incoming Webhook.
+      google_sheets:
+        name: Google Sheets
+        body: Acrescenta linhas de reservas e pagamentos na planilha.
+        help: Use um webhook (n8n/Make) que grave na planilha.
+      notion:
+        name: Notion
+        body: Registra chamados e reservas em um banco do Notion.
+        help: Cole o webhook da automação que cria páginas no Notion.
+      twilio:
+        name: Twilio
+        body: SMS de lembrete para lista de espera e próximas reservas.
+        help: Salve o webhook que fala com a Twilio, ou passe pelo n8n.
+      outlook:
+        name: Outlook Calendar
+        body: Espelha reservas no Outlook / Microsoft 365.
+        help: Marque como ativo enquanto a sincronização da agenda é configurada.
+      custom:
+        name: Webhook personalizado
+        body: Qualquer outro endpoint que deva receber os mesmos eventos do Hub.
+        help: Dê o nome que quiser. Dá para cadastrar mais de um.
+    n8n:
+      setup: Conexão com o n8n
+      setup_help: O caminho usual é um nó Webhook no n8n. A chave JWT da API pública do n8n não entra no Hub — ela fica só no n8n, ou aqui se você quiser testar a API.
+      webhook_url: URL do webhook
+      webhook_help: No n8n, adicione um nó Webhook (POST), ative o fluxo e cole a URL de produção.
+      api_base_url: URL do n8n
+      api_token: Chave da API do n8n
+      token_set: Chave já salva. Deixe em branco para manter.
+      token_placeholder: Cole a chave nova só se for trocar
+      api_help: Opcional. Header X-N8N-API-KEY, só para o botão Testar na API do n8n.
+      saved: Dados do n8n salvos.
+      test: Testar conexão
+      test_ok_webhook: Webhook respondeu.
+      test_ok_api: API respondeu.
+      test_failed: "Não conectou: %{error}"
+      missing_config: Informe a URL do webhook ou a URL do n8n com a chave.
+      hub_api: O n8n chamando o Hub
+      hub_api_help: Crie uma chave em Chaves de API com o nome n8n e use no nó HTTP Request.
+      step_key: Gere uma chave mwh_ em
+      step_node: No n8n, HTTP Request com método GET.
+      or_header: ou
+      events_help: "O Hub envia POST JSON nestes eventos, se a URL do webhook estiver salva:"
+      import_help: "No n8n: menu ⋯ do editor → Import from File. Depois ative o fluxo e ligue Slack/e-mail no nó Pronto."
+      import_file: Baixar workflow MedWork Hub (JSON)
+  api_keys:
+    title: Chaves de API
+    subtitle: Gere tokens para integrar sistemas externos. O valor completo aparece só uma vez.
+    generate: Gerar chave
+    generate_help: Dê um nome à plataforma e, se quiser, uma data de renovação.
+    platform: Plataforma
+    platform_placeholder: Zapier, app interno…
+    key: Chave
+    renewal: Renovação
+    toggle: Ativa
+    edit: Editar chave
+    empty: Nenhuma chave ainda.
+    created: Chave criada. Copie agora — ela não será mostrada de novo.
+    updated: Chave atualizada.
+    deleted: Chave excluída.
+    enabled: Chave ativada.
+    disabled: Chave desativada.
+    regenerated: Nova chave gerada. Copie agora.
+    copy_now: "Chave de %{name}"
+    regenerate: Regenerar
+    activate_all: Ativar selecionadas
+    deactivate_all: Desativar selecionadas
+    delete_all: Excluir selecionadas
+    confirm_delete: Excluir esta chave?
+    confirm_delete_all: Excluir as chaves selecionadas?
+    confirm_regenerate: Regenerar invalida a chave atual. Continuar?
+    bulk_activated: Chaves ativadas.
+    bulk_deactivated: Chaves desativadas.
+    bulk_deleted: Chaves excluídas.
+  audit:
+    subtitle: Histórico de criações, alterações e exclusões na clínica.
+    export_xlsx: Baixar Excel
+    search_placeholder: Ação, usuário, registro ou campo
+    action: Ação
+    actor: Usuário
+    record: Registro
+    record_type: Tipo
+    record_id: ID
+    changes: Alterações
+    details: Detalhes
+    hide: Recolher
+    open_record: Abrir registro
+    field: Campo
+    before: Antes
+    after: Depois
+    changed_fields: Campos alterados
+    from: De
+    to: Até
+    empty: Nenhum evento neste filtro.
+    system: Sistema
+    no_field_changes: Sem detalhe de campos.
+    bulk_help: Apagar remove só o log, não o registro da clínica.
+    confirm_delete: Remover este evento do log?
+    confirm_bulk_delete: Remover os eventos selecionados do log?
+    deleted: Evento removido do log.
+    choose_action: Escolha uma ação.
+    select_event: "Selecionar evento %{id}"
+    action_title: "%{verb} %{resource}"
+    fields_count:
+      one: "%{count} campo"
+      other: "%{count} campos"
+    bulk_deleted:
+      one: "%{count} evento removido."
+      other: "%{count} eventos removidos."
+    verbs:
+      created: Criou
+      updated: Atualizou
+      deleted: Excluiu
+    resources:
+      booking: agendamento
+      invoice: fatura
+      user: usuário
+      professional: profissional
+      room: sala
+      patient: paciente
+      ticket: chamado
+      ticket_comment: comentário
+      waitlist_entry: lista de espera
+      room_block: bloqueio
+      appointment_note: nota
+      api_key: chave de API
+      clinic_integration: integração
+      outbound_email: e-mail
+      setting: configuração
+    fields:
+      status: Status
+      amount: Valor
+      name: Nome
+      email: E-mail
+      role: Perfil
+      start_time: Início
+      end_time: Fim
+      due_date: Vencimento
+      subject: Assunto
+      body: Mensagem
+      priority: Prioridade
+      category: Categoria
+      assignee_id: Responsável
+      professional_id: Profissional
+      room_id: Sala
+      patient_id: Paciente
+      invoice_id: Fatura
+      user_id: Usuário
+      enabled: Ativo
+      provider: Provedor
+      action: Ação
+      details: Detalhes
+      id: ID

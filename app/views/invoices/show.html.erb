@@ -8,10 +8,10 @@
     </p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", back_path(invoices_path), class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), back_path(invoices_path), class: "btn btn--ghost" %>
     <%= link_to "PDF", invoice_path(@invoice, format: :pdf), class: "btn btn--ghost" %>
     <% if clinic_staff? %>
-      <%= link_to "Edit", path_with_return(edit_invoice_path(@invoice)), class: "btn btn--ghost" %>
+      <%= link_to t("ui.edit"), path_with_return(edit_invoice_path(@invoice)), class: "btn btn--ghost" %>
       <% if @invoice.payable? %>
         <%= button_to t("invoices.mark_paid"), pay_invoice_path(@invoice), method: :patch, class: "btn btn--primary", params: { return_to: originating_path } %>
       <% end %>
@@ -178,7 +178,7 @@
               <p class="field-help">Scan in the bank app or copy the code.</p>
               <p class="pix-key"><%= pix %></p>
               <div class="page-actions" style="margin-top:8px;">
-                <button type="button" class="btn btn--primary btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= pix %>" data-action="clipboard#copy">Copy PIX code</button>
+                <button type="button" class="btn btn--primary btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= pix %>" data-clipboard-copied-value="<%= t("ui.copied") %>" data-clipboard-failed-value="<%= t("ui.copy_failed") %>" data-action="clipboard#copy"><%= t("ui.copy") %></button>
                 <% wa = whatsapp_url(@invoice.professional.phone.presence || setting.whatsapp_phone, "Invoice ##{@invoice.id} · #{number_to_currency(@invoice.amount)}\n#{pix}") %>
                 <%= link_to "WhatsApp", wa, class: "btn btn--ghost btn--sm", target: "_blank", rel: "noopener" if wa %>
               </div>

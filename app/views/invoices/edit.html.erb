@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Edit invoice</h1>
+    <h1 class="page-title"><%= t("helpers.heading.invoices.edit") %></h1>
     <p class="page-sub">#<%= @invoice.id.to_s.rjust(4, "0") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", path_with_return(invoice_path(@invoice)), class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), path_with_return(invoice_path(@invoice)), class: "btn btn--ghost" %>
   </div>
 </div>
 <section class="card form-card">

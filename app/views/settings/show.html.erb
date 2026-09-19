@@ -1,57 +1,30 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Settings</h1>
-    <p class="page-sub">Clinic hours, cancellation policy and branding</p>
-  </div>
-  <div class="page-actions">
-    <%= link_to "Edit", edit_settings_path, class: "btn btn--primary" %>
+    <h1 class="page-title"><%= t("nav.settings") %></h1>
+    <p class="page-sub"><%= t("settings.subtitle") %></p>
   </div>
 </div>
 
-<div class="grid">
-  <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">Clinic</h2></div>
-    <dl class="dl-meta">
-      <dt>Name</dt><dd><%= @setting.clinic_name %></dd>
-      <dt>Email</dt><dd><%= @setting.clinic_email.presence || "—" %></dd>
-      <dt>Phone</dt><dd><%= @setting.clinic_phone.presence || "—" %></dd>
-      <dt>Currency</dt><dd><%= @setting.currency %></dd>
-      <dt>Slot</dt><dd><%= @setting.slot_minutes %> min</dd>
-      <dt>Week starts</dt><dd><%= @setting.week_starts_on.titleize %></dd>
-    </dl>
-  </section>
-  <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">Hours and policy</h2></div>
-    <dl class="dl-meta">
-      <dt>Hours</dt><dd>Each room uses its own opening hours on every weekday</dd>
-      <dt>Free cancel</dt><dd><%= @setting.free_cancel_hours %> hours before start</dd>
-      <dt>Late fee</dt><dd><%= @setting.late_cancel_percent %>%</dd>
-      <dt>After start</dt><dd><%= @setting.started_cancel_percent %>%</dd>
-    </dl>
-  </section>
-  <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">Email delivery</h2></div>
-    <dl class="dl-meta">
-      <dt>Method</dt><dd><%= MailerConfig.summary[:delivery_method] %></dd>
-      <dt>From</dt><dd><%= MailerConfig.summary[:from] %></dd>
-      <dt>SMTP</dt><dd><%= MailerConfig.summary[:smtp_address] %><%= MailerConfig.summary[:smtp_port] ? ":#{MailerConfig.summary[:smtp_port]}" : "" %></dd>
-      <dt>User</dt><dd><%= MailerConfig.summary[:smtp_username] %></dd>
-      <dt>Password</dt><dd><%= MailerConfig.summary[:smtp_password] == "saved" ? "Saved (hidden)" : "Not set" %></dd>
-      <dt>STARTTLS</dt><dd><%= MailerConfig.summary[:starttls] == false ? "Off" : "On" %></dd>
-      <dt>Links host</dt><dd><%= MailerConfig.summary[:host] %><%= MailerConfig.summary[:host] && MailerConfig.url_options[:port] ? ":#{MailerConfig.url_options[:port]}" : "" %></dd>
-    </dl>
-    <div class="page-actions" style="margin-top:10px">
-      <%= link_to "Edit delivery", edit_settings_path, class: "btn btn--ghost btn--sm" %>
-      <%= link_to "Sent emails", outbound_emails_path, class: "btn btn--ghost btn--sm" %>
-    </div>
-  </section>
-  <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">PIX and WhatsApp</h2></div>
-    <dl class="dl-meta">
-      <dt>PIX key</dt><dd><%= @setting.pix_key.presence || "Not configured" %></dd>
-      <dt>Receiver</dt><dd><%= @setting.pix_name.presence || "—" %></dd>
-      <dt>City</dt><dd><%= @setting.pix_city.presence || "—" %></dd>
-      <dt>WhatsApp</dt><dd><%= @setting.whatsapp_phone.presence || "—" %></dd>
-    </dl>
-  </section>
+<% if @setting.errors.any? %>
+  <div class="alert alert-danger"><%= @setting.errors.full_messages.to_sentence %></div>
+<% end %>
+
+<div class="settings-shell">
+  <nav class="settings-nav" aria-label="<%= t("nav.settings") %>">
+    <%= link_to t("settings.clinic_nav"), settings_path(edit: "clinic"), class: (@edit_section.to_s == "clinic" ? "is-on" : nil) %>
+    <%= link_to t("settings.policy_nav"), settings_path(edit: "policy"), class: (@edit_section.to_s == "policy" ? "is-on" : nil) %>
+    <%= link_to t("settings.mail_nav"), settings_path(edit: "mail"), class: (@edit_section.to_s == "mail" ? "is-on" : nil) %>
+    <%= link_to t("settings.pix_nav"), settings_path(edit: "pix"), class: (@edit_section.to_s == "pix" ? "is-on" : nil) %>
+    <%= link_to t("settings.tickets_nav"), settings_path(edit: "tickets"), class: (@edit_section.to_s == "tickets" ? "is-on" : nil) %>
+    <%= link_to t("nav.integrations"), integrations_path %>
+    <%= link_to t("nav.api_keys"), api_keys_path %>
+    <%= link_to t("nav.profile"), profile_path %>
+  </nav>
+  <div class="settings-panels">
+    <%= render "settings/clinic_card" %>
+    <%= render "settings/policy_card" %>
+    <%= render "settings/mail_card" %>
+    <%= render "settings/pix_card" %>
+    <%= render "settings/tickets_card" %>
+  </div>
 </div>

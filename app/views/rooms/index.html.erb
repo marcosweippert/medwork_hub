@@ -13,10 +13,10 @@
 
 <%= form_with url: rooms_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name or equipment" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("rooms.search_placeholder") %>
   </div>
-  <%= submit_tag "Search", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.search"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">

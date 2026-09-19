@@ -4,9 +4,9 @@
     <p class="page-sub"><%= [@professional.practice_area_labels.join(" · ").presence, @professional.specialty, @professional.license_number].compact.join(" · ") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Edit", edit_professional_path(@professional), class: "btn btn--ghost" %>
+    <%= link_to t("ui.edit"), edit_professional_path(@professional), class: "btn btn--ghost" %>
     <% unless @professional.delinquent? %>
-      <%= link_to "New booking", new_booking_path(professional_id: @professional.id, return_to: originating_path), class: "btn btn--primary" %>
+      <%= link_to t("bookings.new"), new_booking_path(professional_id: @professional.id, return_to: originating_path), class: "btn btn--primary" %>
     <% end %>
   </div>
 </div>

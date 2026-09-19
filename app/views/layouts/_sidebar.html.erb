@@ -1,10 +1,14 @@
 <aside class="d-sidebar" data-sidebar-target="aside">
   <%= link_to signed_in_home_path, class: "brand" do %>
-    <span class="brand-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+    <span class="brand-logo <%= "brand-logo--image" if clinic_setting.logo.attached? %>">
+      <% if clinic_setting.logo.attached? %>
+        <%= image_tag clinic_setting.logo, alt: "", class: "brand-logo-img" %>
+      <% else %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+      <% end %>
     </span>
     <span class="brand-text">
-      <span class="brand-name">MedWork</span>
+      <span class="brand-name"><%= clinic_setting.clinic_name.presence || "MedWork" %></span>
       <span class="brand-tag">HUB</span>
     </span>
   <% end %>
@@ -39,40 +43,58 @@
         <span><%= t("nav.patients") %></span>
       <% end %>
     <% end %>
+    <% if professional_user? %>
+      <%= link_to tickets_path, class: nav_class(tickets_path) do %>
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v6a4 4 0 0 0 0 8v4H4v-4a4 4 0 0 0 0-8V5z"/><path d="M9 12h6"/></svg>
+        <span><%= t("nav.tickets") %></span>
+      <% end %>
+    <% end %>
   </nav>
 
   <nav class="nav-section">
     <div class="nav-label"><%= t("nav.finance") %></div>
-    <% unless professional_user? %>
-      <%= link_to reports_path, class: nav_class(reports_path) do %>
-        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-7"/></svg>
-        <span><%= t("nav.reports") %></span>
-      <% end %>
-    <% end %>
     <%= link_to invoices_path, class: nav_class(invoices_path) do %>
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>
       <span><%= t("nav.invoices") %></span>
     <% end %>
   </nav>
 
-  <% if admin_user? %>
+  <% if clinic_staff? %>
     <nav class="nav-section">
       <div class="nav-label"><%= t("nav.admin") %></div>
-      <%= link_to settings_path, class: nav_class(settings_path) do %>
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span><%= t("nav.settings") %></span>
+      <%= link_to tickets_path, class: nav_class(tickets_path) do %>
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v6a4 4 0 0 0 0 8v4H4v-4a4 4 0 0 0 0-8V5z"/><path d="M9 12h6"/></svg>
+        <span><%= t("nav.tickets") %></span>
+      <% end %>
+      <%= link_to reports_path, class: nav_class(reports_path) do %>
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-7"/></svg>
+        <span><%= t("nav.reports") %></span>
       <% end %>
       <%= link_to users_path, class: nav_class(users_path) do %>
         <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span><%= t("nav.users") %></span>
       <% end %>
-      <%= link_to outbound_emails_path, class: nav_class(outbound_emails_path) do %>
-        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
-        <span><%= t("nav.emails") %></span>
-      <% end %>
-      <%= link_to audit_events_path, class: nav_class(audit_events_path) do %>
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-        <span><%= t("nav.audit") %></span>
+      <% if admin_user? %>
+        <%= link_to settings_path, class: nav_class(settings_path) do %>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span><%= t("nav.settings") %></span>
+        <% end %>
+        <%= link_to integrations_path, class: nav_class(integrations_path) do %>
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span><%= t("nav.integrations") %></span>
+        <% end %>
+        <%= link_to api_keys_path, class: nav_class(api_keys_path) do %>
+          <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M12 15h10v-2l-3-3-2 2-2-1"/></svg>
+          <span><%= t("nav.api_keys") %></span>
+        <% end %>
+        <%= link_to outbound_emails_path, class: nav_class(outbound_emails_path) do %>
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+          <span><%= t("nav.emails") %></span>
+        <% end %>
+        <%= link_to audit_events_path, class: nav_class(audit_events_path) do %>
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          <span><%= t("nav.audit") %></span>
+        <% end %>
       <% end %>
     </nav>
   <% end %>
@@ -81,7 +103,7 @@
     <div class="workspace">
       <div class="workspace-avatar"><%= current_user&.initials || "MW" %></div>
       <div class="workspace-text">
-        <div class="workspace-name"><%= current_user&.display_name || "MedWork Hub" %></div>
+        <div class="workspace-name"><%= link_to current_user&.display_name || "MedWork Hub", profile_path %></div>
         <div class="workspace-role"><%= current_user&.role.to_s.titleize.presence || "Guest" %></div>
       </div>
     </div>

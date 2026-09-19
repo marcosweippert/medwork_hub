@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Room usage</h1>
+    <h1 class="page-title"><%= t("reports.rooms") %></h1>
     <p class="page-sub"><%= @from.strftime("%d/%m/%Y") %> – <%= @to.strftime("%d/%m/%Y") %> · <%= analytical? ? "analytical" : "synthetic" %></p>
   </div>
   <%= render "export" %>

@@ -10,17 +10,39 @@ class Professional < ApplicationRecord
   validate :practice_areas_are_known
 
   scope :delinquent, -> { joins(:invoices).where(invoices: { status: "overdue" }).distinct }
+  scope :able_to_use, lambda { |room|
+    types = Array(room&.room_types)
+    areas = PracticeArea.keys.select { |key| (PracticeArea.room_types_for(key) & types).any? }
+    if types.empty? || areas.empty?
+      none
+    else
+      joins(:user).includes(:user).where("practice_areas && ARRAY[?]::varchar[]", areas)
+    end
+  }
+
+  def self.for_room_select(room)
+    records = able_to_use(room).order("users.name").to_a
+    overdue_ids = Invoice.where(status: "overdue", professional_id: records.map(&:id)).distinct.pluck(:professional_id).to_set
+    records.each { |record| record.delinquent = overdue_ids.include?(record.id) }
+    records
+  end
 
   def display_name
     user&.name.presence || user&.email.presence || "Professional ##{id}"
   end
 
+  def delinquent=(value)
+    @delinquent = !!value
+  end
+
   def delinquent?
-    if invoices.loaded?
-      invoices.any? { |invoice| invoice.status == "overdue" }
-    else
-      invoices.where(status: "overdue").exists?
-    end
+    return @delinquent unless @delinquent.nil?
+
+    @delinquent = if invoices.loaded?
+                    invoices.any? { |invoice| invoice.status == "overdue" }
+                  else
+                    invoices.where(status: "overdue").exists?
+                  end
   end
 
   def contact_phone

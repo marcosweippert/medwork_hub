@@ -2,12 +2,18 @@ require "net/imap"
 require "timeout"
 
 class ProcessEmailBounces
-  TIMEOUT_SECONDS = 8
+  TIMEOUT_SECONDS = 3
   LOOKBACK_DAYS = 14
+  CACHE_KEY = "process_email_bounces:last"
+  CACHE_TTL = 5.minutes
 
   Result = Struct.new(:checked, :updated, :error, keyword_init: true)
 
-  def self.call
+  def self.call(force: false)
+    return Result.new(checked: 0, updated: 0) unless MailerConfig.delivery_method == :smtp
+    return Result.new(checked: 0, updated: 0) unless MailerConfig.smtp_configured? && MailerConfig.password_configured?
+    return Result.new(checked: 0, updated: 0) unless force || Rails.cache.write(CACHE_KEY, true, expires_in: CACHE_TTL, unless_exist: true)
+
     new.call
   end
 

@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">New user</h1>
-    <p class="page-sub">Name, email and role only. A welcome email is sent with a temporary password.</p>
+    <h1 class="page-title"><%= t("users.new") %></h1>
+    <p class="page-sub"><%= t("users.new_subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", users_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), users_path, class: "btn btn--ghost" %>
   </div>
 </div>
 <section class="card form-card">

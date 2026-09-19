@@ -2,9 +2,11 @@ class OutboundEmailsController < ApplicationController
   before_action :require_admin
   before_action :set_email, only: %i[show preview resend forward download destroy]
 
+  INDEX_COLUMNS = %i[id to_address subject action_name mailer status error_message sent_at user_id].freeze
+
   def index
     ProcessEmailBounces.call
-    scope = OutboundEmail.newest.includes(:user)
+    scope = OutboundEmail.newest.select(*INDEX_COLUMNS).preload(:user)
     scope = scope.where(status: params[:status]) if params[:status].present?
     scope = scope.where(action_name: params[:kind]) if params[:kind].present?
     if params[:q].present?
@@ -18,7 +20,9 @@ class OutboundEmailsController < ApplicationController
     @emails = paginate(scope, per: 24)
   end
 
-  def show; end
+  def show
+    @inbox = OutboundEmail.newest.select(*INDEX_COLUMNS).limit(18)
+  end
 
   def preview
     render layout: false

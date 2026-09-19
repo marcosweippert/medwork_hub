@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">New patient</h1>
-    <p class="page-sub">Linked to a professional</p>
+    <h1 class="page-title"><%= t("patients.new") %></h1>
+    <p class="page-sub"><%= t("patients.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", patients_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), patients_path, class: "btn btn--ghost" %>
   </div>
 </div>
 <section class="card form-card">

@@ -18,7 +18,17 @@ export default class extends Controller {
     }
   }
 
+  pick(event) {
+    event.preventDefault()
+    const input = event.currentTarget.querySelector(".slot-check")
+    if (!input) return
+
+    input.checked = !input.checked
+    this.refresh()
+  }
+
   selectDay(event) {
+    event.preventDefault()
     const date = event.params.date
     this.slotTargets.forEach((el) => {
       if (el.dataset.date === date) el.checked = true

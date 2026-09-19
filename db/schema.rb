@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_19_235100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "api_keys", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "token_digest", null: false
+    t.string "token_prefix", null: false
+    t.boolean "enabled", default: true, null: false
+    t.date "renewal_on"
+    t.datetime "last_used_at"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token_digest"], name: "index_api_keys_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
   create_table "appointment_notes", force: :cascade do |t|
@@ -88,6 +102,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
     t.index ["room_id"], name: "index_bookings_on_room_id"
   end
 
+  create_table "clinic_integrations", force: :cascade do |t|
+    t.string "provider", null: false
+    t.boolean "enabled", default: false, null: false
+    t.datetime "connected_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "config", default: {}, null: false
+    t.string "name", null: false
+    t.string "kind", null: false
+    t.text "notes"
+    t.index ["kind"], name: "index_clinic_integrations_on_kind"
+    t.index ["provider"], name: "index_clinic_integrations_on_provider", unique: true
+  end
+
   create_table "invoices", force: :cascade do |t|
     t.bigint "professional_id", null: false
     t.decimal "amount"
@@ -109,6 +137,24 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
     t.index ["pix_txid"], name: "index_invoices_on_pix_txid", unique: true
     t.index ["professional_id"], name: "index_invoices_on_professional_id"
     t.index ["room_id"], name: "index_invoices_on_room_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "actor_id"
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "kind", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "outbound_emails", force: :cascade do |t|
@@ -217,6 +263,50 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
     t.string "mailer_protocol"
     t.string "welcome_email_subject"
     t.text "welcome_email_html"
+    t.integer "ticket_sla_urgent", default: 4, null: false
+    t.integer "ticket_sla_high", default: 8, null: false
+    t.integer "ticket_sla_medium", default: 24, null: false
+    t.integer "ticket_sla_low", default: 72, null: false
+    t.integer "ticket_sla_warn_hours", default: 4, null: false
+    t.string "ticket_default_priority", default: "medium", null: false
+    t.boolean "ticket_notify_staff", default: true, null: false
+    t.boolean "ticket_notify_requester", default: true, null: false
+    t.bigint "ticket_default_assignee_id"
+    t.integer "ticket_auto_close_days", default: 0, null: false
+    t.index ["ticket_default_assignee_id"], name: "index_settings_on_ticket_default_assignee_id"
+  end
+
+  create_table "ticket_comments", force: :cascade do |t|
+    t.bigint "ticket_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body", null: false
+    t.boolean "internal", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ticket_id"], name: "index_ticket_comments_on_ticket_id"
+    t.index ["user_id"], name: "index_ticket_comments_on_user_id"
+  end
+
+  create_table "tickets", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "assignee_id"
+    t.string "subject", null: false
+    t.text "body", null: false
+    t.string "status", default: "open", null: false
+    t.string "priority", default: "medium", null: false
+    t.string "category", default: "other", null: false
+    t.integer "sla_hours"
+    t.datetime "sla_due_at"
+    t.datetime "first_response_at"
+    t.datetime "resolved_at"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assignee_id"], name: "index_tickets_on_assignee_id"
+    t.index ["priority"], name: "index_tickets_on_priority"
+    t.index ["sla_due_at"], name: "index_tickets_on_sla_due_at"
+    t.index ["status"], name: "index_tickets_on_status"
+    t.index ["user_id"], name: "index_tickets_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -250,6 +340,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "api_keys", "users"
   add_foreign_key "appointment_notes", "bookings"
   add_foreign_key "appointment_notes", "patients"
   add_foreign_key "audit_events", "users"
@@ -259,10 +350,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_160000) do
   add_foreign_key "bookings", "rooms"
   add_foreign_key "invoices", "professionals"
   add_foreign_key "invoices", "rooms"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "outbound_emails", "users"
   add_foreign_key "patients", "professionals"
   add_foreign_key "professionals", "users"
   add_foreign_key "room_blocks", "rooms"
+  add_foreign_key "settings", "users", column: "ticket_default_assignee_id"
+  add_foreign_key "ticket_comments", "tickets"
+  add_foreign_key "ticket_comments", "users"
+  add_foreign_key "tickets", "users"
+  add_foreign_key "tickets", "users", column: "assignee_id"
   add_foreign_key "waitlist_entries", "professionals"
   add_foreign_key "waitlist_entries", "rooms"
 end

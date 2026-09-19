@@ -1,81 +1,89 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Emails</h1>
-    <p class="page-sub">Sent messages. Open expands the content on this page.</p>
+    <h1 class="page-title"><%= t("emails.inbox") %></h1>
+    <p class="page-sub"><%= t("nav.emails") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Welcome email", edit_welcome_outbound_emails_path, class: "btn btn--ghost" %>
-    <%= link_to "Compose", new_outbound_email_path, class: "btn btn--primary" %>
+    <%= link_to t("emails.welcome"), edit_welcome_outbound_emails_path, class: "btn btn--ghost" %>
+    <%= link_to t("emails.compose"), new_outbound_email_path, class: "btn btn--primary" %>
   </div>
 </div>
 
-<%= form_with url: outbound_emails_path, method: :get, class: "filter-bar" do %>
-  <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "To, subject or reason" %>
-  </div>
-  <div class="field">
-    <label class="field-label">Status</label>
-    <%= filter_select :status, [["Sent", "sent"], ["Failed", "failed"], ["Returned", "bounced"]], selected: params[:status] %>
-  </div>
-  <div class="field">
-    <label class="field-label">Kind</label>
-    <%= filter_select :kind, @kinds.map { |kind| [kind.to_s.humanize, kind] }, selected: params[:kind] %>
-  </div>
-  <%= submit_tag "Search", class: "btn btn--ghost" %>
-<% end %>
+<div class="inbox-layout">
+  <aside class="inbox-side">
+    <strong style="font-size:13px;"><%= t("emails.folders") %></strong>
+    <%= link_to t("emails.all"), outbound_emails_path, class: (params[:status].blank? ? "is-on" : nil) %>
+    <%= link_to t("emails.sent"), outbound_emails_path(status: "sent"), class: (params[:status] == "sent" ? "is-on" : nil) %>
+    <%= link_to t("emails.failed"), outbound_emails_path(status: "failed"), class: (params[:status] == "failed" ? "is-on" : nil) %>
+    <%= link_to t("emails.bounced"), outbound_emails_path(status: "bounced"), class: (params[:status] == "bounced" ? "is-on" : nil) %>
+  </aside>
 
-<%= form_with url: bulk_outbound_emails_path, method: :post, data: { controller: "bulk-select" } do %>
-  <div class="bulk-bar" data-bulk-select-target="bar" hidden>
-    <strong data-bulk-select-target="count">0 selected</strong>
-    <span class="field-help">Resend keeps a new log row. Delete only removes the log.</span>
-    <div class="page-actions">
-      <%= button_tag "Resend", name: "bulk_action", value: "resend", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Resend the selected emails?" } %>
-      <%= button_tag "Delete", name: "bulk_action", value: "delete", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Remove selected emails from the log?" } %>
-    </div>
-  </div>
+  <div>
+    <%= form_with url: outbound_emails_path, method: :get, class: "filter-bar" do %>
+      <div class="field field-grow">
+        <label class="field-label"><%= t("ui.search") %></label>
+        <%= text_field_tag :q, params[:q], class: "input", placeholder: "#{t("emails.to")}, #{t("emails.subject")}" %>
+      </div>
+      <div class="field">
+        <label class="field-label"><%= t("ui.status") %></label>
+        <%= filter_select :status, [[t("emails.sent"), "sent"], [t("emails.failed"), "failed"], [t("emails.bounced"), "bounced"]], selected: params[:status] %>
+      </div>
+      <div class="field">
+        <label class="field-label"><%= t("emails.kind") %></label>
+        <%= filter_select :kind, @kinds.map { |kind| [kind.to_s.humanize, kind] }, selected: params[:kind] %>
+      </div>
+      <%= submit_tag t("ui.search"), class: "btn btn--ghost" %>
+    <% end %>
 
-  <section class="card">
-    <div class="email-board-head">
-      <label class="cell-check">
-        <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all emails">
-      </label>
-      <span>When</span>
-      <span>To</span>
-      <span>Subject</span>
-      <span>Kind</span>
-      <span>Status</span>
-      <span class="email-board-actions-label">Actions</span>
-    </div>
-    <% @emails.each do |email| %>
-      <article class="email-item" data-email-item data-controller="email-preview">
-        <div class="email-item-row">
-          <div class="cell-check">
-            <%= check_box_tag "email_ids[]", email.id, false, class: "row-check", id: "email_#{email.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, aria: { label: "Select email #{email.id}" } %>
-          </div>
-          <div class="data-cell-mono"><%= email.sent_at&.strftime("%d/%m/%Y %H:%M") %></div>
-          <div class="email-item-to" title="<%= email.to_address %>"><%= email.to_address %></div>
-          <div class="email-item-subject" title="<%= email.subject %>"><%= email.subject.presence || "Untitled" %></div>
-          <div><%= email.kind_label %></div>
-          <div>
-            <%= status_tag(email.status) %>
-            <% if email.error_message.present? %>
-              <div class="email-item-reason" title="<%= email.error_message %>"><%= email.error_message %></div>
-            <% end %>
-          </div>
-          <div class="row-actions">
-            <button type="button" class="btn btn--chip btn--view" data-email-preview-target="button" data-action="email-preview#toggle">Open</button>
-            <%= action_btn "Resend", resend_outbound_email_path(email), tone: "cal", method: :post, confirm: "Resend this email to #{email.to_address}?" %>
-          </div>
+    <%= form_with url: bulk_outbound_emails_path, method: :post, data: { controller: "bulk-select" } do %>
+      <div class="bulk-bar" data-bulk-select-target="bar" hidden>
+        <strong data-bulk-select-target="count">0 selected</strong>
+        <div class="page-actions">
+          <%= button_tag t("emails.resend"), name: "bulk_action", value: "resend", class: "btn btn--primary btn--sm", data: { turbo_confirm: t("emails.resend") } %>
+          <%= button_tag t("emails.delete"), name: "bulk_action", value: "delete", class: "btn btn--ghost btn--sm" %>
         </div>
-        <div class="email-item-preview" hidden data-email-preview-target="panel">
-          <%= render "preview", email: email, compact: true, tabs: false, copy: false %>
+      </div>
+
+      <section class="card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("ui.all") %>">
+                </th>
+                <th><%= t("emails.when") %></th>
+                <th><%= t("emails.to") %></th>
+                <th><%= t("emails.subject") %></th>
+                <th><%= t("emails.kind") %></th>
+                <th><%= t("ui.status") %></th>
+                <th class="cell-actions"><%= t("ui.actions") %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @emails.each do |email| %>
+                <tr>
+                  <td>
+                    <%= check_box_tag "email_ids[]", email.id, false, class: "row-check", id: "email_#{email.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" } %>
+                  </td>
+                  <td class="data-cell-mono"><%= email.sent_at&.strftime("%d/%m/%Y %H:%M") %></td>
+                  <td><%= email.to_address %></td>
+                  <td><%= link_to email.subject.presence || t("emails.untitled"), outbound_email_path(email), class: "table-link" %></td>
+                  <td><%= email.kind_label %></td>
+                  <td><%= status_tag(email.status) %></td>
+                  <td class="row-actions">
+                    <%= link_to t("emails.open"), outbound_email_path(email), class: "btn btn--chip" %>
+                  </td>
+                </tr>
+              <% end %>
+              <% if @emails.empty? %>
+                <tr><td colspan="7"><%= t("emails.empty") %></td></tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
-      </article>
+        <%= render "shared/pager" %>
+      </section>
     <% end %>
-    <% if @emails.empty? %>
-      <p class="page-sub" style="padding:14px">No emails sent yet.</p>
-    <% end %>
-    <%= render "shared/pager" %>
-  </section>
-<% end %>
+  </div>
+</div>

@@ -65,6 +65,38 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "cannot open billing or transactions" do
+    get billing_path
+    assert_redirected_to rooms_path
+    get transactions_path
+    assert_redirected_to rooms_path
+    get audit_events_path
+    assert_redirected_to rooms_path
+    get integrations_path
+    assert_redirected_to rooms_path
+    get api_keys_path
+    assert_redirected_to rooms_path
+  end
+
+  test "can open own tickets but not another professional ticket" do
+    own = Ticket.create!(user: @pro_user, subject: "Minha sala", body: "Luz queimada", priority: "medium", category: "rooms")
+    other = Ticket.create!(user: @other_user, subject: "Outro chamado", body: "Segredo", priority: "high", category: "other")
+
+    get tickets_path
+    assert_response :success
+    assert_match "Minha sala", response.body
+    assert_no_match "Outro chamado", response.body
+
+    get ticket_path(own)
+    assert_response :success
+    get ticket_path(other)
+    assert_response :not_found
+
+    patch ticket_path(own), params: { ticket: { status: "closed" } }
+    assert_redirected_to ticket_path(own)
+    assert_equal "open", own.reload.status
+  end
+
   test "waitlist lists only the logged professional" do
     WaitlistEntry.create!(room: @psy_room, professional: @professional, starts_at: 1.day.from_now.change(hour: 10), ends_at: 1.day.from_now.change(hour: 10, min: 30), status: "waiting")
     WaitlistEntry.create!(room: @dental_room, professional: @other, starts_at: 1.day.from_now.change(hour: 11), ends_at: 1.day.from_now.change(hour: 11, min: 30), status: "waiting")

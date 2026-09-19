@@ -1,40 +1,61 @@
-<div class="page-head">
-  <div>
-    <h1 class="page-title">Invoices</h1>
-    <p class="page-sub"><%= clinic_staff? ? "Pay, cancel individual times or refund · overdue invoices block new bookings" : "Your invoices for reserved rooms" %></p>
-  </div>
-  <% if clinic_staff? %>
-    <div class="page-actions">
-      <%= link_to "Receivables", receivables_reports_path, class: "btn btn--ghost" %>
-      <%= link_to "New invoice", new_invoice_path(return_to: originating_path), class: "btn btn--primary" %>
+<div class="invoice-hero">
+  <div class="page-head" style="margin:0;">
+    <div>
+      <h1 class="page-title"><%= t("nav.invoices") %></h1>
+      <p class="page-sub"><%= clinic_staff? ? t("invoices.subtitle_staff") : t("invoices.subtitle_pro") %></p>
     </div>
-  <% end %>
+    <% if clinic_staff? %>
+      <div class="page-actions">
+        <%= link_to t("invoices.receivables"), receivables_reports_path, class: "btn btn--ghost" %>
+        <%= link_to t("invoices.new"), new_invoice_path(return_to: originating_path), class: "btn btn--primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="fin-kpis">
+  <div class="fin-kpi">
+    <p class="label"><%= t("invoices.kpi_total") %></p>
+    <strong><%= @invoice_kpis[:total] %></strong>
+  </div>
+  <div class="fin-kpi">
+    <p class="label"><%= t("invoices.kpi_paid") %></p>
+    <strong><%= @invoice_kpis[:paid] %></strong>
+  </div>
+  <div class="fin-kpi">
+    <p class="label"><%= t("invoices.kpi_overdue") %></p>
+    <strong><%= @invoice_kpis[:overdue] %></strong>
+  </div>
+  <div class="fin-kpi">
+    <p class="label"><%= t("invoices.kpi_open") %></p>
+    <strong><%= number_to_currency(@invoice_kpis[:open_amount], precision: 0) %></strong>
+  </div>
 </div>
 
 <%= form_with url: invoices_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Professional, room or comment" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("invoices.search_placeholder") %>
   </div>
   <div class="field">
-    <label class="field-label">Status</label>
-    <%= select_tag :status, options_for_select([["All", ""]] + Invoice::STATUSES.map { |s| [s.titleize, s] }, params[:status]), class: "select" %>
+    <label class="field-label"><%= t("ui.status") %></label>
+    <%= select_tag :status, options_for_select([[t("ui.all"), ""]] + Invoice::STATUSES.map { |s| [t("statuses.#{s}", default: s.humanize), s] }, params[:status]), class: "select" %>
   </div>
   <div class="field">
-    <label class="field-label">Due from</label>
+    <label class="field-label"><%= t("invoices.due_from") %></label>
     <%= date_field_tag :from, params[:from], class: "input" %>
   </div>
   <div class="field">
-    <label class="field-label">Due to</label>
+    <label class="field-label"><%= t("invoices.due_to") %></label>
     <%= date_field_tag :to, params[:to], class: "input" %>
   </div>
   <% if clinic_staff? %>
     <div class="field">
-      <label class="field-label">Professional</label>
-      <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: "All", class: "select" %>
+      <label class="field-label"><%= t("ui.professional") %></label>
+      <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: t("ui.all"), class: "select" %>
     </div>
   <% end %>
-  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
 <%= form_with url: bulk_invoices_path, method: :patch, data: { controller: "bulk-select", bulk_select_matching_value: @total_count } do %>
@@ -126,7 +147,7 @@
                 <% end %>
               </td>
               <td class="cell-actions">
-                <%= action_btn "Open", path_with_return(invoice_path(invoice)), tone: "view" %>
+                <%= action_btn t("ui.open"), path_with_return(invoice_path(invoice)), tone: "view" %>
               </td>
             </tr>
           <% end %>

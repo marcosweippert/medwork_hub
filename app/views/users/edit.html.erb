@@ -1,11 +1,11 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Edit user</h1>
+    <h1 class="page-title"><%= t("helpers.heading.users.edit") %></h1>
     <p class="page-sub">Update name, email and role.</p>
   </div>
   <div class="page-actions">
     <%= button_to "Resend welcome email", invite_user_path(@user), method: :post, class: "btn btn--ghost" %>
-    <%= link_to "Back", users_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), users_path, class: "btn btn--ghost" %>
   </div>
 </div>
 <section class="card form-card">

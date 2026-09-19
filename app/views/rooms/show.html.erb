@@ -5,9 +5,9 @@
   </div>
   <div class="page-actions">
     <% if clinic_staff? %>
-      <%= link_to "Edit", edit_room_path(@room), class: "btn btn--ghost" %>
+      <%= link_to t("ui.edit"), edit_room_path(@room), class: "btn btn--ghost" %>
     <% end %>
-    <%= link_to "Calendar", calendar_room_path(@room), class: "btn btn--primary" %>
+    <%= link_to t("ui.calendar"), calendar_room_path(@room), class: "btn btn--primary" %>
   </div>
 </div>
 

@@ -1,0 +1,172 @@
+<nav class="fb-crumb" aria-label="breadcrumb">
+  <%= link_to t("nav.dashboard"), root_path %>
+  <span>›</span>
+  <%= link_to t("nav.tickets"), tickets_path %>
+  <span>›</span>
+  <span class="is-current"><%= t("tickets.all") %></span>
+</nav>
+<h1 class="fb-page-title"><%= t("nav.tickets") %></h1>
+
+<div class="fb-kpis">
+  <%= link_to tickets_path(ticket_filter_params.except("tab", "status", "queue", "unassigned", "sla")), class: "fb-kpi #{ "is-on" if params[:tab].blank? && params[:status].blank? && params[:queue].blank? }" do %>
+    <span class="fb-kpi-icon is-total">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+    </span>
+    <span><strong><%= @stats[:total] %></strong><span><%= t("tickets.total") %></span></span>
+  <% end %>
+  <%= link_to tickets_path(ticket_filter_params.merge("tab" => "pending")), class: "fb-kpi #{ "is-on" if params[:tab] == "pending" || params[:queue] == "open" }" do %>
+    <span class="fb-kpi-icon is-pending">
+      <svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+    </span>
+    <span><strong><%= @stats[:pending] %></strong><span><%= t("tickets.pending") %></span></span>
+  <% end %>
+  <%= link_to tickets_path(ticket_filter_params.merge("tab" => "solved")), class: "fb-kpi #{ "is-on" if params[:tab] == "solved" || params[:status] == "resolved" }" do %>
+    <span class="fb-kpi-icon is-solved">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    </span>
+    <span><strong><%= @stats[:solved] %></strong><span><%= t("tickets.solved") %></span></span>
+  <% end %>
+  <%= link_to tickets_path(ticket_filter_params.merge("tab" => "closed")), class: "fb-kpi #{ "is-on" if params[:tab] == "closed" || params[:status] == "closed" }" do %>
+    <span class="fb-kpi-icon is-closed">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+    </span>
+    <span><strong><%= @stats[:closed] %></strong><span><%= t("tickets.closed") %></span></span>
+  <% end %>
+</div>
+
+<%= form_with url: tickets_path, method: :get, class: "fb-toolbar" do %>
+  <div class="fb-search">
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("tickets.search_placeholder") %>
+    <%= submit_tag t("ui.search"), class: "btn btn--primary" %>
+  </div>
+  <%= hidden_field_tag :tab, params[:tab] if params[:tab].present? %>
+  <details class="fb-menu">
+    <summary class="btn btn--ghost"><%= t("tickets.filters") %></summary>
+    <div class="fb-menu-list" style="min-width:240px; padding:12px; display:grid; gap:10px;">
+      <div class="field">
+        <label class="field-label"><%= t("tickets.priority") %></label>
+        <%= select_tag :priority, options_for_select([[t("helpers.all"), ""]] + ticket_priority_options, params[:priority]), class: "select" %>
+      </div>
+      <div class="field">
+        <label class="field-label"><%= t("tickets.category") %></label>
+        <%= select_tag :category, options_for_select([[t("helpers.all"), ""]] + ticket_category_options, params[:category]), class: "select" %>
+      </div>
+      <% if clinic_staff? %>
+        <div class="field">
+          <label class="field-label"><%= t("tickets.assign") %></label>
+          <%= select_tag :assignee_id, options_from_collection_for_select(staff_assignees, :id, :display_name, params[:assignee_id]), include_blank: t("helpers.all"), class: "select" %>
+        </div>
+      <% end %>
+      <%= submit_tag t("tickets.filter"), class: "btn btn--primary btn--sm" %>
+    </div>
+  </details>
+  <% if clinic_staff? %>
+    <%= link_to t("tickets.export"), export_tickets_path(request.query_parameters), class: "btn btn--ghost" %>
+  <% end %>
+  <%= link_to t("tickets.create"), new_ticket_path, class: "btn btn--primary" %>
+<% end %>
+
+<div class="fb-tabs">
+  <span><%= t("tickets.show_only") %></span>
+  <%= link_to t("tickets.tab_all"), tickets_path(ticket_filter_params.except("tab", "status", "queue")), class: ("is-on" if params[:tab].blank? && params[:status].blank?) %>
+  <%= link_to t("tickets.tab_pending"), tickets_path(ticket_filter_params.merge("tab" => "pending")), class: ("is-on" if params[:tab] == "pending") %>
+  <%= link_to t("tickets.tab_solved"), tickets_path(ticket_filter_params.merge("tab" => "solved")), class: ("is-on" if params[:tab] == "solved") %>
+  <%= link_to t("tickets.tab_closed"), tickets_path(ticket_filter_params.merge("tab" => "closed")), class: ("is-on" if params[:tab] == "closed") %>
+</div>
+
+<%= form_with url: bulk_tickets_path, method: :patch, data: { controller: "bulk-select" } do %>
+  <% if clinic_staff? %>
+    <div class="bulk-bar bulk-bar--compact" data-bulk-select-target="bar" hidden>
+      <strong data-bulk-select-target="count">0 selected</strong>
+      <button type="submit" name="bulk_action" value="resolve" class="btn btn--primary btn--sm" data-turbo-confirm="<%= t("tickets.confirm_resolve") %>"><%= t("tickets.mark_solved") %></button>
+      <button type="submit" name="bulk_action" value="close" class="btn btn--ghost btn--sm" data-turbo-confirm="<%= t("tickets.confirm_close") %>"><%= t("tickets.archive") %></button>
+    </div>
+  <% end %>
+
+  <section class="fb-table-card">
+    <div class="table-scroll">
+      <table class="fb-table">
+        <thead>
+          <tr>
+            <% if clinic_staff? %>
+              <th>
+                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll">
+              </th>
+            <% end %>
+            <th><%= t("tickets.col_id") %></th>
+            <th><%= t("tickets.requested_by") %></th>
+            <th><%= t("tickets.subject") %></th>
+            <th><%= t("tickets.priority") %></th>
+            <th><%= t("tickets.agent") %></th>
+            <th><%= t("tickets.opened_at") %></th>
+            <th><%= t("tickets.status") %></th>
+            <th><%= t("tickets.sla") %></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tickets.each do |ticket| %>
+            <tr>
+              <% if clinic_staff? %>
+                <td class="cell-check">
+                  <input type="checkbox" name="ids[]" value="<%= ticket.id %>" class="row-check" data-bulk-select-target="row" data-action="change->bulk-select#refresh">
+                </td>
+              <% end %>
+              <td><%= link_to "##{ticket.id}", ticket_path(ticket), class: "fb-id" %></td>
+              <td>
+                <div class="fb-person">
+                  <span class="fb-avatar"><%= ticket.user.initials %></span>
+                  <span><%= ticket.user.display_name %></span>
+                </div>
+              </td>
+              <td>
+                <%= link_to ticket.subject, ticket_path(ticket) %><br>
+                <span class="page-sub"><%= t("statuses.#{ticket.category}", default: ticket.category.humanize) %></span>
+              </td>
+              <td><span class="fb-pri fb-pri-<%= ticket.priority %>"><%= t("statuses.#{ticket.priority}") %></span></td>
+              <td>
+                <% if ticket.assignee %>
+                  <div class="fb-person">
+                    <span class="fb-avatar"><%= ticket.assignee.initials %></span>
+                    <span><%= ticket.assignee.display_name %></span>
+                  </div>
+                <% else %>
+                  <span class="page-sub"><%= t("tickets.unassigned") %></span>
+                <% end %>
+              </td>
+              <td><%= l(ticket.created_at.to_date, format: :default) %></td>
+              <td><span class="fb-st fb-st-<%= ticket.status %>"><%= t("statuses.#{ticket.status}") %></span></td>
+              <td><span class="<%= sla_class(ticket) %>"><%= ticket.sla_label %></span></td>
+              <td>
+                <details class="fb-menu">
+                  <summary aria-label="<%= t("tickets.actions") %>">⋯</summary>
+                  <div class="fb-menu-list">
+                    <%= link_to t("ui.open"), ticket_path(ticket) %>
+                    <% if clinic_staff? && ticket.assignee_id != current_user.id && ticket.open? %>
+                      <%= link_to t("tickets.take"), take_ticket_path(ticket), data: { turbo_method: :patch } %>
+                    <% end %>
+                    <% if clinic_staff? && ticket.open? %>
+                      <%= link_to t("tickets.mark_solved"), resolve_ticket_path(ticket), data: { turbo_method: :patch } %>
+                    <% end %>
+                    <% if clinic_staff? && ticket.status.in?(%w[resolved closed]) %>
+                      <%= link_to t("tickets.reopen"), reopen_ticket_path(ticket), data: { turbo_method: :patch } %>
+                    <% end %>
+                  </div>
+                </details>
+              </td>
+            </tr>
+          <% end %>
+          <% if @tickets.empty? %>
+            <tr>
+              <td colspan="9" style="text-align:center; padding:28px;">
+                <p class="page-sub"><%= t("tickets.empty") %></p>
+                <%= link_to t("tickets.create"), new_ticket_path, class: "btn btn--primary btn--sm" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>
+<%= render "shared/pager" %>

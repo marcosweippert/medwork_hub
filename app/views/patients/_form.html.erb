@@ -10,7 +10,7 @@
     <div class="field span-2"><%= f.label :history, "Clinical notes", class: "field-label" %><%= f.text_area :history, class: "textarea", placeholder: "Relevant history, diagnosis, observations" %></div>
     <div class="span-2 form-actions">
       <%= f.submit class: "btn btn--primary" %>
-      <%= link_to "Cancel", patients_path, class: "btn btn--ghost" %>
+      <%= link_to t("ui.cancel"), patients_path, class: "btn btn--ghost" %>
     </div>
   </div>
 <% end %>

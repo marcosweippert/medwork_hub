@@ -12,6 +12,7 @@
   .sv-regions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
   .sv-radials { grid-template-columns: 1fr; gap: 18px; }
   .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   /* Calendar */
   .cal-shell { grid-template-columns: 240px 1fr; }
@@ -169,6 +170,9 @@
 
   /* ---- Dashboard ---- */
   .kpi-grid { grid-template-columns: 1fr; }
+  .dash-kpis { grid-template-columns: 1fr; }
+  .dash-board { grid-template-columns: 1fr; }
+  .dash-invoice { flex-direction: column; align-items: flex-start; }
   .sv-regions { grid-template-columns: 1fr; gap: 22px; }
   .monthly-footer { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .wx-forecast { grid-template-columns: repeat(4, 1fr); gap: 6px; }

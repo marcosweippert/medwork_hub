@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-  before_action :require_admin
+  before_action :require_clinic_staff
+  before_action :require_admin, only: %i[destroy]
   before_action :set_user, only: %i[show edit update destroy invite]
 
   def index
@@ -24,7 +25,7 @@ class UsersController < ApplicationController
     )
     @user = result.user
     if result.ok?
-      redirect_to users_path, notice: "User created. A welcome email with a temporary password was sent to #{@user.email}."
+      redirect_to users_path, notice: t("users.created", email: @user.email)
     else
       @user.build_professional if @user.professional.nil?
       render :new, status: :unprocessable_entity
@@ -37,7 +38,7 @@ class UsersController < ApplicationController
     attrs = user_params
     attrs.delete(:professional_attributes) unless @user.professional
     if @user.update(attrs.except(:password, :password_confirmation))
-      redirect_to users_path, notice: "User updated."
+      redirect_to users_path, notice: t("users.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -46,16 +47,16 @@ class UsersController < ApplicationController
   def invite
     password = CreateUserAccount.temporary_password
     @user.update!(password: password, password_confirmation: password, must_change_password: true)
-    ClinicMailer.welcome(@user, password).deliver_now
-    redirect_to users_path, notice: "A new temporary password was emailed to #{@user.email}."
+    CreateUserAccount.deliver_welcome(@user, password)
+    redirect_to users_path, notice: t("users.invited", email: @user.email)
   end
 
   def destroy
     if @user == current_user
-      redirect_to users_path, alert: "You cannot delete your own account."
+      redirect_to users_path, alert: t("users.cannot_delete_self")
     else
       @user.destroy
-      redirect_to users_path, notice: "User deleted."
+      redirect_to users_path, notice: t("users.deleted")
     end
   end
 

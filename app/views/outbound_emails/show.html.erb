@@ -1,38 +1,46 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title"><%= @email.subject.presence || "Email" %></h1>
+    <h1 class="page-title"><%= @email.subject.presence || t("emails.untitled") %></h1>
     <p class="page-sub"><%= @email.kind_label %> · <%= @email.to_address %> · <%= @email.sent_at&.strftime("%d/%m/%Y %H:%M") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", outbound_emails_path, class: "btn btn--ghost" %>
-    <%= link_to "Download", download_outbound_email_path(@email), class: "btn btn--ghost" %>
-    <%= button_to "Resend", resend_outbound_email_path(@email), method: :post, class: "btn btn--primary", data: { turbo_confirm: "Resend this email to #{@email.to_address}?" } %>
-    <%= button_to "Delete", outbound_email_path(@email), method: :delete, class: "btn btn--ghost", data: { turbo_confirm: "Remove this email from the log?" } %>
+    <%= link_to t("ui.back"), outbound_emails_path, class: "btn btn--ghost" %>
+    <%= link_to t("emails.download"), download_outbound_email_path(@email), class: "btn btn--ghost" %>
+    <%= button_to t("emails.resend"), resend_outbound_email_path(@email), method: :post, class: "btn btn--primary" %>
+    <%= button_to t("emails.delete"), outbound_email_path(@email), method: :delete, class: "btn btn--ghost" %>
   </div>
 </div>
 
 <div class="mail-show">
-  <aside class="mail-show-meta card">
-    <dl class="dl-meta">
-      <dt>Status</dt><dd><%= status_tag(@email.status) %></dd>
-      <dt>From</dt><dd><%= @email.from_address.presence || "—" %></dd>
-      <dt>To</dt><dd><%= @email.to_address %></dd>
-      <% if @email.cc.present? %><dt>Cc</dt><dd><%= @email.cc %></dd><% end %>
-      <% if @email.bcc.present? %><dt>Bcc</dt><dd><%= @email.bcc %></dd><% end %>
-      <dt>Kind</dt><dd><%= @email.kind_label %></dd>
-      <% if @email.user %><dt>User</dt><dd><%= link_to @email.user.display_name, @email.user %></dd><% end %>
-      <% if @email.error_message.present? %><dt>Reason</dt><dd><%= @email.error_message %></dd><% end %>
-    </dl>
-    <div class="mail-forward">
-      <h2 class="card-title">Forward</h2>
-      <%= form_with url: forward_outbound_email_path(@email), method: :post do %>
-        <label class="field-label">Send a copy to</label>
-        <%= email_field_tag :to, nil, class: "input", placeholder: "email@example.com", required: true %>
-        <%= submit_tag "Forward", class: "btn btn--primary btn--sm", style: "margin-top:8px" %>
+  <aside class="inbox-side">
+    <% @inbox.each do |email| %>
+      <%= link_to outbound_email_path(email), class: (email.id == @email.id ? "is-on" : nil) do %>
+        <div style="font-weight:600;"><%= email.subject.presence || t("emails.untitled") %></div>
+        <div class="page-sub"><%= email.to_address %></div>
       <% end %>
-    </div>
+    <% end %>
   </aside>
-  <section class="card mail-show-body">
-    <%= render "preview", email: @email, compact: false %>
-  </section>
+  <div>
+    <section class="card mail-show-body">
+      <dl class="dl-meta" style="margin-bottom:16px;">
+        <dt><%= t("ui.status") %></dt><dd><%= status_tag(@email.status) %></dd>
+        <dt><%= t("emails.from") %></dt><dd><%= @email.from_address.presence || "—" %></dd>
+        <dt><%= t("emails.to") %></dt><dd><%= @email.to_address %></dd>
+        <% if @email.cc.present? %><dt>Cc</dt><dd><%= @email.cc %></dd><% end %>
+        <% if @email.bcc.present? %><dt>Bcc</dt><dd><%= @email.bcc %></dd><% end %>
+        <dt><%= t("emails.kind") %></dt><dd><%= @email.kind_label %></dd>
+        <% if @email.user %><dt><%= t("emails.user") %></dt><dd><%= link_to @email.user.display_name, @email.user %></dd><% end %>
+        <% if @email.error_message.present? %><dt><%= t("emails.reason") %></dt><dd><%= @email.error_message %></dd><% end %>
+      </dl>
+      <%= render "preview", email: @email, compact: false %>
+    </section>
+    <section class="card" style="margin-top:16px;">
+      <h2 class="card-title"><%= t("emails.forward") %></h2>
+      <%= form_with url: forward_outbound_email_path(@email), method: :post do %>
+        <label class="field-label"><%= t("emails.send_copy") %></label>
+        <%= email_field_tag :to, nil, class: "input", placeholder: "email@example.com", required: true %>
+        <%= submit_tag t("emails.forward"), class: "btn btn--primary btn--sm", style: "margin-top:8px" %>
+      <% end %>
+    </section>
+  </div>
 </div>

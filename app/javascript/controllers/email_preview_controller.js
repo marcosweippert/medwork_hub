@@ -6,6 +6,7 @@ export default class extends Controller {
 
   connect() {
     this.closedText = this.hasButtonTarget ? this.buttonTarget.textContent.trim() : "Open"
+    this.openText = this.hasButtonTarget ? (this.buttonTarget.dataset.openText || "Hide") : "Hide"
   }
 
   toggle(event) {
@@ -14,7 +15,7 @@ export default class extends Controller {
     this.panelTarget.classList.toggle("is-open", opening)
     this.panelTarget.hidden = !opening
     if (this.hasButtonTarget) {
-      this.buttonTarget.textContent = opening ? "Hide" : this.closedText
+      this.buttonTarget.textContent = opening ? this.openText : this.closedText
       this.buttonTarget.classList.toggle("is-open", opening)
     }
     if (opening) this.#loadFrame()

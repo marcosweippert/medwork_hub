@@ -10,13 +10,13 @@
       <%= f.email_field :email, class: "input" %>
     </div>
     <div class="field">
-      <%= f.label :role, class: "field-label" %>
-      <%= f.select :role, User::ROLES.map { |role| [role.titleize, role] }, {}, class: "select", data: { role_fields_target: "role", action: "change->role-fields#sync" } %>
+      <%= f.label :role, t("ui.role"), class: "field-label" %>
+      <%= f.select :role, User::ROLES.map { |role| [t("statuses.#{role}", default: role.humanize), role] }, {}, class: "select", data: { role_fields_target: "role", action: "change->role-fields#sync" } %>
     </div>
     <% if user.new_record? %>
       <div class="field">
-        <span class="field-label">Password</span>
-        <p class="field-help">A temporary password is emailed to the user. They must change it on first login.</p>
+        <span class="field-label"><%= t("ui.password") %></span>
+        <p class="field-help"><%= t("users.password_help") %></p>
       </div>
     <% end %>
     <% user.build_professional if user.professional.nil? %>
@@ -28,8 +28,8 @@
       </div>
     </div>
     <div class="span-2 form-actions">
-      <%= f.submit class: "btn btn--primary" %>
-      <%= link_to "Cancel", users_path, class: "btn btn--ghost" %>
+      <%= f.submit t("ui.save"), class: "btn btn--primary" %>
+      <%= link_to t("ui.cancel"), users_path, class: "btn btn--ghost" %>
     </div>
   </div>
 <% end %>

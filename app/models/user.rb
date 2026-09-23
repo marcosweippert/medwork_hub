@@ -4,6 +4,10 @@ class User < ApplicationRecord
   devise :database_authenticatable, :recoverable, :rememberable, :validatable
 
   has_one :professional, dependent: :destroy
+  has_many :tickets, dependent: :destroy
+  has_many :assigned_tickets, class_name: "Ticket", foreign_key: :assignee_id, dependent: :nullify
+  has_many :notifications, dependent: :destroy
+  has_many :api_keys, dependent: :nullify
   accepts_nested_attributes_for :professional
 
   validates :name, presence: true

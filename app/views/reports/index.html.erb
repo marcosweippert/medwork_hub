@@ -1,16 +1,16 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Reports</h1>
+    <h1 class="page-title"><%= t("reports.title") %></h1>
     <p class="page-sub">Open a report to filter, switch synthetic or analytical view, and export</p>
   </div>
 </div>
 
 <%= form_with url: reports_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
+    <label class="field-label"><%= t("ui.search") %></label>
     <%= text_field_tag :q, params[:q], class: "input", placeholder: "Occupancy, waitlist, emails" %>
   </div>
-  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">

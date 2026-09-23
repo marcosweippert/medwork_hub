@@ -1,7 +1,7 @@
 <% professional = f.object %>
 <div class="field span-2">
-  <span class="field-label">Practice area</span>
-  <p class="field-help">This controls which rooms the professional can reserve.</p>
+  <span class="field-label"><%= t("professionals.practice_area") %></span>
+  <p class="field-help"><%= t("professionals.practice_area_help") %></p>
   <%= hidden_field_tag "#{f.object_name}[practice_areas][]", "" %>
   <div class="choice-grid">
     <% PracticeArea::AREAS.each do |key, config| %>
@@ -14,18 +14,18 @@
   </div>
 </div>
 <div class="field">
-  <%= f.label :specialty, "Specialty / title", class: "field-label" %>
-  <%= f.text_field :specialty, class: "input", placeholder: "Cardiologist, pediatrician, CBT…" %>
+  <%= f.label :specialty, t("professionals.specialty"), class: "field-label" %>
+  <%= f.text_field :specialty, class: "input", placeholder: t("professionals.specialty_placeholder") %>
 </div>
 <div class="field">
   <%= f.label :license_number, class: "field-label" %>
   <%= f.text_field :license_number, class: "input" %>
 </div>
 <div class="field">
-  <%= f.label :phone, "WhatsApp / phone", class: "field-label" %>
+  <%= f.label :phone, t("professionals.phone"), class: "field-label" %>
   <%= f.text_field :phone, class: "input", placeholder: "11999998888" %>
 </div>
 <div class="field span-2">
   <%= f.label :bio, class: "field-label" %>
-  <%= f.text_area :bio, class: "textarea", placeholder: "Short professional profile" %>
+  <%= f.text_area :bio, class: "textarea", placeholder: t("professionals.bio_placeholder") %>
 </div>

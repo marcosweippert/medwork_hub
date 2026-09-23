@@ -5,8 +5,15 @@ class InvoicesController < ApplicationController
 
   def index
     @professionals = professional_user? ? Array(current_professional) : Professional.includes(:user)
+    scoped = filtered_invoices
+    @invoice_kpis = {
+      total: scoped.count,
+      paid: scoped.where(status: "paid").count,
+      overdue: scoped.where(status: "overdue").count,
+      open_amount: scoped.open_or_overdue.sum(:amount)
+    }
     @invoices = paginate(
-      filtered_invoices.includes(:room, professional: :user, bookings: :room),
+      scoped.includes(:room, professional: :user, bookings: :room),
       per: 20
     )
   end

@@ -1,8 +1,9 @@
 /* ============ CONTENT + COMMON COMPONENTS ============ */
 .content { padding: 16px 20px 20px; width: 100%; }
 
-.form-card { max-width: 760px; }
+.form-card { max-width: 920px; }
 .form-card--wide { max-width: 1100px; }
+.form-card .card-title, .form-card h1 { margin-bottom: 4px; }
 .form-actions {
   display: flex;
   gap: 8px;
@@ -360,8 +361,8 @@ input.btn.btn--chip {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 20px;
+  padding: 20px;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;

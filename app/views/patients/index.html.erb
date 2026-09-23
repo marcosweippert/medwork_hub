@@ -1,19 +1,19 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Patients</h1>
-    <p class="page-sub">Linked to a professional</p>
+    <h1 class="page-title"><%= t("patients.title") %></h1>
+    <p class="page-sub"><%= t("patients.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "New patient", new_patient_path, class: "btn btn--primary" %>
+    <%= link_to t("patients.new"), new_patient_path, class: "btn btn--primary" %>
   </div>
 </div>
 
 <%= form_with url: patients_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Name, contact or professional" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("patients.search_placeholder") %>
   </div>
-  <%= submit_tag "Search", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.search"), class: "btn btn--ghost" %>
 <% end %>
 
 <section class="card">
@@ -36,7 +36,7 @@
             <td class="cell-actions">
               <div class="row-actions">
                 <%= action_btn "View", patient, tone: "view" %>
-                <%= action_btn "Edit", edit_patient_path(patient), tone: "edit" %>
+                <%= action_btn t("ui.edit"), edit_patient_path(patient), tone: "edit" %>
               </div>
             </td>
           </tr>

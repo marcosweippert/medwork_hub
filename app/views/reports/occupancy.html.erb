@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Occupancy</h1>
+    <h1 class="page-title"><%= t("reports.occupancy") %></h1>
     <p class="page-sub">Week of <%= @week.strftime("%d/%m/%Y") %> · clinic average <%= @clinic_average %>% · <%= analytical? ? "analytical" : "synthetic" %></p>
   </div>
   <%= render "export" %>
@@ -14,7 +14,7 @@
   </div>
   <div class="field">
     <label class="field-label">Room</label>
-    <%= select_tag :room_id, options_from_collection_for_select(Room.order(:name), :id, :name, params[:room_id]), include_blank: "All rooms", class: "select" %>
+    <%= select_tag :room_id, options_from_collection_for_select(Room.order(:name), :id, :name, params[:room_id]), include_blank: t("ui.all_rooms"), class: "select" %>
   </div>
   <%= submit_tag "Apply", class: "btn btn--ghost" %>
   <%= link_to "Prev", occupancy_reports_path(week: @week - 7, room_id: params[:room_id], view: report_view), class: "btn btn--ghost" %>

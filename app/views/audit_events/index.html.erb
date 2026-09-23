@@ -1,90 +1,143 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Audit log</h1>
-    <p class="page-sub"><%= @stats[:total] %> events · <%= @stats[:today] %> today · <%= @stats[:updates] %> updates · <%= @stats[:deletes] %> deletes</p>
+    <h1 class="page-title"><%= t("nav.audit") %></h1>
+    <p class="page-sub"><%= t("audit.subtitle") %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Export CSV", export_audit_events_path(request.query_parameters), class: "btn btn--ghost" %>
+    <%= link_to t("audit.export_xlsx"), export_audit_events_path(audit_filter_params), class: "btn btn--ghost", data: { turbo: false } %>
   </div>
 </div>
 
 <%= form_with url: audit_events_path, method: :get, class: "filter-bar" do %>
   <div class="field field-grow">
-    <label class="field-label">Search</label>
-    <%= text_field_tag :q, params[:q], class: "input", placeholder: "Action, user, record or details" %>
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("audit.search_placeholder") %>
   </div>
   <div class="field">
-    <label class="field-label">Action</label>
+    <label class="field-label"><%= t("audit.action") %></label>
     <%= filter_select :action_name, @actions.map { |action| [action.tr("._", " "), action] }, selected: params[:action_name] %>
   </div>
   <div class="field">
-    <label class="field-label">Record</label>
-    <%= filter_select :record_type, @record_types.map { |type| [type, type] }, selected: params[:record_type] %>
+    <label class="field-label"><%= t("audit.record_type") %></label>
+    <%= filter_select :record_type, @record_types.map { |type| [t("audit.resources.#{type.underscore}", default: type), type] }, selected: params[:record_type] %>
   </div>
   <div class="field">
-    <label class="field-label">User</label>
-    <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]), include_blank: "All", class: "select" %>
+    <label class="field-label"><%= t("audit.actor") %></label>
+    <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]), include_blank: t("ui.all"), class: "select" %>
   </div>
   <div class="field">
-    <label class="field-label">From</label>
+    <label class="field-label"><%= t("audit.from") %></label>
     <%= date_field_tag :from, params[:from], class: "input" %>
   </div>
   <div class="field">
-    <label class="field-label">To</label>
+    <label class="field-label"><%= t("audit.to") %></label>
     <%= date_field_tag :to, params[:to], class: "input" %>
   </div>
-  <%= submit_tag "Search", class: "btn btn--ghost" %>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
 <%= form_with url: bulk_audit_events_path, method: :post, data: { controller: "bulk-select" } do %>
   <div class="bulk-bar" data-bulk-select-target="bar" hidden>
     <strong data-bulk-select-target="count">0 selected</strong>
-    <span class="field-help">Delete only removes log rows, not the clinic records.</span>
+    <span class="field-help"><%= t("audit.bulk_help") %></span>
     <div class="page-actions">
-      <%= button_tag "Delete", name: "bulk_action", value: "delete", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Remove the selected audit events?" } %>
+      <%= button_tag t("ui.delete"), name: "bulk_action", value: "delete", class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("audit.confirm_bulk_delete") } %>
     </div>
   </div>
 
   <section class="card">
-    <div class="email-board-head">
-      <label class="cell-check">
-        <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all events">
-      </label>
-      <span>When</span>
-      <span>User</span>
-      <span>Action</span>
-      <span>Record</span>
-      <span>Status</span>
-      <span class="email-board-actions-label">Actions</span>
+    <div class="table-scroll">
+      <table class="data-table data-table--audit">
+        <thead>
+          <tr>
+            <th class="cell-check">
+              <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("ui.all") %>">
+            </th>
+            <th><%= t("ui.when") %></th>
+            <th><%= t("audit.actor") %></th>
+            <th><%= t("audit.action") %></th>
+            <th><%= t("audit.record") %></th>
+            <th><%= t("audit.changes") %></th>
+            <th class="cell-actions"><%= t("ui.actions") %></th>
+          </tr>
+        </thead>
+        <% @events.each do |event| %>
+          <tbody data-controller="email-preview">
+            <tr>
+              <td class="cell-check">
+                <%= check_box_tag "event_ids[]", event.id, false, class: "row-check", id: "event_#{event.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, aria: { label: t("audit.select_event", id: event.id) } %>
+              </td>
+              <td class="data-cell-mono cell-when">
+                <%= event.created_at.strftime("%d/%m/%Y") %>
+                <span class="cell-when-time"><%= event.created_at.strftime("%H:%M:%S") %></span>
+              </td>
+              <td class="cell-name">
+                <%= event.actor_name %>
+                <% if event.actor_email.present? %>
+                  <div class="field-help"><%= event.actor_email %></div>
+                <% end %>
+              </td>
+              <td>
+                <div class="audit-action">
+                  <%= status_tag(event.verb) %>
+                  <span title="<%= event.action %>"><%= audit_action_title(event) %></span>
+                </div>
+              </td>
+              <td class="cell-name">
+                <strong><%= audit_resource_label(event) %> #<%= event.auditable_id || "—" %></strong>
+                <div class="field-help" title="<%= event.record_label %>"><%= event.record_label %></div>
+              </td>
+              <td class="cell-audit-summary" title="<%= event.changes_summary %>">
+                <%= event.changes_summary %>
+                <div class="field-help"><%= t("audit.fields_count", count: event.change_count) %></div>
+              </td>
+              <td class="cell-actions">
+                <div class="row-actions">
+                  <button type="button" class="btn btn--chip btn--view" data-email-preview-target="button" data-action="email-preview#toggle" data-open-text="<%= t("audit.hide") %>"><%= t("audit.details") %></button>
+                  <%= action_btn t("ui.open"), audit_event_path(event), tone: "edit" %>
+                  <% if (path = auditable_path_for(event)) %>
+                    <%= action_btn t("audit.open_record"), path, tone: "cal" %>
+                  <% end %>
+                  <%= action_btn t("ui.delete"), audit_event_path(event), tone: "danger", method: :delete, confirm: t("audit.confirm_delete") %>
+                </div>
+              </td>
+            </tr>
+            <tr class="audit-detail" hidden data-email-preview-target="panel">
+              <td colspan="7">
+                <% entries = event.change_entries %>
+                <% if entries.any? %>
+                  <table class="audit-changes">
+                    <thead>
+                      <tr>
+                        <th><%= t("audit.field") %></th>
+                        <th><%= t("audit.before") %></th>
+                        <th><%= t("audit.after") %></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% entries.each do |entry| %>
+                        <tr>
+                          <th><%= audit_field_label(entry[:field]) %></th>
+                          <td><%= format_audit_value(entry[:from]) %></td>
+                          <td><%= format_audit_value(entry[:to]) %></td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                <% else %>
+                  <p class="page-sub"><%= t("audit.no_field_changes") %></p>
+                <% end %>
+              </td>
+            </tr>
+          </tbody>
+        <% end %>
+        <% if @events.empty? %>
+          <tbody>
+            <tr><td colspan="7"><%= t("audit.empty") %></td></tr>
+          </tbody>
+        <% end %>
+      </table>
     </div>
-    <% @events.each do |event| %>
-      <article class="email-item" data-email-item data-controller="email-preview">
-        <div class="email-item-row audit-item-row">
-          <div class="cell-check">
-            <%= check_box_tag "event_ids[]", event.id, false, class: "row-check", id: "event_#{event.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, aria: { label: "Select event #{event.id}" } %>
-          </div>
-          <div class="data-cell-mono"><%= event.created_at.strftime("%d/%m/%Y %H:%M") %></div>
-          <div class="email-item-subject"><%= event.actor_name %></div>
-          <div class="email-item-subject" title="<%= event.action %>"><%= event.action.tr("._", " ") %></div>
-          <div class="email-item-to"><%= event.record_name %></div>
-          <div><%= status_tag(event.verb) %></div>
-          <div class="row-actions">
-            <button type="button" class="btn btn--chip btn--view" data-email-preview-target="button" data-action="email-preview#toggle">Details</button>
-            <%= action_btn "Open", audit_event_path(event), tone: "edit" %>
-            <% if (path = auditable_path_for(event)) %>
-              <%= action_btn "Record", path, tone: "cal" %>
-            <% end %>
-            <%= action_btn "Delete", audit_event_path(event), tone: "danger", method: :delete, confirm: "Remove this event from the log?" %>
-          </div>
-        </div>
-        <div class="email-item-preview" hidden data-email-preview-target="panel">
-          <pre class="email-text"><%= JSON.pretty_generate(event.parsed_details) %></pre>
-        </div>
-      </article>
-    <% end %>
-    <% if @events.empty? %>
-      <p class="page-sub" style="padding:14px">No events yet.</p>
-    <% end %>
     <%= render "shared/pager" %>
   </section>
 <% end %>

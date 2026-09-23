@@ -4,27 +4,28 @@
     <p class="page-sub">
       <%= @room.types_label %> ·
       <%= number_to_currency(@room.slot_price) %> / <%= Setting.current.slot_minutes %> min ·
-      <%= format("%02d:00", @room.opens_at) %>–<%= format("%02d:00", @room.closes_at) %> every day unless this room marks a weekday as closed
+      <%= format("%02d:00", @room.opens_at) %>–<%= format("%02d:00", @room.closes_at) %>
+      <%= t("calendar.hours") %>
     </p>
   </div>
   <div class="page-actions">
-    <%= link_to "Waitlist (#{@waitlist_count})", room_waitlist_entries_path(@room), class: "btn btn--ghost" %>
-    <%= link_to "Prev", calendar_room_path(@room, date: @date - 7), class: "btn btn--ghost" %>
-    <%= link_to "Next", calendar_room_path(@room, date: @date + 7), class: "btn btn--ghost" %>
+    <%= link_to t("calendar.waitlist_count", count: @waitlist_count), room_waitlist_entries_path(@room), class: "btn btn--ghost" %>
+    <%= link_to t("ui.prev"), calendar_room_path(@room, date: @date - 7), class: "btn btn--ghost" %>
+    <%= link_to t("ui.next"), calendar_room_path(@room, date: @date + 7), class: "btn btn--ghost" %>
   </div>
 </div>
 
 <div class="notice-banner">
-  Click a reserved or occupied hour to join the waitlist. Free cancellation until <%= clinic_policy[:free_hours] %>h before start.
+  <%= t("calendar.waitlist_hint", hours: clinic_policy[:free_hours]) %>
 </div>
 
 <div class="legend">
-  <span><i class="free"></i>Available</span>
-  <span><i class="reserved"></i>Reserved</span>
-  <span><i class="occupied"></i>Occupied · waitlist</span>
-  <span><i class="blocked"></i>Blocked</span>
-  <span><i class="closed"></i>Closed</span>
-  <span><i class="pick"></i>Selected</span>
+  <span><i class="free"></i><%= t("ui.available") %></span>
+  <span><i class="reserved"></i><%= t("ui.reserved") %></span>
+  <span><i class="occupied"></i><%= t("calendar.occupied_waitlist") %></span>
+  <span><i class="blocked"></i><%= t("ui.blocked") %></span>
+  <span><i class="closed"></i><%= t("ui.closed") %></span>
+  <span><i class="pick"></i><%= t("ui.selected") %></span>
 </div>
 
 <section class="card">
@@ -35,15 +36,15 @@
 
     <div class="form-grid" style="margin-bottom:12px;">
       <div class="field">
-        <label class="field-label">Professional</label>
+        <label class="field-label"><%= t("calendar.professional") %></label>
         <%= professional_field_tag :professional_id, @professionals %>
       </div>
       <div class="field">
-        <label class="field-label">Repeat weekly</label>
-        <%= select_tag :weeks, options_for_select([["This week only", 1]] + (2..12).map { |n| ["#{n} weeks", n] }, params[:weeks] || 1), class: "select" %>
+        <label class="field-label"><%= t("calendar.repeat_weekly") %></label>
+        <%= select_tag :weeks, options_for_select([[t("calendar.this_week"), 1]] + (2..12).map { |n| [t("calendar.weeks", count: n), n] }, params[:weeks] || 1), class: "select" %>
       </div>
       <div class="field">
-        <label class="field-label">Selection</label>
+        <label class="field-label"><%= t("ui.selection") %></label>
         <div class="field-help">
           <span data-slot-picker-target="count">0</span> × <%= Setting.current.slot_minutes %> min · R$
           <span data-slot-picker-target="total">0,00</span>
@@ -54,54 +55,54 @@
     <%= render "rooms/slot_grid", calendar: @calendar, room: @room %>
 
     <div class="page-actions" style="margin-top:12px;">
-      <%= submit_tag "Reserve slots", class: "btn btn--primary" %>
+      <%= submit_tag t("calendar.reserve_slots"), class: "btn btn--primary" %>
     </div>
   <% end %>
 </section>
 
 <div class="grid" style="margin-top:12px;">
   <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">Daily</h2></div>
+    <div class="card-head"><h2 class="card-title"><%= t("ui.daily") %></h2></div>
     <% if @free_days.any? %>
       <%= form_with url: room_reservations_path(@room), method: :post, class: "form-grid" do %>
         <%= hidden_field_tag :billing_type, "daily" %>
         <%= hidden_field_tag :date, @date %>
         <div class="field">
-          <label class="field-label">Professional</label>
+          <label class="field-label"><%= t("calendar.professional") %></label>
           <%= professional_field_tag :professional_id, @professionals %>
         </div>
         <div class="field">
-          <label class="field-label">Day</label>
-          <%= select_tag :day, options_for_select(@free_days.map { |day| [day.strftime("%a %d/%m/%Y"), day.iso8601] }), class: "select" %>
-          <p class="field-help"><%= number_to_currency(@room.daily_rate) %> · only fully free days</p>
+          <label class="field-label"><%= t("ui.day") %></label>
+          <%= select_tag :day, options_for_select(@free_days.map { |day| [l(day, format: "%a %d/%m/%Y"), day.iso8601] }), class: "select" %>
+          <p class="field-help"><%= number_to_currency(@room.daily_rate) %> · <%= t("calendar.only_free_days") %></p>
         </div>
         <div class="field span-2">
-          <%= submit_tag "Reserve day", class: "btn btn--primary btn--sm" %>
+          <%= submit_tag t("calendar.reserve_day"), class: "btn btn--primary btn--sm" %>
         </div>
       <% end %>
     <% else %>
       <p class="field-help" style="margin:0;">
-        No fully free days ahead. If some hours are reserved, use <strong>All</strong> on the calendar to select the remaining slots.
+        <%= t("calendar.no_free_days").html_safe %>
       </p>
     <% end %>
   </section>
 
   <section class="col-6 card">
-    <div class="card-head"><h2 class="card-title">Monthly</h2></div>
+    <div class="card-head"><h2 class="card-title"><%= t("ui.monthly") %></h2></div>
     <%= form_with url: room_reservations_path(@room), method: :post, class: "form-grid" do %>
       <%= hidden_field_tag :billing_type, "monthly" %>
       <%= hidden_field_tag :date, @date %>
       <div class="field">
-        <label class="field-label">Professional</label>
+        <label class="field-label"><%= t("calendar.professional") %></label>
         <%= professional_field_tag :professional_id, @professionals %>
       </div>
       <div class="field">
-        <label class="field-label">Month</label>
+        <label class="field-label"><%= t("ui.month") %></label>
         <%= month_field_tag :month, @date.strftime("%Y-%m"), class: "input" %>
-        <p class="field-help">Pro-rata: monthly / 30 × remaining days, minus occupied 30-min slots</p>
+        <p class="field-help"><%= t("calendar.month_help") %></p>
       </div>
       <div class="field span-2">
-        <%= submit_tag "Reserve month", class: "btn btn--primary btn--sm" %>
+        <%= submit_tag t("calendar.reserve_month"), class: "btn btn--primary btn--sm" %>
       </div>
     <% end %>
   </section>

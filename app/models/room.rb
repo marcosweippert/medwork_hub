@@ -38,21 +38,13 @@ class Room < ApplicationRecord
 
   def schedule_for(date)
     return if Array(closed_weekdays).map(&:to_i).include?(date.wday)
+    return if date.sunday? && Setting.current.sunday_closed
 
-    setting = Setting.current
-    if date.sunday?
-      return if setting.sunday_closed
+    open = opens_at.to_i
+    close = closes_at.to_i
+    return if close <= open
 
-      [opens_at, closes_at]
-    elsif date.saturday?
-      open = [opens_at.to_i, setting.saturday_opens_at.to_i].max
-      close = [closes_at.to_i, setting.saturday_closes_at.to_i].min
-      return if close <= open
-
-      [open, close]
-    else
-      [opens_at, closes_at]
-    end
+    [open, close]
   end
 
   def working_hours_on(date)
@@ -103,22 +95,30 @@ class Room < ApplicationRecord
     upcoming_free_days(from: from, limit: 1).first || from.to_date
   end
 
-  def fully_free_on?(date)
+  def fully_free_on?(date, holding: nil, blocks: nil)
     open, close = schedule_for(date)
     return false if open.blank?
 
     starts_at = date.in_time_zone.change(hour: open)
     ends_at = date.in_time_zone.change(hour: close)
     return false if starts_at < Time.current
+    return false if occupied_by_block?(starts_at, ends_at, blocks)
+    return false if occupied_by_booking?(starts_at, ends_at, holding)
 
-    !slot_taken?(starts_at, ends_at)
+    true
   end
 
   def upcoming_free_days(from: Date.current, limit: 14)
     date = from.to_date
+    last = date + 59
+    range_start = date.in_time_zone.beginning_of_day
+    range_end = last.in_time_zone.end_of_day
+    holding = bookings.holding.where("start_time < ? AND end_time > ?", range_end, range_start).to_a
+    blocks = RoomBlock.for_week(self, (date..last).to_a)
+
     found = []
     60.times do
-      found << date if fully_free_on?(date)
+      found << date if fully_free_on?(date, holding: holding, blocks: blocks)
       break if found.size >= limit
 
       date += 1
@@ -155,5 +155,21 @@ class Room < ApplicationRecord
 
   def blank_block?(attrs)
     attrs["starts_at"].blank? && attrs["ends_at"].blank? && Array(attrs["weekdays"]).compact_blank.empty?
+  end
+
+  def occupied_by_block?(starts_at, ends_at, blocks)
+    if blocks
+      blocks.any? { |block| block.covers?(starts_at, ends_at) }
+    else
+      blocked?(starts_at, ends_at)
+    end
+  end
+
+  def occupied_by_booking?(starts_at, ends_at, holding)
+    if holding
+      holding.any? { |booking| booking.start_time < ends_at && booking.end_time > starts_at }
+    else
+      bookings.holding.where("start_time < ? AND end_time > ?", ends_at, starts_at).exists?
+    end
   end
 end

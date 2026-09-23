@@ -35,7 +35,7 @@ class ProfessionalsController < ApplicationController
     )
     @user = result.user
     if result.ok?
-      redirect_to @user.professional, notice: "Professional created. A welcome email with a temporary password was sent to #{@user.email}."
+      redirect_to @user.professional, notice: t("professionals.created", email: @user.email)
     else
       @user.build_professional if @user.professional.nil?
       render :new, status: :unprocessable_entity

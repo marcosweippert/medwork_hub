@@ -9,7 +9,13 @@ en:
     patients: Patients
     reports: Reports
     invoices: Invoices
+    tickets: Tickets
+    billing: Billing
+    transactions: Transactions
+    profile: Profile
     settings: Settings
+    integrations: Integrations
+    api_keys: API keys
     users: Users
     emails: Emails
     audit: Audit log
@@ -24,9 +30,15 @@ en:
       bookings: Bookings
       rooms: Rooms
       invoices: Invoices
+      tickets: Tickets
+      billings: Billing
+      transactions: Transactions
+      profiles: Profile
       reports: Reports
       users: Users
       settings: Settings
+      integrations: Integrations
+      api_keys: API keys
       waitlist_entries: Waitlist
       room_blocks: Room blocks
       audit_events: Audit log
@@ -35,6 +47,10 @@ en:
       welcome_email: Welcome email
       new: "New %{base}"
       edit: "Edit %{base}"
+    heading:
+      integrations:
+        new: New integration
+        edit: Edit integration
     select_professional: Select professional
     select_room: Select room
     professional_overdue: "%{name} (overdue)"
@@ -43,30 +59,82 @@ en:
     pending: Reserved
     confirmed: Occupied
     bounced: Returned
+    in_progress: In progress
+    resolved: Resolved
+    closed: Closed
+    low: Low
+    medium: Medium
+    high: High
+    urgent: Urgent
+    billing: Billing
+    rooms: Rooms
+    bookings: Bookings
+    technical: Technical
+    other: Other
+    hourly: Hourly
+    monthly: Monthly
+    waiting: Waiting
+    offered: Offered
+    booked: Booked
+    created: Created
+    updated: Updated
+    deleted: Deleted
+    active: Active
+    paused: Paused
   dashboards:
     title: Dashboard
     occupancy: occupancy
     open: open
     rooms: Rooms
     new_booking: New booking
+    find_slot: Find slot
+    quick_actions: Quick actions
+    summary: Summary
+    featured_rooms: Featured rooms
+    next_session: Next session
+    see_calendar: See calendar
+    see_details: See details
+    my_account: My account
+    other_options: Other options
+    help: Help center
+    open_receivables: View invoices
+    subtitle: "Occupancy is %{occupancy}% across %{rooms} rooms today."
+    metrics: Key metrics
+    shortcuts: Shortcuts
     paid_month: Paid this month
+    vs_last_month: vs last month
+    recent_transactions: Recent transactions
+    all: See all
     refunded: refunded
     occupancy_today: Occupancy today
     active_holds: Active holds
     receivables: Receivables
     overdue: overdue
     rooms_today: Rooms today
+    rooms_count:
+      one: "%{count} room"
+      other: "%{count} rooms"
+    upcoming_count:
+      one: "%{count} coming up in this list"
+      other: "%{count} coming up in this list"
     manage: Manage
-    upcoming: Upcoming
-    all: All
+    upcoming: Agenda
+    attention: Open invoices
+    all: View all
     professional: Professional
     room: Room
     when: When
     actions: Actions
+    good_morning: "Good morning, %{name}"
+    good_afternoon: "Good afternoon, %{name}"
+    good_evening: "Good evening, %{name}"
+    empty_rooms: No rooms yet.
+    empty_upcoming: Nothing scheduled from now on.
+    empty_invoices: No open invoices.
+    search_placeholder: Search invoices
     delinquent:
       one: "%{count} professional with overdue invoices cannot create new reservations:"
       other: "%{count} professionals with overdue invoices cannot create new reservations:"
-    open_receivables: Open receivables
   rooms:
     title: Rooms
     new: New room
@@ -90,6 +158,158 @@ en:
   invoices:
     mark_paid: Mark paid
     cancel_selected: Cancel selected times
+  tickets:
+    new: New ticket
+    opened: Ticket opened.
+    updated: Ticket updated.
+    replied: Reply sent.
+    staff_only: Only clinic staff can update this ticket.
+    open_queue: Open tickets
+    sla_breached: SLA breached
+    sla_met: Done
+    sla_late: "Overdue since %{time}"
+    sla_until: "Due %{time}"
+    sla_policy: "SLA: urgent %{urgent}h · high %{high}h · medium %{medium}h · low %{low}h"
+    reply: Reply
+    internal: Internal note
+    assign: Assignee
+    requester: Requester
+    empty: No tickets.
+    clear: Clear
+    filter: Filter
+    all: All tickets
+    total: Total tickets
+    pending: Pending tickets
+    solved: Solved tickets
+    closed: Closed tickets
+    create: Create new ticket
+    filters: Filters
+    export: Export CSV
+    show_only: "Show only:"
+    tab_all: All
+    tab_pending: Pending
+    tab_solved: Solved
+    tab_closed: Closed
+    col_id: ID
+    requested_by: Requested by
+    agent: Agent
+    actions: Actions
+    mark_solved: Mark as solved
+    archive: Archive
+    confirm_resolve: Mark selected tickets as solved?
+    confirm_close: Close selected tickets?
+    bulk_resolved: Tickets marked as solved.
+    bulk_closed: Tickets archived.
+    body: Description
+    subject: Subject
+    priority: Priority
+    category: Category
+    status: Status
+    sla: SLA
+    thread: Thread
+    submit: Open ticket
+    save: Save
+    queue_help: Queue, SLA and conversation with the clinic
+    search_placeholder: Subject, text or requester
+    unassigned: Unassigned
+    mine: Mine
+    take: Take
+    taken: You took this ticket.
+    reopen: Reopen
+    reopened: Ticket reopened.
+    details: Details
+    opened_at: Opened at
+    first_response: First response
+    reply_placeholder: Write a message…
+    subject_placeholder: Short summary
+    body_placeholder: What happened and what you already tried.
+    locked: This ticket is resolved or closed. Reopen it to send messages.
+    staff_team: Clinic team
+    reply_title: Reply
+  notifications:
+    title: Notifications
+    subtitle: New tickets and conversation messages.
+    empty: No notifications.
+    mark_all: Mark all as read
+    marked_all: Notifications marked as read.
+    see_all: See all
+    unread: Unread
+    read: Read
+    ticket_opened_title: New ticket
+    ticket_message_title: New message on your ticket
+    ticket_message_staff_title: New message on a ticket
+  settings:
+    subtitle: Each card has its own editor. Save only what you changed.
+    saved: Card settings saved.
+    clinic:
+      title: Clinic
+      name: Name
+      email: Email
+      phone: Phone
+      currency: Currency
+      slot: Time slot
+      week: Week starts
+      week_sunday: Sunday
+      week_monday: Monday
+      logo: Logo
+      logo_help: PNG, JPG or WebP up to 2 MB. Shown next to the clinic name in the sidebar.
+      logo_remove: Remove current logo
+      logo_invalid: must be PNG, JPG or WebP
+      logo_too_large: must be 2 MB or smaller
+    policy:
+      title: Hours and policy
+      hours: Hours
+      hours_help: Each room uses its own opening and closing hours, including Saturday. Sunday follows the option below.
+      saturday: Saturday
+      sunday: Sunday
+      sat_open: Saturday opens
+      sat_close: Saturday closes
+      sunday_closed: Sunday closed
+      free_cancel: Free cancel (hours)
+      late_fee: Late fee
+      after_start: After start
+    mail:
+      title: Email delivery
+      method: Method
+      address: SMTP address
+      port: Port
+      domain: Domain
+      user: Username
+      password: Password
+      password_saved: Saved (hidden)
+      password_missing: Not set
+      password_kept: Saved — leave blank to keep
+      password_new: App password
+      auth: Authentication
+      from: From
+      host: Links host
+      host_port: Links port
+      protocol: Protocol
+      auto: Auto
+    pix:
+      title: PIX and WhatsApp
+      key: PIX key
+      receiver: Receiver
+      city: City
+      missing: Not configured
+    tickets:
+      title: Ticket maintenance
+      help: SLA, default priority and who is notified of new tickets or messages.
+      sla_urgent: Urgent SLA (hours)
+      sla_high: High SLA (hours)
+      sla_medium: Medium SLA (hours)
+      sla_low: Low SLA (hours)
+      sla_warn: Warn when remaining (hours)
+      default_priority: Default priority
+      default_assignee: Default assignee
+      no_assignee: No assignee
+      auto_close: Close resolved after (days)
+      auto_close_help: Use 0 to keep resolved tickets open.
+      auto_close_after: "%{days} days"
+      notify_staff: Notify staff of new tickets and requester messages
+      notify_requester: Notify the requester when staff replies
+      on: On
+      off: Off
   number:
     currency:
       format:

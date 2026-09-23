@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["professional", "room", "hourlyRate"]
-  static values = { calendarUrl: String }
+  static values = { calendarUrl: String, empty: String }
 
   connect() {
     this.filterRooms()
@@ -57,7 +57,11 @@ export default class extends Controller {
     if (!frame || !this.calendarUrlValue) return
     const roomId = this.roomTarget.value
     if (!roomId) {
-      frame.innerHTML = `<p class="field-help" style="margin:8px 0;">Select a professional and a compatible room to load the weekly calendar.</p>`
+      const hint = document.createElement("p")
+      hint.className = "field-help"
+      hint.style.margin = "8px 0"
+      hint.textContent = this.emptyValue
+      frame.replaceChildren(hint)
       return
     }
     const url = new URL(this.calendarUrlValue, window.location.origin)

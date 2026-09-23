@@ -1,0 +1,277 @@
+{
+  "name": "MedWork Hub · eventos",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## MedWork Hub\n\n1. Ative este workflow (Active no canto superior direito).\n2. No Webhook, copie a **Production URL**.\n3. Cole em Integrações → n8n no Hub.\n4. Slack Text: `{{ $json.slack_text }}`\n5. Switch: cada regra = `$json.event` **is equal to** (não ‘is not empty’).",
+        "height": 300,
+        "width": 320,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-280, 120],
+      "id": "note-ajuda",
+      "name": "Ajuda"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "medwork-hub",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [80, 280],
+      "id": "webhook-medwork",
+      "name": "Webhook MedWork",
+      "webhookId": "medwork-hub"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst body = raw.body && typeof raw.body === 'object' && (raw.body.event || raw.body.data) ? raw.body : raw;\nconst event = String(body.event || raw.event || 'unknown');\nconst data = body.data && typeof body.data === 'object' ? body.data : {};\nconst clinic = body.clinic || 'MedWork Hub';\n\nconst when = (iso) => {\n  if (!iso) return '';\n  const d = new Date(iso);\n  if (Number.isNaN(d.getTime())) return String(iso);\n  return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });\n};\nconst line = (label, value) => (value == null || value === '' ? null : `*${label}:* ${value}`);\nconst block = (emoji, titulo, lines) => [`${emoji} *${titulo}*`, '', ...lines.filter(Boolean), '', `_${clinic}${body.occurred_at ? ' · ' + when(body.occurred_at) : ''}_`].join('\\n');\n\nlet titulo = event;\nlet texto = '';\nlet slack_text = '';\n\nif (event === 'booking.created') {\n  titulo = 'Nova reserva';\n  texto = [data.professional, data.room, when(data.start_time)].filter(Boolean).join(' · ');\n  slack_text = block(':calendar:', titulo, [\n    line('Profissional', data.professional),\n    line('Sala', data.room),\n    line('Início', when(data.start_time)),\n    line('Fim', when(data.end_time)),\n    line('Status', data.status),\n    line('Reserva', data.id ? '#' + data.id : null),\n    line('Fatura', data.invoice_id ? '#' + data.invoice_id : null)\n  ]);\n} else if (event === 'invoice.paid') {\n  titulo = 'Fatura paga';\n  texto = [data.amount, data.professional, data.room].filter(Boolean).join(' · ');\n  slack_text = block(':white_check_mark:', titulo, [\n    line('Valor', data.amount),\n    line('Profissional', data.professional),\n    line('Sala', data.room),\n    line('Vencimento', data.due_date),\n    line('Fatura', data.id ? '#' + data.id : null)\n  ]);\n} else if (event === 'ticket.created') {\n  titulo = 'Novo chamado';\n  texto = [data.subject, data.priority, data.user].filter(Boolean).join(' · ');\n  slack_text = block(':ticket:', titulo, [\n    line('Assunto', data.subject),\n    line('Prioridade', data.priority),\n    line('Categoria', data.category),\n    line('Solicitante', data.user),\n    line('Chamado', data.id ? '#' + data.id : null)\n  ]);\n} else if (event === 'n8n.test') {\n  titulo = 'Teste de conexão';\n  texto = 'Webhook ok';\n  slack_text = block(':satellite:', titulo, ['O Hub conseguiu falar com o n8n.', line('Clínica', clinic)]);\n} else {\n  slack_text = block(':bell:', event, [line('Dados', JSON.stringify(data))]);\n}\n\nreturn [{ json: { event, clinic, occurred_at: body.occurred_at, data, titulo, texto, slack_text } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, 280],
+      "id": "code-resumo",
+      "name": "Montar resumo"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-booking",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "booking.created",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reserva"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-invoice",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "invoice.paid",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fatura"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-ticket",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "ticket.created",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chamado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-test",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "n8n.test",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "teste"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [560, 280],
+      "id": "switch-evento",
+      "name": "Tipo de evento"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            { "name": "acao", "value": "reserva" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 40],
+      "id": "set-reserva",
+      "name": "Reserva criada"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            { "name": "acao", "value": "fatura" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 200],
+      "id": "set-fatura",
+      "name": "Fatura paga"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            { "name": "acao", "value": "chamado" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 360],
+      "id": "set-chamado",
+      "name": "Chamado aberto"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            { "name": "acao", "value": "teste" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 520],
+      "id": "set-teste",
+      "name": "Teste"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            { "name": "acao", "value": "outro" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 680],
+      "id": "set-outro",
+      "name": "Outro evento"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1060, 280],
+      "id": "noop-pronto",
+      "name": "Pronto"
+    }
+  ],
+  "connections": {
+    "Webhook MedWork": {
+      "main": [[{ "node": "Montar resumo", "type": "main", "index": 0 }]]
+    },
+    "Montar resumo": {
+      "main": [[{ "node": "Tipo de evento", "type": "main", "index": 0 }]]
+    },
+    "Tipo de evento": {
+      "main": [
+        [{ "node": "Reserva criada", "type": "main", "index": 0 }],
+        [{ "node": "Fatura paga", "type": "main", "index": 0 }],
+        [{ "node": "Chamado aberto", "type": "main", "index": 0 }],
+        [{ "node": "Teste", "type": "main", "index": 0 }],
+        [{ "node": "Outro evento", "type": "main", "index": 0 }]
+      ]
+    },
+    "Reserva criada": {
+      "main": [[{ "node": "Pronto", "type": "main", "index": 0 }]]
+    },
+    "Fatura paga": {
+      "main": [[{ "node": "Pronto", "type": "main", "index": 0 }]]
+    },
+    "Chamado aberto": {
+      "main": [[{ "node": "Pronto", "type": "main", "index": 0 }]]
+    },
+    "Teste": {
+      "main": [[{ "node": "Pronto", "type": "main", "index": 0 }]]
+    },
+    "Outro evento": {
+      "main": [[{ "node": "Pronto", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

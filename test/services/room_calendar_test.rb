@@ -18,16 +18,28 @@ class RoomCalendarTest < ActiveSupport::TestCase
     assert_equal 30, @calendar.slot_minutes[1] - @calendar.slot_minutes[0]
   end
 
-  test "saturday follows clinic hours and sunday is closed" do
+  test "saturday uses room hours and sunday is closed" do
     travel_to Time.zone.local(2026, 8, 22, 7, 0, 0) do
       sunday = Date.new(2026, 8, 23)
       saturday = Date.new(2026, 8, 29)
 
       assert_equal :closed, @calendar.slot_for(sunday, 10 * 60).status
-      assert_equal :closed, @calendar.slot_for(saturday, 8 * 60).status
+      assert_equal :free, @calendar.slot_for(saturday, 8 * 60).status
       assert_equal :free, @calendar.slot_for(saturday, 10 * 60).status
-      assert_equal :closed, @calendar.slot_for(saturday, 14 * 60).status
+      assert_equal :free, @calendar.slot_for(saturday, 14 * 60).status
       assert_equal :free, @calendar.slot_for(Date.new(2026, 8, 28), 8 * 60).status
+    end
+  end
+
+  test "elapsed hours today are past and remaining hours stay free until room close" do
+    travel_to Time.zone.local(2026, 9, 19, 15, 10, 0) do
+      saturday = Date.new(2026, 9, 19)
+      calendar = RoomCalendar.new(@room, start_date: saturday)
+
+      assert_equal :past, calendar.slot_for(saturday, 14 * 60).status
+      assert_equal :past, calendar.slot_for(saturday, 15 * 60).status
+      assert_equal :free, calendar.slot_for(saturday, 15 * 60 + 30).status
+      assert_equal :free, calendar.slot_for(saturday, 17 * 60 + 30).status
     end
   end
 

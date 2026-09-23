@@ -45,12 +45,17 @@ class RoomCalendar
   end
 
   def within_schedule?(date, starts_at, ends_at)
-    open, close = @room.schedule_for(date)
+    open, close = schedule_for_date(date)
     return false if open.blank?
 
     day_start = date.in_time_zone.change(hour: open)
     day_end = date.in_time_zone.change(hour: close)
     starts_at >= day_start && ends_at <= day_end
+  end
+
+  def schedule_for_date(date)
+    @schedules ||= {}
+    @schedules[date] ||= @room.schedule_for(date)
   end
 
   def blocked?(starts_at, ends_at)
@@ -63,7 +68,7 @@ class RoomCalendar
   end
 
   def overlapping_bookings
-    @overlapping_bookings ||= @room.bookings.visible_on_calendar.includes(:invoice)
+    @overlapping_bookings ||= @room.bookings.visible_on_calendar.preload(:invoice)
       .where("start_time < ? AND end_time > ?", dates.last.end_of_day, dates.first.beginning_of_day)
       .to_a
   end

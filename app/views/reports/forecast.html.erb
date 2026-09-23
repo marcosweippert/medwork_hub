@@ -1,6 +1,6 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Occupancy forecast</h1>
+    <h1 class="page-title"><%= t("reports.forecast") %></h1>
     <p class="page-sub">Next 8 weeks based on current holds · <%= analytical? ? "analytical" : "synthetic" %></p>
   </div>
   <%= render "export" %>
@@ -10,7 +10,7 @@
   <%= render "view_field" %>
   <div class="field">
     <label class="field-label">Room</label>
-    <%= select_tag :room_id, options_from_collection_for_select(Room.order(:name), :id, :name, params[:room_id]), include_blank: "All rooms", class: "select" %>
+    <%= select_tag :room_id, options_from_collection_for_select(Room.order(:name), :id, :name, params[:room_id]), include_blank: t("ui.all_rooms"), class: "select" %>
   </div>
   <%= submit_tag "Apply", class: "btn btn--ghost" %>
 <% end %>

@@ -1,10 +1,10 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Welcome email</h1>
+    <h1 class="page-title"><%= t("helpers.page.welcome_email") %></h1>
     <p class="page-sub">This template is sent when a user account is created. Use {{name}}, {{email}}, {{password}}, {{role}}, {{clinic}} and {{login_url}}.</p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", outbound_emails_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), outbound_emails_path, class: "btn btn--ghost" %>
   </div>
 </div>
 
@@ -21,8 +21,8 @@
         <%= f.text_area :welcome_email_html, class: "input", rows: 16 %>
       </div>
       <div class="form-actions">
-        <%= f.submit "Save", class: "btn btn--primary" %>
-        <%= link_to "Cancel", outbound_emails_path, class: "btn btn--ghost" %>
+        <%= f.submit t("ui.save"), class: "btn btn--primary" %>
+        <%= link_to t("ui.cancel"), outbound_emails_path, class: "btn btn--ghost" %>
       </div>
     <% end %>
   </section>

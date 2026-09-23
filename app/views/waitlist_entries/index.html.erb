@@ -1,61 +1,102 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Waitlist<%= " · #{@room.name}" if @room %></h1>
-    <p class="page-sub">Queue for occupied hours. The first person is notified when a cancellation or reschedule frees the slot; staff can then reserve it here.</p>
+    <h1 class="page-title"><%= t("waitlist.title") %><%= " · #{@room.name}" if @room %></h1>
+    <p class="page-sub"><%= t("waitlist.subtitle") %></p>
   </div>
   <div class="page-actions">
     <% if @room %>
-      <%= link_to "Join waitlist", new_room_waitlist_entry_path(@room), class: "btn btn--primary" %>
-      <%= link_to "Calendar", calendar_room_path(@room), class: "btn btn--ghost" %>
+      <%= link_to t("waitlist.join"), new_room_waitlist_entry_path(@room), class: "btn btn--primary" %>
+      <%= link_to t("ui.calendar"), calendar_room_path(@room), class: "btn btn--ghost" %>
     <% end %>
   </div>
 </div>
 
 <%= form_with url: (@room ? room_waitlist_entries_path(@room) : waitlist_entries_path), method: :get, class: "filter-bar" do %>
-  <div class="field">
-    <label class="field-label">Status</label>
-    <%= filter_select :status, WaitlistEntry::STATUSES.map { |s| [s.titleize, s] }, selected: params[:status], include_blank: "Open" %>
+  <div class="field field-grow">
+    <label class="field-label"><%= t("ui.search") %></label>
+    <%= text_field_tag :q, params[:q], class: "input", placeholder: t("waitlist.search_placeholder") %>
   </div>
-  <%= submit_tag "Filter", class: "btn btn--ghost" %>
+  <div class="field">
+    <label class="field-label"><%= t("ui.status") %></label>
+    <%= filter_select :status, WaitlistEntry::STATUSES.map { |s| [t("statuses.#{s}", default: s.humanize), s] }, selected: params[:status], include_blank: t("waitlist.open_only") %>
+  </div>
+  <% unless @room %>
+    <div class="field">
+      <label class="field-label"><%= t("ui.room") %></label>
+      <%= select_tag :room_id, options_from_collection_for_select(@rooms, :id, :name, params[:room_id]), include_blank: t("ui.all"), class: "select" %>
+    </div>
+  <% end %>
+  <% unless professional_user? %>
+    <div class="field">
+      <label class="field-label"><%= t("ui.professional") %></label>
+      <%= select_tag :professional_id, options_from_collection_for_select(@professionals, :id, :display_name, params[:professional_id]), include_blank: t("ui.all"), class: "select" %>
+    </div>
+  <% end %>
+  <div class="field">
+    <label class="field-label"><%= t("waitlist.from") %></label>
+    <%= date_field_tag :from, params[:from], class: "input" %>
+  </div>
+  <div class="field">
+    <label class="field-label"><%= t("waitlist.to") %></label>
+    <%= date_field_tag :to, params[:to], class: "input" %>
+  </div>
+  <%= submit_tag t("ui.filter"), class: "btn btn--ghost" %>
 <% end %>
 
-<section class="card">
-  <div class="table-scroll">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Professional</th>
-          <% unless @room %><th>Room</th><% end %>
-          <th>Slot</th>
-          <th>Status</th>
-          <th class="cell-actions"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @entries.each do |entry| %>
-          <tr>
-            <td class="cell-name"><%= entry.professional.display_name %></td>
-            <% unless @room %><td><%= entry.room.name %></td><% end %>
-            <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m %H:%M") %>–<%= entry.ends_at.strftime("%H:%M") %></td>
-            <td>
-              <%= status_tag(entry.status) %>
-              <% if entry.offered? && entry.notified_at %><div class="field-help" style="margin:2px 0 0;">Notified <%= entry.notified_at.strftime("%d/%m %H:%M") %></div><% end %>
-            </td>
-            <td class="cell-actions">
-              <div class="row-actions">
-                <% if entry.status.in?(%w[waiting offered]) %>
-                  <%= button_to "Reserve", convert_waitlist_entry_path(entry), method: :post, class: "btn btn--chip btn--pay", data: { turbo_confirm: "Create a reservation for this waitlist slot?" } %>
-                  <%= button_to "Remove", waitlist_entry_path(entry), method: :delete, class: "btn btn--chip btn--danger" %>
-                <% end %>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-        <% if @entries.empty? %>
-          <tr><td colspan="5">Nobody waiting. Open a room calendar and click an occupied hour to join.</td></tr>
-        <% end %>
-      </tbody>
-    </table>
+<%= form_with url: bulk_waitlist_entries_path, method: :patch, data: { controller: "bulk-select" } do %>
+  <div class="bulk-bar" data-bulk-select-target="bar" hidden>
+    <strong data-bulk-select-target="count">0 selected</strong>
+    <div class="page-actions">
+      <% if clinic_staff? %>
+        <%= button_tag t("waitlist.reserve"), name: "bulk_action", value: "convert", class: "btn btn--primary btn--sm", data: { turbo_confirm: t("waitlist.confirm_reserve") } %>
+      <% end %>
+      <%= button_tag t("waitlist.remove"), name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("waitlist.confirm_remove") } %>
+    </div>
   </div>
-  <%= render "shared/pager" %>
-</section>
+
+  <section class="card">
+    <div class="table-scroll">
+      <table class="data-table data-table--waitlist-index">
+        <thead>
+          <tr>
+            <th class="cell-check">
+              <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("ui.all") %>">
+            </th>
+            <th><%= t("ui.professional") %></th>
+            <% unless @room %><th><%= t("ui.room") %></th><% end %>
+            <th><%= t("waitlist.slot") %></th>
+            <th><%= t("ui.status") %></th>
+            <th class="cell-actions"><%= t("ui.actions") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @entries.each do |entry| %>
+            <tr>
+              <td class="cell-check">
+                <% if entry.status.in?(%w[waiting offered]) %>
+                  <%= check_box_tag "ids[]", entry.id, false, class: "row-check", id: "waitlist_#{entry.id}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" } %>
+                <% end %>
+              </td>
+              <td class="cell-name"><%= entry.professional.display_name %></td>
+              <% unless @room %><td><%= entry.room.name %></td><% end %>
+              <td class="data-cell-mono"><%= entry.starts_at.strftime("%d/%m %H:%M") %>–<%= entry.ends_at.strftime("%H:%M") %></td>
+              <td>
+                <%= status_tag(entry.status) %>
+                <% if entry.offered? && entry.notified_at %>
+                  <div class="field-help" style="margin:2px 0 0;"><%= t("waitlist.notified", time: entry.notified_at.strftime("%d/%m %H:%M")) %></div>
+                <% end %>
+              </td>
+              <td class="cell-actions">
+                <%= action_btn t("ui.open"), calendar_room_path(entry.room, date: entry.starts_at.to_date), tone: "view" %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @entries.empty? %>
+            <tr><td colspan="<%= @room ? 5 : 6 %>"><%= t("waitlist.empty") %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <%= render "shared/pager" %>
+  </section>
+<% end %>

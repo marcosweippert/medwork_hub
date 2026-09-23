@@ -1,0 +1,42 @@
+<section class="col-6 card <%= "is-editing" if settings_editing?("mail") %>">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("settings.mail.title") %></h2>
+    <% unless settings_editing?("mail") %>
+      <%= link_to t("ui.edit"), settings_path(edit: "mail"), class: "btn btn--ghost btn--sm" %>
+    <% end %>
+  </div>
+  <% if settings_editing?("mail") %>
+    <%= form_with model: @setting, url: settings_path, method: :patch, class: "form-grid" do |f| %>
+      <%= hidden_field_tag :section, "mail" %>
+      <div class="field"><%= f.label :smtp_address, t("settings.mail.address"), class: "field-label" %><%= f.text_field :smtp_address, class: "input", placeholder: "smtp.gmail.com" %></div>
+      <div class="field"><%= f.label :smtp_port, t("settings.mail.port"), class: "field-label" %><%= f.number_field :smtp_port, class: "input", placeholder: "587" %></div>
+      <div class="field"><%= f.label :smtp_domain, t("settings.mail.domain"), class: "field-label" %><%= f.text_field :smtp_domain, class: "input" %></div>
+      <div class="field"><%= f.label :smtp_username, t("settings.mail.user"), class: "field-label" %><%= f.text_field :smtp_username, class: "input", autocomplete: "off" %></div>
+      <div class="field">
+        <%= f.label :smtp_password, t("settings.mail.password"), class: "field-label" %>
+        <%= f.password_field :smtp_password, class: "input", value: "", autocomplete: "new-password", placeholder: @setting.smtp_password_set? ? t("settings.mail.password_kept") : t("settings.mail.password_new") %>
+      </div>
+      <div class="field"><%= f.label :smtp_authentication, t("settings.mail.auth"), class: "field-label" %><%= f.select :smtp_authentication, [%w[Plain plain], %w[Login login], %w[CRAM-MD5 cram_md5]], {}, class: "select" %></div>
+      <div class="field"><%= f.label :mailer_from, t("settings.mail.from"), class: "field-label" %><%= f.email_field :mailer_from, class: "input" %></div>
+      <div class="field"><%= f.label :mailer_host, t("settings.mail.host"), class: "field-label" %><%= f.text_field :mailer_host, class: "input" %></div>
+      <div class="field"><%= f.label :mailer_port, t("settings.mail.host_port"), class: "field-label" %><%= f.number_field :mailer_port, class: "input" %></div>
+      <div class="field"><%= f.label :mailer_protocol, t("settings.mail.protocol"), class: "field-label" %><%= f.select :mailer_protocol, [%w[http http], %w[https https]], { include_blank: t("settings.mail.auto") }, class: "select" %></div>
+      <div class="field span-2"><label class="field-label"><%= f.check_box :smtp_enable_starttls %> STARTTLS</label></div>
+      <div class="field span-2 form-actions">
+        <%= f.submit t("ui.save"), class: "btn btn--primary btn--sm" %>
+        <%= link_to t("ui.cancel"), settings_path, class: "btn btn--ghost btn--sm" %>
+      </div>
+    <% end %>
+  <% else %>
+    <dl class="dl-meta">
+      <dt><%= t("settings.mail.method") %></dt><dd><%= MailerConfig.summary[:delivery_method] %></dd>
+      <dt><%= t("settings.mail.from") %></dt><dd><%= MailerConfig.summary[:from] %></dd>
+      <dt>SMTP</dt><dd><%= MailerConfig.summary[:smtp_address] %><%= MailerConfig.summary[:smtp_port] ? ":#{MailerConfig.summary[:smtp_port]}" : "" %></dd>
+      <dt><%= t("settings.mail.user") %></dt><dd><%= MailerConfig.summary[:smtp_username] %></dd>
+      <dt><%= t("settings.mail.password") %></dt><dd><%= MailerConfig.summary[:smtp_password] == "saved" ? t("settings.mail.password_saved") : t("settings.mail.password_missing") %></dd>
+    </dl>
+    <div class="page-actions" style="margin-top:10px">
+      <%= link_to t("nav.emails"), outbound_emails_path, class: "btn btn--ghost btn--sm" %>
+    </div>
+  <% end %>
+</section>

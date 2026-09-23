@@ -4,9 +4,9 @@
     <p class="page-sub"><%= @user.email %> · <%= @user.role.to_s.titleize %></p>
   </div>
   <div class="page-actions">
-    <%= link_to "Back", users_path, class: "btn btn--ghost" %>
+    <%= link_to t("ui.back"), users_path, class: "btn btn--ghost" %>
     <%= button_to "Resend welcome email", invite_user_path(@user), method: :post, class: "btn btn--ghost" %>
-    <%= link_to "Edit", edit_user_path(@user), class: "btn btn--primary" %>
+    <%= link_to t("ui.edit"), edit_user_path(@user), class: "btn btn--primary" %>
   </div>
 </div>
 <section class="card form-card">

@@ -1,0 +1,113 @@
+en:
+  flash:
+    first_access: Create a new password to finish your first access.
+    password_updated: Password updated. Welcome to MedWork Hub.
+    patients:
+      created: Patient created.
+      updated: Patient updated.
+      deleted: Patient deleted.
+    rooms:
+      invalid_date: Select a valid date.
+      created: Room created.
+      updated: Room updated.
+      deleted: Room deleted.
+    bookings:
+      created: Booking created.
+      updated: Booking updated.
+      deleted: Booking deleted.
+      rescheduled: Booking rescheduled.
+      completed: Booking marked as completed.
+      complete_blocked: Only finished live bookings can be completed.
+      cancelled: Booking cancelled.
+      cancelled_refund: "Booking cancelled. Refund %{refund}%{fee}."
+      cancelled_fee: "Booking cancelled. Cancellation fee: %{fee}."
+      kept_fee: " · kept %{fee}"
+      waitlist_notified: " Waitlist: %{name} was notified."
+      delinquent: has overdue invoices and cannot make new reservations
+    invoices:
+      created: Invoice created.
+      updated: Invoice updated.
+      deleted: Invoice deleted.
+      paid: Invoice marked as paid.
+      refunded: Refund recorded. Future slots on this invoice were released.
+      cancelled_refund: "Invoice cancelled. Refund %{refund}%{fee}."
+      cancelled: Invoice cancelled and slots released.
+      slots_refund: "Selected slots cancelled. Refund %{refund}%{fee}."
+      slots_cancelled: Selected slots cancelled and released.
+      select_one: Select at least one invoice.
+      bulk: "Bulk update: %{summary}."
+      bulk_paid: "%{count} paid"
+      bulk_cancelled: "%{count} cancelled"
+      bulk_refunded: "%{count} refunded"
+      bulk_skipped: "%{count} skipped"
+      bulk_none: No invoices were updated.
+    reservations:
+      confirmed: Reservation confirmed. An invoice was created for payment.
+    waitlist:
+      added: Added to the waitlist for this slot.
+      cancelled: Waitlist entry cancelled.
+    notes:
+      saved: Appointment note saved.
+      removed: Note removed.
+    blocks:
+      created: Room blocked for the selected period.
+      removed: Block removed.
+    professionals:
+      updated: Professional updated.
+      deleted: Professional deleted.
+    emails:
+      required: To and message are required.
+      welcome_saved: Welcome email saved.
+      sent: "Email sent to %{email}."
+      send_failed: "Send failed: %{error}"
+      resent: "Email resent to %{email}."
+      resend_failed: "Resend failed: %{error}"
+      forward_missing: Enter an email to forward to.
+      forwarded: "Email forwarded to %{email}."
+      forward_failed: "Forward failed: %{error}"
+      bulk_resent: "Resent %{ok} email(s).%{failed}"
+      bulk_failed: " %{count} failed."
+      bulk_removed: "Removed %{count} email(s) from the log."
+      choose_action: Choose a bulk action.
+      removed: Email removed from the log.
+  clinic_errors:
+    invoice_cancelled: This invoice is already cancelled.
+    invoice_refunded: This invoice is already refunded.
+    refund_paid_only: Only paid invoices can be refunded.
+    refund_already: This invoice was already fully refunded.
+    refund_nothing: Nothing left to refund.
+    refund_positive: Refund amount must be greater than zero.
+    reschedule_cancelled: Cancelled bookings cannot be rescheduled.
+    reschedule_start: Select a new start time.
+    end_after_start: End time must be after start time.
+    outside_hours: The new time is outside opening hours.
+    time_taken: That time is no longer available.
+    booking_cancelled: This booking is already cancelled.
+    booking_completed: Completed bookings cannot be cancelled.
+    select_slot: Select at least one time slot.
+    no_live_slots: None of the selected slots are on a live hourly booking.
+    started_slots: Started slots cannot be cancelled. Uncheck times that already began.
+    select_professional: Select a professional.
+    overdue_block: This professional has overdue invoices and cannot make new reservations.
+    room_type_blocked: This professional cannot reserve this room type.
+    select_available_slot: Select at least one available slot.
+    slots_unparsed: Could not parse selected slots.
+    slots_outside_hours: One or more slots are outside opening hours.
+    slots_blocked: This room is blocked for one or more selected times.
+    slots_taken: One or more slots are no longer available.
+    no_repeat_weeks: None of the repeated weeks are available.
+    select_day: Select a valid day.
+    day_closed: This day has no opening hours.
+    day_started: Cannot reserve a day that has already started.
+    day_blocked: This room is blocked on the selected day.
+    day_unavailable: This day is not fully available.
+    month_no_days: No remaining days left in this month.
+    month_no_hours: No free hours left in this month.
+    select_month: Select a valid month.
+    room_booked: This room is already booked for the selected time.
+    room_blocked: This room is blocked for the selected time.
+    closes_after_open: must be after opening hour.
+    unknown_room_type: contains an unknown type.
+    unknown_practice_area: contains an unknown area.
+    practice_area_required: select at least one practice area.
+    pix_key_invalid: must be a CPF, CNPJ, email, +55 phone or random key.

@@ -25,7 +25,7 @@ class RoomsController < ApplicationController
       { room: room, available: available, occupancy: room.occupancy_on(@date) }
     end
   rescue Date::Error, ArgumentError
-    redirect_to availability_rooms_path, alert: "Select a valid date"
+    redirect_to availability_rooms_path, alert: t("flash.rooms.invalid_date")
   end
 
   def show
@@ -62,7 +62,7 @@ class RoomsController < ApplicationController
   def create
     @room = Room.new(room_params)
     if @room.save
-      redirect_to @room, notice: "Room created successfully."
+      redirect_to @room, notice: t("flash.rooms.created")
     else
       @room.room_blocks.build if @room.room_blocks.empty?
       render :new, status: :unprocessable_entity
@@ -75,7 +75,7 @@ class RoomsController < ApplicationController
 
   def update
     if @room.update(room_params)
-      redirect_to @room, notice: "Room updated successfully."
+      redirect_to @room, notice: t("flash.rooms.updated")
     else
       @room.room_blocks.build if @room.room_blocks.empty?
       render :edit, status: :unprocessable_entity
@@ -84,7 +84,7 @@ class RoomsController < ApplicationController
 
   def destroy
     @room.destroy
-    redirect_to rooms_url, notice: "Room deleted."
+    redirect_to rooms_url, notice: t("flash.rooms.deleted")
   end
 
   private

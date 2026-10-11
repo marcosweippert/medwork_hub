@@ -8,15 +8,15 @@ class RefundInvoice
   end
 
   def call
-    return failure("Only paid invoices can be refunded") unless @invoice.status == "paid"
-    return failure("This invoice was already fully refunded") if @invoice.status == "refunded"
+    return failure(I18n.t("clinic_errors.refund_paid_only")) unless @invoice.status == "paid"
+    return failure(I18n.t("clinic_errors.refund_already")) if @invoice.status == "refunded"
 
     refundable = @invoice.amount.to_d - @invoice.refunded_amount.to_d
-    return failure("Nothing left to refund") if refundable <= 0
+    return failure(I18n.t("clinic_errors.refund_nothing")) if refundable <= 0
 
     refund = @amount.present? ? @amount.to_d : refundable
     refund = refundable if refund > refundable
-    return failure("Refund amount must be greater than zero") if refund <= 0
+    return failure(I18n.t("clinic_errors.refund_positive")) if refund <= 0
 
     released = []
     ActiveRecord::Base.transaction do

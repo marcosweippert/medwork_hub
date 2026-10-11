@@ -25,6 +25,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     pro = User.create!(name: "Pro", email: "usr-pro-#{SecureRandom.hex(4)}@example.com", password: "password", role: "professional")
     sign_in pro
     get users_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
   end
 end

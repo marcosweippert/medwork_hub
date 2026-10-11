@@ -77,6 +77,12 @@ en:
     paused: Paused
   dashboards:
     title: Dashboard
+    professional_subtitle: Your rooms, patients, and invoices.
+    upcoming: Upcoming
+    open_invoices:
+      one: "%{count} open invoice"
+      other: "%{count} open invoices"
+    no_upcoming: No upcoming bookings.
     occupancy: occupancy
     open: open
     rooms: Rooms

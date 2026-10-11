@@ -39,7 +39,7 @@ class OutboundEmailsController < ApplicationController
   def update_welcome
     @setting = Setting.current
     if @setting.update(welcome_params)
-      redirect_to edit_welcome_outbound_emails_path, notice: "Welcome email saved."
+      redirect_to edit_welcome_outbound_emails_path, notice: t("flash.emails.welcome_saved")
     else
       @preview_html = WelcomeEmailTemplate.html_for(setting: @setting, **WelcomeEmailTemplate.preview_vars(@setting))
       @preview_subject = WelcomeEmailTemplate.subject_for(setting: @setting, **WelcomeEmailTemplate.preview_vars(@setting))
@@ -61,38 +61,38 @@ class OutboundEmailsController < ApplicationController
       @to = to
       @subject = subject
       @body = body
-      flash.now[:alert] = "To and message are required."
+      flash.now[:alert] = t("flash.emails.required")
       render :new, status: :unprocessable_entity
       return
     end
 
-    OutboundMailer.compose(to: to, subject: subject, body: body).deliver_now
-    redirect_to outbound_emails_path, notice: "Email sent to #{to}."
+    OutboundMailer.compose(to: to, subject: subject, body: body).deliver_later
+    redirect_to outbound_emails_path, notice: t("flash.emails.sent", email: to)
   rescue StandardError => e
     record_failure_message(to: to, subject: subject, body: body, error: e)
-    redirect_to new_outbound_email_path(to: to, subject: subject, body: body), alert: "Send failed: #{e.message}"
+    redirect_to new_outbound_email_path(to: to, subject: subject, body: body), alert: t("flash.emails.send_failed", error: e.message)
   end
 
   def resend
     deliver_copy(@email)
-    redirect_to outbound_emails_path, notice: "Email resent to #{@email.to_address}."
+    redirect_to outbound_emails_path, notice: t("flash.emails.resent", email: @email.to_address)
   rescue StandardError => e
     record_failure(@email, e, to: @email.to_address)
-    redirect_to outbound_emails_path, alert: "Resend failed: #{e.message}"
+    redirect_to outbound_emails_path, alert: t("flash.emails.resend_failed", error: e.message)
   end
 
   def forward
     to = params[:to].to_s.strip
     if to.blank?
-      redirect_to outbound_email_path(@email), alert: "Enter an email to forward to."
+      redirect_to outbound_email_path(@email), alert: t("flash.emails.forward_missing")
       return
     end
 
     deliver_copy(@email, to: to)
-    redirect_to outbound_emails_path, notice: "Email forwarded to #{to}."
+    redirect_to outbound_emails_path, notice: t("flash.emails.forwarded", email: to)
   rescue StandardError => e
     record_failure(@email, e, to: to)
-    redirect_to outbound_email_path(@email), alert: "Forward failed: #{e.message}"
+    redirect_to outbound_email_path(@email), alert: t("flash.emails.forward_failed", error: e.message)
   end
 
   def download
@@ -114,19 +114,19 @@ class OutboundEmailsController < ApplicationController
         record_failure(email, e, to: email.to_address)
         fail += 1
       end
-      redirect_to outbound_emails_path, notice: "Resent #{ok} email(s).#{fail.positive? ? " #{fail} failed." : ""}"
+      redirect_to outbound_emails_path, notice: t("flash.emails.bulk_resent", ok: ok, failed: fail.positive? ? t("flash.emails.bulk_failed", count: fail) : "")
     when "delete"
       count = emails.count
       emails.destroy_all
-      redirect_to outbound_emails_path, notice: "Removed #{count} email(s) from the log."
+      redirect_to outbound_emails_path, notice: t("flash.emails.bulk_removed", count: count)
     else
-      redirect_to outbound_emails_path, alert: "Choose a bulk action."
+      redirect_to outbound_emails_path, alert: t("flash.emails.choose_action")
     end
   end
 
   def destroy
     @email.destroy
-    redirect_to outbound_emails_path, notice: "Email removed from the log."
+    redirect_to outbound_emails_path, notice: t("flash.emails.removed")
   end
 
   private
@@ -140,7 +140,7 @@ class OutboundEmailsController < ApplicationController
   end
 
   def deliver_copy(email, to: nil)
-    OutboundMailer.replay(email, to: to).deliver_now
+    OutboundMailer.replay(email, to: to).deliver_later
   end
 
   def record_failure(email, error, to:)

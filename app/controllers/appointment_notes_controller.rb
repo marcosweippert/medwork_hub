@@ -5,7 +5,7 @@ class AppointmentNotesController < ApplicationController
     @note = @booking.appointment_notes.new(note_params)
     if @note.save
       @booking.update_column(:patient_id, @note.patient_id) if @booking.patient_id.blank?
-      redirect_to @booking, notice: "Appointment note saved."
+      redirect_to @booking, notice: t("flash.notes.saved")
     else
       redirect_to @booking, alert: @note.errors.full_messages.to_sentence
     end
@@ -13,7 +13,7 @@ class AppointmentNotesController < ApplicationController
 
   def destroy
     @booking.appointment_notes.find(params[:id]).destroy
-    redirect_to @booking, notice: "Note removed."
+    redirect_to @booking, notice: t("flash.notes.removed")
   end
 
   private

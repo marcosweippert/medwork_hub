@@ -41,7 +41,7 @@ class CreateUserAccount
   end
 
   def self.deliver_welcome(user, password)
-    ClinicMailer.welcome(user, password).deliver_now
+    ClinicMailer.welcome(user, password).deliver_later
   rescue StandardError => e
     Rails.logger.error("Welcome email failed for #{user.email}: #{e.class}: #{e.message}")
   end

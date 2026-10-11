@@ -7,15 +7,15 @@ class CancelInvoice
   end
 
   def call
-    return failure("This invoice is already cancelled") if @invoice.status == "cancelled"
-    return failure("This invoice is already refunded") if @invoice.status == "refunded"
+    return failure(I18n.t("clinic_errors.invoice_cancelled")) if @invoice.status == "cancelled"
+    return failure(I18n.t("clinic_errors.invoice_refunded")) if @invoice.status == "refunded"
 
     if @invoice.payable?
       @invoice.cancel!(reason: @reason)
       return Result.new(success?: true, fee: 0, refund: 0)
     end
 
-    return failure("Only paid invoices can be refunded") unless @invoice.status == "paid" || @invoice.paid_at.present?
+    return failure(I18n.t("clinic_errors.refund_paid_only")) unless @invoice.status == "paid" || @invoice.paid_at.present?
 
     live = @invoice.bookings.live.to_a
     monthly = live.find { |booking| ClinicPolicy.monthly?(booking) }

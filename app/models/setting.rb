@@ -88,7 +88,7 @@ class Setting < ApplicationRecord
 
   def saturday_closes_after_opens
     return if saturday_opens_at.blank? || saturday_closes_at.blank?
-    errors.add(:saturday_closes_at, "must be after opening hour") if saturday_closes_at <= saturday_opens_at
+    errors.add(:saturday_closes_at, I18n.t("clinic_errors.closes_after_open")) if saturday_closes_at <= saturday_opens_at
   end
 
   def normalize_smtp_blanks
@@ -105,7 +105,7 @@ class Setting < ApplicationRecord
     return if pix_key.blank?
     return if PixKey.valid?(pix_key)
 
-    errors.add(:pix_key, "must be a CPF, CNPJ, email, +55 phone or random key")
+    errors.add(:pix_key, I18n.t("clinic_errors.pix_key_invalid"))
   end
 
   def acceptable_logo

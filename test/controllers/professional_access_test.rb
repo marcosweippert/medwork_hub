@@ -13,11 +13,13 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
     sign_in @pro_user
   end
 
-  test "home and dashboard are blocked" do
+  test "home shows the professional panel" do
+    Patient.create!(professional: @professional, name: "Clara Luz", contact: "clara@example.com")
     get root_path
-    assert_redirected_to rooms_path
+    assert_response :success
+    assert_match "Suas salas, pacientes e faturas.", response.body
     get professionals_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
   end
 
   test "rooms index lists only matching room types" do
@@ -43,11 +45,11 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
 
   test "cannot mark invoice paid or cancel slots" do
     patch pay_invoice_path(@own_invoice)
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
     assert_equal "open", @own_invoice.reload.status
 
     patch cancel_slots_invoice_path(@own_invoice), params: { slot_starts: ["2026-09-20T10:00:00"] }
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
   end
 
   test "can view own invoices but not another professional" do
@@ -67,13 +69,13 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
 
   test "cannot open billing or transactions" do
     get billing_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
     get transactions_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
     get audit_events_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
     get docs_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
   end
 
   test "can open own tickets but not another professional ticket" do

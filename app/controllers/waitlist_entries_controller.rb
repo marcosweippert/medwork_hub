@@ -38,7 +38,7 @@ class WaitlistEntriesController < ApplicationController
       load_waitlist_form
       render :new, status: :unprocessable_entity
     elsif @entry.save
-      redirect_to calendar_room_path(@room, date: @entry.starts_at), notice: "Added to the waitlist for this slot."
+      redirect_to calendar_room_path(@room, date: @entry.starts_at), notice: t("flash.waitlist.added")
     else
       load_waitlist_form
       render :new, status: :unprocessable_entity
@@ -48,7 +48,7 @@ class WaitlistEntriesController < ApplicationController
   def destroy
     room = @entry.room
     @entry.update!(status: "cancelled")
-    redirect_back fallback_location: room_waitlist_entries_path(room), notice: "Waitlist entry cancelled."
+    redirect_back fallback_location: room_waitlist_entries_path(room), notice: t("flash.waitlist.cancelled")
   end
 
   def convert

@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   before_action :set_current_user
   before_action :set_clinic_name, if: :devise_controller?
   before_action :require_password_change, if: :user_signed_in?
-  before_action :run_operational_jobs, unless: :devise_controller?
   before_action :load_header_notifications, if: :user_signed_in?
   helper_method :admin_user?, :professional_user?, :clinic_staff?, :current_professional, :signed_in_home_path, :unread_notifications_count, :clinic_setting
 
@@ -33,15 +32,6 @@ class ApplicationController < ActionController::Base
 
   def set_clinic_name
     @clinic_name = Setting.order(:id).first&.clinic_name.presence || "MedWork Hub"
-  end
-
-  def run_operational_jobs
-    return unless Rails.cache.write("invoice_expire_overdue", true, expires_in: 5.minutes, unless_exist: true)
-
-    Invoice.expire_overdue!
-    Ticket.auto_close_stale!
-  rescue StandardError => e
-    Rails.logger.warn("Operational jobs failed: #{e.class}: #{e.message}")
   end
 
   def admin_user?
@@ -76,13 +66,13 @@ class ApplicationController < ActionController::Base
   end
 
   def signed_in_home_path
-    professional_user? ? rooms_path : root_path
+    root_path
   end
 
   def after_sign_in_path_for(resource)
     return edit_password_change_path if resource.must_change_password?
 
-    resource.professional? ? rooms_path : root_path
+    root_path
   end
 
   def require_admin
@@ -117,6 +107,6 @@ class ApplicationController < ActionController::Base
     return unless current_user.must_change_password?
     return if controller_name == "password_changes"
 
-    redirect_to edit_password_change_path, alert: "Create a new password to finish your first access."
+    redirect_to edit_password_change_path, alert: t("flash.first_access")
   end
 end

@@ -81,7 +81,7 @@ class Invoice < ApplicationRecord
   end
 
   def billing_type_label
-    bookings.map { |booking| booking.billing_type.to_s.titleize }.uniq.join(" / ").presence || "—"
+    bookings.map { |booking| I18n.t("invoices.types.#{booking.billing_type}", default: booking.billing_type.to_s) }.uniq.join(" / ").presence || "—"
   end
 
   def slot_count

@@ -7,6 +7,7 @@ pt-BR:
     filter: Filtrar
     open: Abrir
     edit: Editar
+    view: Ver
     delete: Excluir
     copy: Copiar
     copied: Copiado
@@ -140,6 +141,96 @@ pt-BR:
     kpi_open: A receber
     confirm_cancel_selected: Cancelar as faturas selecionadas? As pagas são estornadas conforme a política.
     open_invoice: "Fatura #%{number}"
+    number: "Fatura #%{number}"
+    pdf: PDF
+    total: Total
+    refunded: Estornado
+    amount_due: A pagar
+    net: Líquido
+    room_fallback: Sala
+    clinic_invoice: "Fatura da clínica · cada linha por hora é um horário de %{minutes} min"
+    bill_to: Cobrança para
+    professional_fallback: Profissional
+    general: Geral
+    blocked_reservations: bloqueado para novas reservas
+    dates: Datas
+    issued: "Emitida em %{date}"
+    due: "Vencimento %{date}"
+    paid_at: "Paga em %{time}"
+    refunded_at: "Estornada em %{time}"
+    cancel_hint: Marque abaixo só os horários de 30 min que deseja cancelar. O restante da reserva permanece. Horários pagos são estornados conforme a política.
+    select_all_times: Selecionar todos os horários canceláveis
+    select_time: "Selecionar %{time}"
+    when: Quando
+    value: Valor
+    selected_count: "%{count} selecionados"
+    only_checked: Só os horários marcados são cancelados e estornados.
+    no_times: Nenhum horário nesta fatura.
+    comment: Comentário
+    cancellation_fee: Taxa de cancelamento
+    how_it_works: Como esta fatura funciona
+    help_hourly: "Reservas por hora são cobradas em horários de %{minutes} min."
+    help_partial: Marque só os horários que quer liberar. O restante continua reservado.
+    help_free: "Cancelamento grátis até %{hours}h antes do início."
+    help_late: "Depois dessa janela, fica %{late}%%. Depois do início, %{started}%%."
+    pay_pix: Pagar com PIX
+    pix_help: Escaneie no app do banco ou copie o código.
+    pix_missing: Cadastre uma chave PIX em Configurações para o profissional pagar por aqui.
+    whatsapp_body: "Fatura #%{number} · %{amount}"
+    refund_title: Estornar o restante
+    refund_help: Libera todos os horários ainda ativos desta fatura. Para liberar só alguns, use as caixas da tabela.
+    amount: Valor
+    reason: Motivo
+    optional: Opcional
+    issue_refund: Estornar
+    confirm_refund: Estornar esta fatura e liberar os horários restantes?
+    cancel_invoice: Cancelar fatura
+    confirm_cancel_open: Cancelar esta fatura e liberar os horários?
+    confirm_cancel_paid: Cancelar esta fatura paga e estornar conforme a política?
+    due_column: Vencimento
+    period: Período
+    type: Tipo
+    slots: Horários
+    empty: Nenhuma fatura com estes filtros.
+    select_all: Selecionar todas as faturas deste filtro
+    select_invoice: "Selecionar fatura %{number}"
+    bulk_help: A caixa do cabeçalho seleciona todas as faturas do filtro, não só esta página. Para cancelar um horário de 30 min, abra a fatura.
+    pay: Pagar
+    cancel: Cancelar
+    refund: Estornar
+    confirm_pay: Marcar as faturas selecionadas como pagas?
+    confirm_cancel: Cancelar as faturas selecionadas? As pagas são estornadas conforme a política.
+    confirm_refund_bulk: Estornar as faturas pagas selecionadas e liberar os horários restantes?
+    manual: Fatura manual de um profissional
+    select: Selecione
+    types:
+      hourly: Por hora
+      daily: Diária
+      monthly: Mensal
+    pdf_doc:
+      title: "Fatura #%{number}"
+      columns:
+        index: "#"
+        date: Data
+        start: Início
+        end: Fim
+        duration: Duração
+        room: Sala
+        type: Tipo
+        status: Status
+        value: Valor
+      room: "Sala: %{name}"
+      payment_open: "Pagamento: PIX ou recepção"
+      summary: Resumo
+      slots: "Horários %{count}  |  Tipo %{type}"
+      amounts: "Valor %{amount}  |  Estornado %{refunded}"
+      slot_note: "Cada linha por hora é um horário de %{minutes} min. PIX %{txid}"
+      policy_title: Política de cancelamento
+      policy: "Cancelamento grátis até %{hours}h antes do início. Depois disso, fica %{late}%%. Depois do início, fica %{started}%%."
+      partial: Horários de 30 min podem ser cancelados numa fatura paga por hora; o restante permanece reservado.
+      notes: "Observações: %{notes}"
+      generated: "Gerado em %{time}  |  %{clinic}"
+      page: "Página %{page} de %{pages}"
   professionals:
     title: Profissionais
     subtitle: Profissionais em atraso não conseguem reservar novos horários
@@ -157,8 +248,20 @@ pt-BR:
   patients:
     title: Pacientes
     subtitle: Vinculados a um profissional
+    subtitle_own: Seus pacientes
     new: Novo paciente
     search_placeholder: Nome, contato ou profissional
+    name: Nome
+    contact: Contato
+    contact_placeholder: E-mail ou telefone
+    history: Histórico clínico
+    history_placeholder: Histórico, diagnóstico, observações
+    no_contact: Sem contato
+    no_history: Nenhum histórico registrado.
+    slot_notes: Notas dos horários
+    export: Exportar dados
+    delete: Excluir paciente
+    confirm_delete: Excluir este paciente e as notas de atendimento? As reservas permanecem, sem o vínculo.
   reports:
     title: Relatórios
     subtitle: Abra um relatório para filtrar, mudar a visão e exportar

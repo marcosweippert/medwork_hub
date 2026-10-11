@@ -10,11 +10,12 @@ No primeiro acesso, se `must_change_password` estiver marcado, o usuário é obr
 
 | Área | Admin | Staff | Profissional |
 | --- | --- | --- | --- |
-| Painel | sim | sim | redireciona para Salas |
+| Painel | sim | sim | o próprio (pacientes, horários, faturas, chamados) |
 | Salas / calendário | todas | todas | só tipos da sua especialidade; não cria sala |
 | Reservas | todas | todas | as suas |
 | Lista de espera | todas | todas | a sua |
-| Profissionais / pacientes | sim | sim | não |
+| Profissionais | sim | sim | não |
+| Pacientes | todos | todos | só os seus; pode exportar e excluir |
 | Faturas | todas + pagar/estornar | todas + pagar/estornar | só as suas; **não** marca paga |
 | Chamados | fila completa | fila completa | só os que abriu; não muda status da fila |
 | Relatórios | sim | sim | não |
@@ -29,7 +30,7 @@ No primeiro acesso, se `must_change_password` estiver marcado, o usuário é obr
 
 ## Profissional
 
-- Home: **Salas**.
+- Home: **Painel**, com os próprios pacientes, horários, faturas e chamados.
 - Calendário trava o profissional logado (não escolhe outro).
 - Não vê salas de outro tipo (`Room.for_professional`).
 - Não paga fatura, não cancela horários em lote, não abre billing nem auditoria.

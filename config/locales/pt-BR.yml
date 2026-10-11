@@ -89,6 +89,12 @@ pt-BR:
     other: Outro
   dashboards:
     title: Painel
+    professional_subtitle: Suas salas, pacientes e faturas.
+    upcoming: Próximos horários
+    open_invoices:
+      one: "%{count} fatura em aberto"
+      other: "%{count} faturas em aberto"
+    no_upcoming: Nenhum horário futuro.
     occupancy: ocupação
     open: em aberto
     rooms: Salas

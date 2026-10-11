@@ -46,7 +46,7 @@ class ProfessionalsController < ApplicationController
 
   def update
     if @professional.update(professional_params)
-      redirect_to @professional, notice: "Professional updated successfully."
+      redirect_to @professional, notice: t("flash.professionals.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -54,7 +54,7 @@ class ProfessionalsController < ApplicationController
 
   def destroy
     @professional.destroy
-    redirect_to professionals_url, notice: "Professional deleted."
+    redirect_to professionals_url, notice: t("flash.professionals.deleted")
   end
 
   private

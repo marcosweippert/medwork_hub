@@ -1,0 +1,113 @@
+pt-BR:
+  flash:
+    first_access: Crie uma nova senha para concluir o primeiro acesso.
+    password_updated: Senha atualizada. Bem-vindo ao MedWork Hub.
+    patients:
+      created: Paciente criado.
+      updated: Paciente atualizado.
+      deleted: Paciente excluído.
+    rooms:
+      invalid_date: Selecione uma data válida.
+      created: Sala criada.
+      updated: Sala atualizada.
+      deleted: Sala excluída.
+    bookings:
+      created: Agendamento criado.
+      updated: Agendamento atualizado.
+      deleted: Agendamento excluído.
+      rescheduled: Agendamento remarcado.
+      completed: Agendamento concluído.
+      complete_blocked: Só é possível concluir um horário que já terminou.
+      cancelled: Agendamento cancelado.
+      cancelled_refund: "Agendamento cancelado. Estorno %{refund}%{fee}."
+      cancelled_fee: "Agendamento cancelado. Taxa de cancelamento: %{fee}."
+      kept_fee: " · retido %{fee}"
+      waitlist_notified: " Lista de espera: %{name} foi avisado."
+      delinquent: tem faturas em atraso e não pode fazer novas reservas
+    invoices:
+      created: Fatura criada.
+      updated: Fatura atualizada.
+      deleted: Fatura excluída.
+      paid: Fatura marcada como paga.
+      refunded: Estorno registrado. Os horários futuros desta fatura foram liberados.
+      cancelled_refund: "Fatura cancelada. Estorno %{refund}%{fee}."
+      cancelled: Fatura cancelada e horários liberados.
+      slots_refund: "Horários selecionados cancelados. Estorno %{refund}%{fee}."
+      slots_cancelled: Horários selecionados cancelados e liberados.
+      select_one: Selecione ao menos uma fatura.
+      bulk: "Atualização em lote: %{summary}."
+      bulk_paid: "%{count} pagas"
+      bulk_cancelled: "%{count} canceladas"
+      bulk_refunded: "%{count} estornadas"
+      bulk_skipped: "%{count} ignoradas"
+      bulk_none: Nenhuma fatura foi atualizada.
+    reservations:
+      confirmed: Reserva confirmada. Uma fatura foi criada para o pagamento.
+    waitlist:
+      added: Incluído na lista de espera deste horário.
+      cancelled: Entrada da lista de espera cancelada.
+    notes:
+      saved: Nota do atendimento salva.
+      removed: Nota removida.
+    blocks:
+      created: Sala bloqueada no período selecionado.
+      removed: Bloqueio removido.
+    professionals:
+      updated: Profissional atualizado.
+      deleted: Profissional excluído.
+    emails:
+      required: Informe o destinatário e a mensagem.
+      welcome_saved: E-mail de boas-vindas salvo.
+      sent: "E-mail enviado para %{email}."
+      send_failed: "Falha no envio: %{error}"
+      resent: "E-mail reenviado para %{email}."
+      resend_failed: "Falha ao reenviar: %{error}"
+      forward_missing: Informe um e-mail para encaminhar.
+      forwarded: "E-mail encaminhado para %{email}."
+      forward_failed: "Falha ao encaminhar: %{error}"
+      bulk_resent: "Reenviados %{ok} e-mail(s).%{failed}"
+      bulk_failed: " %{count} falharam."
+      bulk_removed: "%{count} e-mail(s) removidos do log."
+      choose_action: Escolha uma ação em lote.
+      removed: E-mail removido do log.
+  clinic_errors:
+    invoice_cancelled: Esta fatura já está cancelada.
+    invoice_refunded: Esta fatura já foi estornada.
+    refund_paid_only: Só faturas pagas podem ser estornadas.
+    refund_already: Esta fatura já foi estornada por completo.
+    refund_nothing: Não há valor restante para estornar.
+    refund_positive: O valor do estorno precisa ser maior que zero.
+    reschedule_cancelled: Agendamentos cancelados não podem ser remarcados.
+    reschedule_start: Selecione um novo horário de início.
+    end_after_start: O término precisa ser depois do início.
+    outside_hours: O novo horário está fora do expediente.
+    time_taken: Esse horário não está mais disponível.
+    booking_cancelled: Este agendamento já está cancelado.
+    booking_completed: Agendamentos concluídos não podem ser cancelados.
+    select_slot: Selecione ao menos um horário.
+    no_live_slots: Nenhum dos horários selecionados está em uma reserva por hora ainda ativa.
+    started_slots: Horários já iniciados não podem ser cancelados. Desmarque os que já começaram.
+    select_professional: Selecione um profissional.
+    overdue_block: Este profissional tem faturas em atraso e não pode fazer novas reservas.
+    room_type_blocked: Este profissional não pode reservar este tipo de sala.
+    select_available_slot: Selecione ao menos um horário livre.
+    slots_unparsed: Não foi possível ler os horários selecionados.
+    slots_outside_hours: Um ou mais horários estão fora do expediente.
+    slots_blocked: A sala está bloqueada em um ou mais horários selecionados.
+    slots_taken: Um ou mais horários não estão mais disponíveis.
+    no_repeat_weeks: Nenhuma das semanas repetidas está disponível.
+    select_day: Selecione um dia válido.
+    day_closed: Este dia não tem expediente.
+    day_started: Não é possível reservar um dia que já começou.
+    day_blocked: A sala está bloqueada no dia selecionado.
+    day_unavailable: Este dia não está totalmente livre.
+    month_no_days: Não restam dias neste mês.
+    month_no_hours: Não restam horários livres neste mês.
+    select_month: Selecione um mês válido.
+    room_booked: Esta sala já está reservada neste horário.
+    room_blocked: Esta sala está bloqueada neste horário.
+    closes_after_open: deve ser depois do horário de abertura.
+    unknown_room_type: contém um tipo desconhecido.
+    unknown_practice_area: contém uma área desconhecida.
+    practice_area_required: selecione ao menos uma área de atuação.
+    pix_key_invalid: deve ser CPF, CNPJ, e-mail, telefone +55 ou chave aleatória.

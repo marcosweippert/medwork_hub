@@ -53,26 +53,26 @@ export default class extends Controller {
 
   countLabel(count) {
     if (this.matchingActive) {
-      return count === 1 ? "1 matching this filter" : `${count} matching this filter`
+      return count === 1 ? "1 neste filtro" : `${count} neste filtro`
     }
-    return count === 1 ? "1 selected" : `${count} selected`
+    return count === 1 ? "1 selecionado" : `${count} selecionados`
   }
 
   updateConfirms(count) {
     const noun = this.matchingActive
-      ? `${count} invoices matching this filter`
-      : (count === 1 ? "1 selected invoice" : `${count} selected invoices`)
+      ? `${count} faturas deste filtro`
+      : (count === 1 ? "1 fatura selecionada" : `${count} faturas selecionadas`)
 
     this.element.querySelectorAll("button[name='bulk_action']").forEach((button) => {
       switch (button.value) {
         case "pay":
-          button.dataset.turboConfirm = `Mark ${noun} as paid?`
+          button.dataset.turboConfirm = `Marcar ${noun} como pagas?`
           break
         case "cancel":
-          button.dataset.turboConfirm = `Cancel ${noun}? Paid invoices are refunded according to the cancellation policy.`
+          button.dataset.turboConfirm = `Cancelar ${noun}? As pagas são estornadas conforme a política.`
           break
         case "refund":
-          button.dataset.turboConfirm = `Refund ${noun} and release remaining slots?`
+          button.dataset.turboConfirm = `Estornar ${noun} e liberar os horários restantes?`
           break
       }
     })

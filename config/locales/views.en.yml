@@ -7,6 +7,7 @@ en:
     filter: Filter
     open: Open
     edit: Edit
+    view: View
     delete: Delete
     copy: Copy
     copied: Copied
@@ -140,6 +141,96 @@ en:
     kpi_open: Outstanding
     confirm_cancel_selected: Cancel selected invoices? Paid invoices are refunded according to the cancellation policy.
     open_invoice: "Invoice #%{number}"
+    number: "Invoice #%{number}"
+    pdf: PDF
+    total: Total
+    refunded: Refunded
+    amount_due: Amount due
+    net: Net
+    room_fallback: Room
+    clinic_invoice: "Clinic invoice · each hourly line is a %{minutes}-minute slot"
+    bill_to: Bill to
+    professional_fallback: Professional
+    general: General
+    blocked_reservations: blocked from new reservations
+    dates: Dates
+    issued: "Issued %{date}"
+    due: "Due %{date}"
+    paid_at: "Paid %{time}"
+    refunded_at: "Refunded %{time}"
+    cancel_hint: Select times below to cancel only those 30-minute slots. The rest of the reservation stays. Paid times are refunded by the cancellation policy.
+    select_all_times: Select all cancellable times
+    select_time: "Select %{time}"
+    when: When
+    value: Value
+    selected_count: "%{count} selected"
+    only_checked: Only checked times are cancelled and refunded.
+    no_times: No reserved times on this invoice.
+    comment: Comment
+    cancellation_fee: Cancellation fee
+    how_it_works: How this invoice works
+    help_hourly: "Hourly reservations are billed in %{minutes}-minute slots."
+    help_partial: Check only the times you want to release. The rest stays booked.
+    help_free: "Free cancel until %{hours}h before start."
+    help_late: "After that window, %{late}%% is kept. After start, %{started}%%."
+    pay_pix: Pay with PIX
+    pix_help: Scan in the bank app or copy the code.
+    pix_missing: Add a PIX key in Settings so professionals can pay without a manual checkout.
+    whatsapp_body: "Invoice #%{number} · %{amount}"
+    refund_title: Refund remaining
+    refund_help: Releases all remaining live times on this invoice. Prefer slot checkboxes to drop only some hours.
+    amount: Amount
+    reason: Reason
+    optional: Optional
+    issue_refund: Issue refund
+    confirm_refund: Refund this invoice and release remaining slots?
+    cancel_invoice: Cancel invoice
+    confirm_cancel_open: Cancel this invoice and release slots?
+    confirm_cancel_paid: Cancel this paid invoice and refund according to the cancellation policy?
+    due_column: Due
+    period: Period
+    type: Type
+    slots: Slots
+    empty: No invoices match these filters.
+    select_all: Select all invoices matching this filter
+    select_invoice: "Select invoice %{number}"
+    bulk_help: The header checkbox selects every invoice matching the current filters, not only this page. To drop a single 30-min time, open the invoice.
+    pay: Pay
+    cancel: Cancel
+    refund: Refund
+    confirm_pay: Mark selected invoices as paid?
+    confirm_cancel: Cancel selected invoices? Paid invoices are refunded according to the cancellation policy.
+    confirm_refund_bulk: Refund selected paid invoices and release remaining slots?
+    manual: Manual invoice for a professional
+    select: Select
+    types:
+      hourly: Hourly
+      daily: Daily
+      monthly: Monthly
+    pdf_doc:
+      title: "Invoice #%{number}"
+      columns:
+        index: "#"
+        date: Date
+        start: Start
+        end: End
+        duration: Duration
+        room: Room
+        type: Type
+        status: Status
+        value: Value
+      room: "Room: %{name}"
+      payment_open: "Payment: PIX or reception"
+      summary: Summary
+      slots: "Slots %{count}  |  Type %{type}"
+      amounts: "Amount %{amount}  |  Refunded %{refunded}"
+      slot_note: "Each hourly line is one %{minutes}-minute slot. PIX %{txid}"
+      policy_title: Cancellation policy
+      policy: "Free cancel until %{hours}h before start. After that, %{late}%% is kept. After start, %{started}%% is kept."
+      partial: Individual 30-minute slots can be cancelled on a paid hourly invoice; remaining times stay reserved.
+      notes: "Notes: %{notes}"
+      generated: "Generated %{time}  |  %{clinic}"
+      page: "Page %{page} of %{pages}"
   professionals:
     title: Professionals
     subtitle: Overdue professionals cannot book new slots
@@ -157,8 +248,20 @@ en:
   patients:
     title: Patients
     subtitle: Linked to a professional
+    subtitle_own: Your patients
     new: New patient
     search_placeholder: Name, contact or professional
+    name: Name
+    contact: Contact
+    contact_placeholder: Email or phone
+    history: Clinical history
+    history_placeholder: History, diagnosis, observations
+    no_contact: No contact
+    no_history: No history recorded yet.
+    slot_notes: Slot notes
+    export: Export data
+    delete: Delete patient
+    confirm_delete: Delete this patient and appointment notes? Bookings stay, without the link.
   reports:
     title: Reports
     subtitle: Open a report to filter, switch synthetic or analytical view, and export

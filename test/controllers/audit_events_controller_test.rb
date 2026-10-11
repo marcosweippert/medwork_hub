@@ -37,6 +37,6 @@ class AuditEventsControllerTest < ActionDispatch::IntegrationTest
   test "professional cannot open the audit log" do
     sign_in @pro_user
     get audit_events_path
-    assert_redirected_to rooms_path
+    assert_redirected_to root_path
   end
 end

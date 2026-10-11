@@ -25,9 +25,9 @@ docs/                # esta documentação
 
 ## Jobs “no request”
 
-`run_operational_jobs`: no máximo a cada 5 minutos (cache), `Invoice.expire_overdue!` e `Ticket.auto_close_stale!`.
+`bin/rails medwork:reminders` roda `ClinicMaintenanceJob` (faturas atrasadas e chamados resolvidos antigos) e depois `ReminderDispatchJob`. Não há manutenção dentro do request.
 
-Lembretes de e-mail: rake `medwork:reminders` → `ReminderDispatchJob`.
+Convite, lista de espera e e-mail avulso usam `deliver_later`. Em produção o adapter é `:async` (fila no processo). O cron de lembretes continua síncrono.
 
 ## CSS / JS
 

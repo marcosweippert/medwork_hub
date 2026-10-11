@@ -11,7 +11,7 @@ class PasswordChangesController < ApplicationController
     @user = current_user
     if @user.update(password_params.merge(must_change_password: false))
       bypass_sign_in(@user)
-      redirect_to (current_user.professional? ? rooms_path : root_path), notice: "Password updated. Welcome to MedWork Hub."
+      redirect_to root_path, notice: t("flash.password_updated")
     else
       render :edit, status: :unprocessable_entity
     end

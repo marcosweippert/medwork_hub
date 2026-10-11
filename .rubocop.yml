@@ -1,0 +1,31 @@
+inherit_from: .rubocop_todo.yml
+
+plugins:
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: disable
+  SuggestExtensions: false
+  Exclude:
+    - db/**/*
+    - bin/**/*
+    - vendor/**/*
+    - tmp/**/*
+    - config/routes.rb
+
+Style:
+  Enabled: false
+Layout:
+  Enabled: false
+Metrics:
+  Enabled: false
+Naming:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: true
+Lint/UselessAssignment:
+  Enabled: true
+Rails/Output:
+  Enabled: true

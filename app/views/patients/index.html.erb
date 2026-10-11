@@ -1,7 +1,7 @@
 <div class="page-head">
   <div>
     <h1 class="page-title"><%= t("patients.title") %></h1>
-    <p class="page-sub"><%= t("patients.subtitle") %></p>
+    <p class="page-sub"><%= professional_user? ? t("patients.subtitle_own") : t("patients.subtitle") %></p>
   </div>
   <div class="page-actions">
     <%= link_to t("patients.new"), new_patient_path, class: "btn btn--primary" %>
@@ -21,10 +21,10 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Contact</th>
-          <th>Professional</th>
-          <th class="cell-actions">Actions</th>
+          <th><%= t("patients.name") %></th>
+          <th><%= t("patients.contact") %></th>
+          <% unless professional_user? %><th><%= t("nav.professionals") %></th><% end %>
+          <th class="cell-actions"><%= t("ui.actions") %></th>
         </tr>
       </thead>
       <tbody>
@@ -32,10 +32,10 @@
           <tr>
             <td class="cell-name"><%= patient.name %></td>
             <td><%= patient.contact %></td>
-            <td><%= patient.professional.display_name %></td>
+            <% unless professional_user? %><td><%= patient.professional.display_name %></td><% end %>
             <td class="cell-actions">
               <div class="row-actions">
-                <%= action_btn "View", patient, tone: "view" %>
+                <%= action_btn t("ui.view"), patient, tone: "view" %>
                 <%= action_btn t("ui.edit"), edit_patient_path(patient), tone: "edit" %>
               </div>
             </td>

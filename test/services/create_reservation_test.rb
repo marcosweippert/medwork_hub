@@ -33,7 +33,7 @@ class CreateReservationTest < ActiveSupport::TestCase
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
       assert_not result.success?
-      assert_match(/opening hours/, result.error)
+      assert_match(/expediente/, result.error)
     end
   end
 
@@ -56,7 +56,7 @@ class CreateReservationTest < ActiveSupport::TestCase
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
       assert_not result.success?
-      assert_match(/opening hours/, result.error)
+      assert_match(/expediente/, result.error)
     end
   end
 
@@ -91,7 +91,7 @@ class CreateReservationTest < ActiveSupport::TestCase
       result = CreateReservation.new(room: @room, professional: other, billing_type: "daily", day: "2026-08-31").call
 
       assert_not result.success?
-      assert_match(/fully available/, result.error)
+      assert_match(/não está totalmente livre/, result.error)
     end
   end
 
@@ -179,7 +179,7 @@ class CreateReservationTest < ActiveSupport::TestCase
     ).call
 
     assert_not result.success?
-    assert_match(/room type/, result.error)
+    assert_match(/tipo de sala/, result.error)
   end
 
   test "recurring weekday block prevents reservation" do
@@ -197,7 +197,7 @@ class CreateReservationTest < ActiveSupport::TestCase
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
       assert_not result.success?
-      assert_match(/blocked/, result.error)
+      assert_match(/bloqueada/, result.error)
     end
   end
 
@@ -210,7 +210,7 @@ class CreateReservationTest < ActiveSupport::TestCase
       result = CreateReservation.new(room: @room, professional: @professional, billing_type: "hourly", slots: slots).call
 
       assert_not result.success?
-      assert_match(/blocked/, result.error)
+      assert_match(/bloqueada/, result.error)
     end
   end
 end

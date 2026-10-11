@@ -37,7 +37,7 @@ class InvoicesController < ApplicationController
   def create
     @invoice = Invoice.new(invoice_params)
     if @invoice.save
-      redirect_to path_with_return(invoice_path(@invoice)), notice: "Invoice created successfully."
+      redirect_to path_with_return(invoice_path(@invoice)), notice: t("flash.invoices.created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -47,7 +47,7 @@ class InvoicesController < ApplicationController
 
   def update
     if @invoice.update(invoice_params)
-      redirect_to path_with_return(invoice_path(@invoice)), notice: "Invoice updated successfully."
+      redirect_to path_with_return(invoice_path(@invoice)), notice: t("flash.invoices.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -55,18 +55,18 @@ class InvoicesController < ApplicationController
 
   def destroy
     @invoice.destroy
-    redirect_back_to invoices_url, notice: "Invoice deleted."
+    redirect_back_to invoices_url, notice: t("flash.invoices.deleted")
   end
 
   def pay
     @invoice.mark_paid!
-    redirect_back_to @invoice, notice: "Invoice marked as paid."
+    redirect_back_to @invoice, notice: t("flash.invoices.paid")
   end
 
   def refund
     result = RefundInvoice.new(invoice: @invoice, reason: params[:reason], amount: params[:amount]).call
     if result.success?
-      redirect_back_to @invoice, notice: "Refund recorded. Future slots on this invoice were released."
+      redirect_back_to @invoice, notice: t("flash.invoices.refunded")
     else
       redirect_back_to @invoice, alert: result.error
     end
@@ -76,10 +76,9 @@ class InvoicesController < ApplicationController
     result = CancelInvoice.new(invoice: @invoice, reason: params[:reason]).call
     if result.success?
       message = if result.refund.to_d.positive?
-                  "Invoice cancelled. Refund #{helpers.number_to_currency(result.refund)}" \
-                    "#{result.fee.to_d.positive? ? " · kept #{helpers.number_to_currency(result.fee)}" : ""}."
+                  t("flash.invoices.cancelled_refund", refund: helpers.number_to_currency(result.refund), fee: fee_note(result.fee))
                 else
-                  "Invoice cancelled and slots released."
+                  t("flash.invoices.cancelled")
                 end
       redirect_back_to @invoice, notice: message
     else
@@ -91,10 +90,9 @@ class InvoicesController < ApplicationController
     result = CancelBookingSlots.new(invoice: @invoice, slot_starts: params[:slot_starts], reason: params[:reason]).call
     if result.success?
       message = if result.refund.to_d.positive?
-                  "Selected slots cancelled. Refund #{helpers.number_to_currency(result.refund)}" \
-                    "#{result.fee.to_d.positive? ? " · kept #{helpers.number_to_currency(result.fee)}" : ""}."
+                  t("flash.invoices.slots_refund", refund: helpers.number_to_currency(result.refund), fee: fee_note(result.fee))
                 else
-                  "Selected slots cancelled and released."
+                  t("flash.invoices.slots_cancelled")
                 end
       redirect_back_to @invoice, notice: message
     else
@@ -105,7 +103,7 @@ class InvoicesController < ApplicationController
   def bulk
     invoices = bulk_invoices_scope
     if invoices.none?
-      redirect_back_to invoices_path, alert: "Select at least one invoice."
+      redirect_back_to invoices_path, alert: t("flash.invoices.select_one")
       return
     end
 
@@ -166,13 +164,19 @@ class InvoicesController < ApplicationController
     action_name == "show" && params[:print].present? ? "print" : "application"
   end
 
+  def fee_note(fee)
+    return "" unless fee.to_d.positive?
+
+    t("flash.bookings.kept_fee", fee: helpers.number_to_currency(fee))
+  end
+
   def bulk_flash(result)
     parts = []
-    parts << "#{result.paid} paid" if result.paid.positive?
-    parts << "#{result.cancelled} cancelled" if result.cancelled.positive?
-    parts << "#{result.refunded} refunded" if result.refunded.positive?
-    parts << "#{result.skipped} skipped" if result.skipped.positive?
-    message = parts.any? ? "Bulk update: #{parts.join(", ")}." : "No invoices were updated."
+    parts << t("flash.invoices.bulk_paid", count: result.paid) if result.paid.positive?
+    parts << t("flash.invoices.bulk_cancelled", count: result.cancelled) if result.cancelled.positive?
+    parts << t("flash.invoices.bulk_refunded", count: result.refunded) if result.refunded.positive?
+    parts << t("flash.invoices.bulk_skipped", count: result.skipped) if result.skipped.positive?
+    message = parts.any? ? t("flash.invoices.bulk", summary: parts.join(", ")) : t("flash.invoices.bulk_none")
     message = [message, *result.errors].join(" ")
     succeeded = result.paid.positive? || result.cancelled.positive? || result.refunded.positive?
     succeeded ? { notice: message } : { alert: message }

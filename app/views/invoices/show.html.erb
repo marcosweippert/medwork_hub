@@ -1,22 +1,22 @@
 <div class="page-head">
   <div>
-    <h1 class="page-title">Invoice #<%= @invoice.id.to_s.rjust(4, "0") %></h1>
+    <h1 class="page-title"><%= t("invoices.number", number: @invoice.id.to_s.rjust(4, "0")) %></h1>
     <p class="page-sub">
       <%= @invoice.professional.display_name %> ·
-      <%= @invoice.room&.name || "Room" %> ·
-      <%= @invoice.status.to_s.titleize %>
+      <%= @invoice.room&.name || t("invoices.room_fallback") %> ·
+      <%= t("statuses.#{@invoice.status}", default: @invoice.status.to_s.humanize) %>
     </p>
   </div>
   <div class="page-actions">
     <%= link_to t("ui.back"), back_path(invoices_path), class: "btn btn--ghost" %>
-    <%= link_to "PDF", invoice_path(@invoice, format: :pdf), class: "btn btn--ghost" %>
+    <%= link_to t("invoices.pdf"), invoice_path(@invoice, format: :pdf), class: "btn btn--ghost" %>
     <% if clinic_staff? %>
       <%= link_to t("ui.edit"), path_with_return(edit_invoice_path(@invoice)), class: "btn btn--ghost" %>
       <% if @invoice.payable? %>
         <%= button_to t("invoices.mark_paid"), pay_invoice_path(@invoice), method: :patch, class: "btn btn--primary", params: { return_to: originating_path } %>
       <% end %>
       <% if @invoice.payable? || @invoice.refundable? %>
-        <%= button_to "Cancel invoice", cancel_invoice_path(@invoice), method: :patch, class: "btn btn--ghost", params: { return_to: originating_path }, data: { turbo_confirm: @invoice.payable? ? "Cancel this invoice and release slots?" : "Cancel this paid invoice and refund according to the cancellation policy?" } %>
+        <%= button_to t("invoices.cancel_invoice"), cancel_invoice_path(@invoice), method: :patch, class: "btn btn--ghost", params: { return_to: originating_path }, data: { turbo_confirm: @invoice.payable? ? t("invoices.confirm_cancel_open") : t("invoices.confirm_cancel_paid") } %>
       <% end %>
     <% end %>
   </div>
@@ -24,15 +24,15 @@
 
 <section class="kpi-grid kpi-compact">
   <article class="kpi-card c-primary">
-    <div class="kpi-label">Total</div>
+    <div class="kpi-label"><%= t("invoices.total") %></div>
     <div class="kpi-value"><%= number_to_currency(@invoice.amount) %></div>
   </article>
   <article class="kpi-card c-danger">
-    <div class="kpi-label">Refunded</div>
+    <div class="kpi-label"><%= t("invoices.refunded") %></div>
     <div class="kpi-value"><%= number_to_currency(@invoice.refunded_amount) %></div>
   </article>
   <article class="kpi-card c-success">
-    <div class="kpi-label"><%= @invoice.payable? ? "Amount due" : "Net" %></div>
+    <div class="kpi-label"><%= @invoice.payable? ? t("invoices.amount_due") : t("invoices.net") %></div>
     <div class="kpi-value"><%= number_to_currency(@invoice.net_amount) %></div>
   </article>
 </section>
@@ -42,7 +42,7 @@
     <header class="invoice-doc-head">
       <div class="invoice-brand">
         <%= Setting.current.clinic_name.presence || "MedWork Hub" %>
-        <small>Clinic invoice · each hourly line is a <%= Setting.current.slot_minutes %>-minute slot</small>
+        <small><%= t("invoices.clinic_invoice", minutes: Setting.current.slot_minutes) %></small>
       </div>
       <div class="invoice-meta">
         <div class="num">#<%= @invoice.id.to_s.rjust(4, "0") %></div>
@@ -52,29 +52,29 @@
 
     <dl class="invoice-grid">
       <div>
-        <dt>Bill to</dt>
+        <dt><%= t("invoices.bill_to") %></dt>
         <dd>
           <strong><%= clinic_staff? ? link_to(@invoice.professional.display_name, professional_path(@invoice.professional), class: "table-link") : @invoice.professional.display_name %></strong><br>
-          <%= @invoice.professional.specialty.presence || "Professional" %><br>
-          <%= @invoice.room&.name || "General" %>
+          <%= @invoice.professional.specialty.presence || t("invoices.professional_fallback") %><br>
+          <%= @invoice.room&.name || t("invoices.general") %>
           <% if @invoice.professional.delinquent? %>
-            <br><%= status_tag("overdue") %> blocked from new reservations
+            <br><%= status_tag("overdue") %> <%= t("invoices.blocked_reservations") %>
           <% end %>
         </dd>
       </div>
       <div>
-        <dt>Dates</dt>
+        <dt><%= t("invoices.dates") %></dt>
         <dd>
-          Issued <%= @invoice.issued_on.strftime("%d/%m/%Y") %><br>
-          Due <%= @invoice.due_date&.strftime("%d/%m/%Y") || "—" %><br>
-          <% if @invoice.paid_at %>Paid <%= @invoice.paid_at.strftime("%d/%m/%Y %H:%M") %><br><% end %>
-          <% if @invoice.refunded_at %>Refunded <%= @invoice.refunded_at.strftime("%d/%m/%Y %H:%M") %><% end %>
+          <%= t("invoices.issued", date: @invoice.issued_on.strftime("%d/%m/%Y")) %><br>
+          <%= t("invoices.due", date: @invoice.due_date&.strftime("%d/%m/%Y") || "—") %><br>
+          <% if @invoice.paid_at %><%= t("invoices.paid_at", time: @invoice.paid_at.strftime("%d/%m/%Y %H:%M")) %><br><% end %>
+          <% if @invoice.refunded_at %><%= t("invoices.refunded_at", time: @invoice.refunded_at.strftime("%d/%m/%Y %H:%M")) %><% end %>
         </dd>
       </div>
     </dl>
 
     <% if clinic_staff? %>
-      <p class="invoice-hint">Select times below to cancel only those 30-minute slots. The rest of the reservation stays. Paid times are refunded by the cancellation policy.</p>
+      <p class="invoice-hint"><%= t("invoices.cancel_hint") %></p>
     <% end %>
 
     <% if @invoice.bookings.any? %>
@@ -87,14 +87,14 @@
               <tr>
                 <% if cancellable %>
                   <th class="cell-check">
-                    <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all cancellable times">
+                    <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("invoices.select_all_times") %>">
                   </th>
                 <% end %>
                 <th class="cell-num">#</th>
-                <th>Room</th>
-                <th>When</th>
-                <th>Status</th>
-                <th class="cell-price">Value</th>
+                <th><%= t("ui.room") %></th>
+                <th><%= t("invoices.when") %></th>
+                <th><%= t("ui.status") %></th>
+                <th class="cell-price"><%= t("invoices.value") %></th>
               </tr>
             </thead>
             <tbody>
@@ -103,12 +103,12 @@
                   <% if cancellable %>
                     <td class="cell-check">
                       <% if row[:cancellable] %>
-                        <%= check_box_tag "slot_starts[]", row[:start].iso8601, false, class: "row-check", id: "slot_#{row[:start].to_i}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, aria: { label: "Select #{row[:start].strftime('%H:%M')}" } %>
+                        <%= check_box_tag "slot_starts[]", row[:start].iso8601, false, class: "row-check", id: "slot_#{row[:start].to_i}", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, aria: { label: t("invoices.select_time", time: row[:start].strftime("%H:%M")) } %>
                       <% end %>
                     </td>
                   <% end %>
                   <td class="cell-num"><%= index %></td>
-                  <td class="cell-name"><%= row[:booking].room.name %> · <%= row[:booking].billing_type %></td>
+                  <td class="cell-name"><%= row[:booking].room.name %> · <%= t("invoices.types.#{row[:booking].billing_type}", default: row[:booking].billing_type.to_s) %></td>
                   <td class="data-cell-mono"><%= row[:start].strftime("%d/%m %H:%M") %>–<%= row[:end].strftime("%H:%M") %></td>
                   <td><%= status_tag(row[:status]) %></td>
                   <td class="cell-price"><%= number_to_currency(row[:amount]) %></td>
@@ -122,9 +122,9 @@
         <%= form_with url: cancel_slots_invoice_path(@invoice), method: :patch, data: { controller: "bulk-select" } do %>
           <%= hidden_field_tag :return_to, originating_path %>
           <div class="bulk-bar" data-bulk-select-target="bar" hidden>
-            <strong data-bulk-select-target="count">0 selected</strong>
-            <span class="field-help">Only checked times are cancelled and refunded.</span>
-            <%= submit_tag t("invoices.cancel_selected"), class: "btn btn--primary btn--sm", data: { turbo_confirm: "Cancelar os horários selecionados e estornar conforme a política de cancelamento?" } %>
+            <strong data-bulk-select-target="count"><%= t("invoices.selected_count", count: 0) %></strong>
+            <span class="field-help"><%= t("invoices.only_checked") %></span>
+            <%= submit_tag t("invoices.cancel_selected"), class: "btn btn--primary btn--sm", data: { turbo_confirm: t("invoices.confirm_cancel_selected") } %>
           </div>
           <%= table %>
         <% end %>
@@ -132,37 +132,37 @@
         <%= table %>
       <% end %>
     <% else %>
-      <p class="field-help">No reserved times on this invoice.</p>
+      <p class="field-help"><%= t("invoices.no_times") %></p>
     <% end %>
 
     <% if @invoice.notes.present? %>
       <div class="invoice-comment">
-        <div class="invoice-comment-label">Comment</div>
+        <div class="invoice-comment-label"><%= t("invoices.comment") %></div>
         <pre><%= @invoice.notes %></pre>
       </div>
     <% end %>
 
     <div class="invoice-totals">
-      <div><span>Total</span><strong><%= number_to_currency(@invoice.amount) %></strong></div>
+      <div><span><%= t("invoices.total") %></span><strong><%= number_to_currency(@invoice.amount) %></strong></div>
       <% if @invoice.refunded_amount.to_d.positive? %>
-        <div><span>Refunded</span><strong><%= number_to_currency(@invoice.refunded_amount) %></strong></div>
+        <div><span><%= t("invoices.refunded") %></span><strong><%= number_to_currency(@invoice.refunded_amount) %></strong></div>
       <% end %>
       <% if @invoice.cancellation_fee.to_d.positive? %>
-        <div><span>Cancellation fee</span><strong><%= number_to_currency(@invoice.cancellation_fee) %></strong></div>
+        <div><span><%= t("invoices.cancellation_fee") %></span><strong><%= number_to_currency(@invoice.cancellation_fee) %></strong></div>
       <% end %>
-      <div class="is-net"><span><%= @invoice.payable? ? "Amount due" : "Net" %></span><strong><%= number_to_currency(@invoice.net_amount) %></strong></div>
+      <div class="is-net"><span><%= @invoice.payable? ? t("invoices.amount_due") : t("invoices.net") %></span><strong><%= number_to_currency(@invoice.net_amount) %></strong></div>
     </div>
   </article>
 
   <aside class="invoice-side">
     <% policy = ClinicPolicy.summary %>
     <section class="card">
-      <div class="card-head"><h2 class="card-title">How this invoice works</h2></div>
+      <div class="card-head"><h2 class="card-title"><%= t("invoices.how_it_works") %></h2></div>
       <ul class="invoice-help">
-        <li>Hourly reservations are billed in <%= Setting.current.slot_minutes %>-minute slots.</li>
-        <li>Check only the times you want to release. The rest stays booked.</li>
-        <li>Free cancel until <%= policy[:free_hours] %>h before start.</li>
-        <li>After that window, <%= policy[:late_percent] %>% is kept. After start, <%= policy[:started_percent] %>%.</li>
+        <li><%= t("invoices.help_hourly", minutes: Setting.current.slot_minutes) %></li>
+        <li><%= t("invoices.help_partial") %></li>
+        <li><%= t("invoices.help_free", hours: policy[:free_hours]) %></li>
+        <li><%= t("invoices.help_late", late: policy[:late_percent], started: policy[:started_percent]) %></li>
       </ul>
     </section>
 
@@ -170,42 +170,42 @@
       <% pix = @invoice.pix_code %>
       <% setting = Setting.current %>
       <section class="card pix-box">
-        <div class="card-head"><h2 class="card-title">Pay with PIX</h2></div>
+        <div class="card-head"><h2 class="card-title"><%= t("invoices.pay_pix") %></h2></div>
         <% if pix.present? %>
           <div class="pix-layout">
             <div class="pix-qr"><%= pix_qr_svg(pix) %></div>
             <div class="pix-copy">
-              <p class="field-help">Scan in the bank app or copy the code.</p>
+              <p class="field-help"><%= t("invoices.pix_help") %></p>
               <p class="pix-key"><%= pix %></p>
               <div class="page-actions" style="margin-top:8px;">
                 <button type="button" class="btn btn--primary btn--sm" data-controller="clipboard" data-clipboard-text-value="<%= pix %>" data-clipboard-copied-value="<%= t("ui.copied") %>" data-clipboard-failed-value="<%= t("ui.copy_failed") %>" data-action="clipboard#copy"><%= t("ui.copy") %></button>
-                <% wa = whatsapp_url(@invoice.professional.phone.presence || setting.whatsapp_phone, "Invoice ##{@invoice.id} · #{number_to_currency(@invoice.amount)}\n#{pix}") %>
+                <% wa = whatsapp_url(@invoice.professional.phone.presence || setting.whatsapp_phone, "#{t("invoices.whatsapp_body", number: @invoice.id, amount: number_to_currency(@invoice.amount))}\n#{pix}") %>
                 <%= link_to "WhatsApp", wa, class: "btn btn--ghost btn--sm", target: "_blank", rel: "noopener" if wa %>
               </div>
             </div>
           </div>
         <% else %>
-          <p class="field-help" style="margin:0;">Add a PIX key in Settings so professionals can pay without a manual checkout.</p>
+          <p class="field-help" style="margin:0;"><%= t("invoices.pix_missing") %></p>
         <% end %>
       </section>
     <% end %>
 
     <% if clinic_staff? && @invoice.refundable? %>
       <section class="card">
-        <div class="card-head"><h2 class="card-title">Refund remaining</h2></div>
-        <p class="field-help">Releases all remaining live times on this invoice. Prefer slot checkboxes to drop only some hours.</p>
+        <div class="card-head"><h2 class="card-title"><%= t("invoices.refund_title") %></h2></div>
+        <p class="field-help"><%= t("invoices.refund_help") %></p>
         <%= form_with url: refund_invoice_path(@invoice), method: :patch, class: "form-grid" do %>
           <%= hidden_field_tag :return_to, originating_path %>
           <div class="field">
-            <label class="field-label">Amount</label>
+            <label class="field-label"><%= t("invoices.amount") %></label>
             <%= number_field_tag :amount, (@invoice.amount.to_d - @invoice.refunded_amount.to_d), step: 0.01, min: 0.01, class: "input" %>
           </div>
           <div class="field">
-            <label class="field-label">Reason</label>
-            <%= text_field_tag :reason, nil, class: "input", placeholder: "Optional" %>
+            <label class="field-label"><%= t("invoices.reason") %></label>
+            <%= text_field_tag :reason, nil, class: "input", placeholder: t("invoices.optional") %>
           </div>
           <div class="field span-2">
-            <%= submit_tag "Issue refund", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Refund this invoice and release remaining slots?" } %>
+            <%= submit_tag t("invoices.issue_refund"), class: "btn btn--primary btn--sm", data: { turbo_confirm: t("invoices.confirm_refund") } %>
           </div>
         <% end %>
       </section>

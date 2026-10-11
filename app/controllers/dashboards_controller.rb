@@ -1,7 +1,30 @@
 class DashboardsController < ApplicationController
-  before_action :require_clinic_staff
-
   def index
+    if professional_user?
+      render_professional
+    else
+      render_staff
+    end
+  end
+
+  private
+
+  def render_professional
+    professional = current_professional
+    if professional.blank?
+      redirect_to rooms_path, alert: t("access.staff_only")
+      return
+    end
+
+    @patients_count = Patient.where(professional_id: professional.id).count
+    @upcoming_bookings = Booking.where(professional_id: professional.id).includes(:room).upcoming.limit(6)
+    @open_amount = Invoice.where(professional_id: professional.id).open_or_overdue.sum(:amount)
+    @open_invoices_count = Invoice.where(professional_id: professional.id).open_or_overdue.count
+    @open_tickets = current_user.tickets.open_queue.count
+    render :professional
+  end
+
+  def render_staff
     rooms = Room.order(:name).to_a
     occupancy = rooms.index_with { |room| room.occupancy_on(Date.current) }
 

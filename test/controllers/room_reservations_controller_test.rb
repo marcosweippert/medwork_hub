@@ -37,6 +37,6 @@ class RoomReservationsControllerTest < ActionDispatch::IntegrationTest
     }
     assert_redirected_to calendar_room_path(@room, date: "2026-08-28")
     follow_redirect!
-    assert_match "Select at least one available slot", response.body
+    assert_match "Selecione ao menos um horário livre", response.body
   end
 end

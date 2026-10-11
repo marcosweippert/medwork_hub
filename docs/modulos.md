@@ -84,9 +84,7 @@ Lembretes de reserva e fatura atrasada **não** rodam em cada request. Cron:
 bin/rails medwork:reminders
 ```
 
-(a cada 15 minutos é o intervalo sugerido.)
-
-A cada ~5 minutos, em requests autenticados, o Hub tenta: expirar faturas em atraso e fechar chamados resolvidos antigos.
+(a cada 15 minutos é o intervalo sugerido.) O mesmo comando expira faturas em atraso e fecha chamados resolvidos antigos.
 
 ## Relatórios (staff)
 

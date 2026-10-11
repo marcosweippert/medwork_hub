@@ -8,14 +8,14 @@ class CancelBookingSlots
   end
 
   def call
-    return failure("Select at least one time slot") if @slot_starts.empty?
-    return failure("This invoice is already cancelled") if @invoice.status == "cancelled"
-    return failure("This invoice is already refunded") if @invoice.status == "refunded"
+    return failure(I18n.t("clinic_errors.select_slot")) if @slot_starts.empty?
+    return failure(I18n.t("clinic_errors.invoice_cancelled")) if @invoice.status == "cancelled"
+    return failure(I18n.t("clinic_errors.invoice_refunded")) if @invoice.status == "refunded"
 
     selected = selected_slots
-    return failure("None of the selected slots are on a live hourly booking") if selected.empty?
+    return failure(I18n.t("clinic_errors.no_live_slots")) if selected.empty?
     if selected.any? { |item| item[:start] <= Time.current }
-      return failure("Started slots cannot be cancelled. Uncheck times that already began.")
+      return failure(I18n.t("clinic_errors.started_slots"))
     end
 
     paid = @invoice.status == "paid" || @invoice.paid_at.present?

@@ -1,0 +1,62 @@
+<section class="invoice-hero">
+  <div class="page-head" style="margin:0;">
+    <div>
+      <p class="page-sub"><%= Date.current.strftime("%d/%m/%Y") %></p>
+      <h1 class="page-title"><%= dashboard_greeting %></h1>
+      <p class="page-sub"><%= t("dashboards.professional_subtitle") %></p>
+    </div>
+    <div class="page-actions">
+      <%= link_to t("dashboards.new_booking"), new_booking_path, class: "btn btn--primary" %>
+      <%= link_to t("patients.new"), new_patient_path, class: "btn btn--ghost" %>
+    </div>
+  </div>
+</section>
+
+<div class="fin-kpis">
+  <%= link_to patients_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("nav.patients") %></p>
+    <strong><%= @patients_count %></strong>
+  <% end %>
+  <%= link_to bookings_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("dashboards.upcoming") %></p>
+    <strong><%= @upcoming_bookings.size %></strong>
+  <% end %>
+  <%= link_to invoices_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("dashboards.receivables") %></p>
+    <strong><%= number_to_currency(@open_amount, precision: 0) %></strong>
+    <p class="page-sub" style="margin-top:6px;"><%= t("dashboards.open_invoices", count: @open_invoices_count) %></p>
+  <% end %>
+  <%= link_to tickets_path, class: "fin-kpi" do %>
+    <p class="label"><%= t("nav.tickets") %></p>
+    <strong><%= @open_tickets %></strong>
+  <% end %>
+</div>
+
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title"><%= t("dashboards.next_session") %></h2>
+    <%= link_to t("dashboards.see_calendar"), bookings_path, class: "btn btn--ghost btn--sm" %>
+  </div>
+  <% if @upcoming_bookings.any? %>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><%= t("nav.rooms") %></th>
+            <th><%= t("ui.when") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @upcoming_bookings.each do |booking| %>
+            <tr>
+              <td class="cell-name"><%= link_to booking.room.name, booking %></td>
+              <td><%= l(booking.start_time, format: :short) if booking.start_time %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="field-help" style="margin:0;"><%= t("dashboards.no_upcoming") %></p>
+  <% end %>
+</section>

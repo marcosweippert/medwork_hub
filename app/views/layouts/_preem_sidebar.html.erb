@@ -15,9 +15,11 @@
       <%= link_to t("nav.rooms"), rooms_path %>
       <%= link_to t("nav.bookings"), bookings_path %>
       <%= link_to t("nav.waitlist"), waitlist_entries_path %>
-      <%= link_to t("nav.professionals"), professionals_path %>
+      <% unless professional_user? %>
+        <%= link_to t("nav.professionals"), professionals_path %>
+        <%= link_to t("nav.reports"), reports_path %>
+      <% end %>
       <%= link_to t("nav.patients"), patients_path %>
-      <%= link_to t("nav.reports"), reports_path %>
       <%= link_to t("nav.invoices"), invoices_path %>
     </nav>
 

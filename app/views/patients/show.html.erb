@@ -1,26 +1,27 @@
 <div class="page-head">
   <div>
     <h1 class="page-title"><%= @patient.name %></h1>
-    <p class="page-sub"><%= @patient.contact.presence || "No contact" %> · <%= @patient.professional.display_name %></p>
+    <p class="page-sub"><%= @patient.contact.presence || t("patients.no_contact") %><% unless professional_user? %> · <%= @patient.professional.display_name %><% end %></p>
   </div>
   <div class="page-actions">
+    <%= link_to t("patients.export"), export_patient_path(@patient), class: "btn btn--ghost" %>
     <%= link_to t("ui.edit"), edit_patient_path(@patient), class: "btn btn--ghost" %>
-    <%= link_to "Professional", @patient.professional, class: "btn btn--primary" %>
+    <%= button_to t("patients.delete"), @patient, method: :delete, class: "btn btn--ghost", data: { turbo_confirm: t("patients.confirm_delete") } %>
   </div>
 </div>
 
 <section class="card">
-  <div class="card-head"><h2 class="card-title">Clinical notes</h2></div>
+  <div class="card-head"><h2 class="card-title"><%= t("patients.history") %></h2></div>
   <% if @patient.history.present? %>
     <p style="font-size:12px;margin:0;white-space:pre-wrap;"><%= @patient.history %></p>
   <% else %>
-    <p class="field-help" style="margin:0;">No history recorded yet.</p>
+    <p class="field-help" style="margin:0;"><%= t("patients.no_history") %></p>
   <% end %>
 </section>
 
 <% if @notes.any? %>
   <section class="card" style="margin-top:12px;">
-    <div class="card-head"><h2 class="card-title">Slot notes</h2></div>
+    <div class="card-head"><h2 class="card-title"><%= t("patients.slot_notes") %></h2></div>
     <% @notes.each do |note| %>
       <article class="note-item">
         <strong><%= note.booking.room.name %></strong>

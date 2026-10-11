@@ -6,7 +6,7 @@ class Professional < ApplicationRecord
   has_many :waitlist_entries, dependent: :destroy
 
   before_validation :normalize_practice_areas
-  validates :practice_areas, presence: { message: "select at least one practice area" }
+  validates :practice_areas, presence: { message: ->(*) { I18n.t("clinic_errors.practice_area_required") } }
   validate :practice_areas_are_known
 
   scope :delinquent, -> { joins(:invoices).where(invoices: { status: "overdue" }).distinct }
@@ -83,6 +83,6 @@ class Professional < ApplicationRecord
 
   def practice_areas_are_known
     unknown = Array(practice_areas) - PracticeArea.keys
-    errors.add(:practice_areas, "contains an unknown area") if unknown.any?
+    errors.add(:practice_areas, I18n.t("clinic_errors.unknown_practice_area")) if unknown.any?
   end
 end

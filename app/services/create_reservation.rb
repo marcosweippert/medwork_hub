@@ -14,12 +14,12 @@ class CreateReservation
   end
 
   def call
-    return failure("Select a professional") if @professional.blank?
+    return failure(I18n.t("clinic_errors.select_professional")) if @professional.blank?
     if @professional.delinquent?
-      return failure("This professional has overdue invoices and cannot make new reservations")
+      return failure(I18n.t("clinic_errors.overdue_block"))
     end
     unless @professional.can_reserve?(@room)
-      return failure("This professional cannot reserve this room type")
+      return failure(I18n.t("clinic_errors.room_type_blocked"))
     end
 
     case @billing_type
@@ -34,19 +34,19 @@ class CreateReservation
   private
 
   def create_hourly_or_daily
-    return failure("Select at least one available slot") if @slots.empty?
+    return failure(I18n.t("clinic_errors.select_available_slot")) if @slots.empty?
 
     ranges = merge_slots(@slots.map { |value| Time.zone.parse(value.to_s) }.sort)
-    return failure("Could not parse selected slots") if ranges.empty?
+    return failure(I18n.t("clinic_errors.slots_unparsed")) if ranges.empty?
 
     ranges.each do |starts_at, ends_at|
-      return failure("One or more slots are outside opening hours") unless within_schedule?(starts_at, ends_at)
-      return failure("This room is blocked for one or more selected times") if @room.blocked?(starts_at, ends_at)
-      return failure("One or more slots are no longer available") if @room.slot_taken?(starts_at, ends_at)
+      return failure(I18n.t("clinic_errors.slots_outside_hours")) unless within_schedule?(starts_at, ends_at)
+      return failure(I18n.t("clinic_errors.slots_blocked")) if @room.blocked?(starts_at, ends_at)
+      return failure(I18n.t("clinic_errors.slots_taken")) if @room.slot_taken?(starts_at, ends_at)
     end
 
     expanded, skipped = expand_weekly(ranges)
-    return failure("None of the repeated weeks are available") if expanded.empty?
+    return failure(I18n.t("clinic_errors.no_repeat_weeks")) if expanded.empty?
 
     billing = daily_selection?(ranges) && @weeks == 1 ? "daily" : "hourly"
     amount = if billing == "daily"
@@ -69,16 +69,16 @@ class CreateReservation
 
   def create_daily
     date = parsed_day
-    return failure("Select a valid day") if date.blank?
+    return failure(I18n.t("clinic_errors.select_day")) if date.blank?
 
     open, close = @room.schedule_for(date)
-    return failure("This day has no opening hours") if open.blank?
+    return failure(I18n.t("clinic_errors.day_closed")) if open.blank?
 
     starts_at = date.in_time_zone.change(hour: open)
     ends_at = date.in_time_zone.change(hour: close)
-    return failure("Cannot reserve a day that has already started") if starts_at < Time.current
-    return failure("This room is blocked on the selected day") if @room.blocked?(starts_at, ends_at)
-    return failure("This day is not fully available") if @room.slot_taken?(starts_at, ends_at)
+    return failure(I18n.t("clinic_errors.day_started")) if starts_at < Time.current
+    return failure(I18n.t("clinic_errors.day_blocked")) if @room.blocked?(starts_at, ends_at)
+    return failure(I18n.t("clinic_errors.day_unavailable")) if @room.slot_taken?(starts_at, ends_at)
 
     persist(
       ranges: [[starts_at, ends_at]],
@@ -97,8 +97,8 @@ class CreateReservation
   def create_monthly
     month_date = @month.present? ? Date.parse("#{@month}-01") : Date.current.beginning_of_month
     quote = MonthlyReservationQuote.new(room: @room, month: month_date.strftime("%Y-%m"), as_of: Time.current)
-    return failure("No remaining days left in this month") if quote.remaining_days <= 0
-    return failure("No free hours left in this month") if quote.plans.empty?
+    return failure(I18n.t("clinic_errors.month_no_days")) if quote.remaining_days <= 0
+    return failure(I18n.t("clinic_errors.month_no_hours")) if quote.plans.empty?
 
     persist(
       ranges: quote.plans.map { |plan| [plan.starts_at, plan.ends_at] },
@@ -109,7 +109,7 @@ class CreateReservation
       line_amounts: quote.plans.map(&:amount)
     )
   rescue Date::Error, ArgumentError
-    failure("Select a valid month")
+    failure(I18n.t("clinic_errors.select_month"))
   end
 
   def persist(ranges:, amount:, billing_type:, notes:, recurrence_group_id: nil, line_amount: nil, line_amounts: nil)

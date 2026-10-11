@@ -14,7 +14,11 @@ Produção assume HTTPS atrás de proxy (`force_ssl` + `assume_ssl`). Configure 
 
 ## Uploads
 
-Active Storage em disco local por padrão. Em host real, mude `config/storage.yml` para S3 (logo da clínica, etc.).
+Active Storage usa disco local. Com `AWS_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e, se precisar, `AWS_REGION`, produção passa a gravar no S3 (`config/storage.yml`, serviço `amazon`).
+
+## Dados do paciente
+
+Na ficha do paciente, **Exportar dados** baixa um JSON (nome, contato, histórico, reservas e notas). **Excluir paciente** apaga o cadastro e as notas; as reservas ficam, sem o vínculo. Profissional só alcança os próprios pacientes.
 
 ## E-mail
 
@@ -26,7 +30,7 @@ Active Storage em disco local por padrão. Em host real, mude `config/storage.ym
 */15 * * * * cd /app && bin/rails medwork:reminders
 ```
 
-Sem esse cron, reserva e fatura atrasada **não** geram lembrete sozinhas.
+Sem esse cron, lembretes, faturas em atraso e o encerramento de chamados resolvidos **não** rodam. Convites e e-mails avulsos entram na fila do processo (`deliver_later`).
 
 ## Seed
 

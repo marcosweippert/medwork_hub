@@ -17,7 +17,7 @@ class RoomBlocksController < ApplicationController
     @block = RoomBlock.new(block_params)
     @block.room = @room if @room
     if @block.save
-      redirect_back fallback_location: block_redirect, notice: "Room blocked for the selected period."
+      redirect_back fallback_location: block_redirect, notice: t("flash.blocks.created")
     else
       redirect_back fallback_location: block_redirect, alert: @block.errors.full_messages.to_sentence
     end
@@ -25,7 +25,7 @@ class RoomBlocksController < ApplicationController
 
   def destroy
     @block.destroy
-    redirect_back fallback_location: room_blocks_path, notice: "Block removed."
+    redirect_back fallback_location: room_blocks_path, notice: t("flash.blocks.removed")
   end
 
   private

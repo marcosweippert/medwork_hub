@@ -8,18 +8,18 @@ class RescheduleBooking
   end
 
   def call
-    return failure("Cancelled bookings cannot be rescheduled") if @booking.status == "cancelled"
+    return failure(I18n.t("clinic_errors.reschedule_cancelled")) if @booking.status == "cancelled"
     starts_at = parse_time(@start_time)
-    return failure("Select a new start time") if starts_at.blank?
+    return failure(I18n.t("clinic_errors.reschedule_start")) if starts_at.blank?
 
     duration = @booking.end_time - @booking.start_time
     ends_at = @end_time.present? ? parse_time(@end_time) : starts_at + duration
-    return failure("End time must be after start time") if ends_at <= starts_at
-    return failure("The new time is outside opening hours") unless within_schedule?(starts_at, ends_at)
+    return failure(I18n.t("clinic_errors.end_after_start")) if ends_at <= starts_at
+    return failure(I18n.t("clinic_errors.outside_hours")) unless within_schedule?(starts_at, ends_at)
 
     overlap = @booking.room.bookings.holding.where.not(id: @booking.id)
       .where("start_time < ? AND end_time > ?", ends_at, starts_at)
-    return failure("That time is no longer available") if overlap.exists?
+    return failure(I18n.t("clinic_errors.time_taken")) if overlap.exists?
 
     original_start = @booking.start_time
     original_end = @booking.end_time

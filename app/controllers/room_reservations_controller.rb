@@ -13,7 +13,7 @@ class RoomReservationsController < ApplicationController
     ).call
 
     if result.success?
-      redirect_to result.invoice, notice: "Reservation confirmed. An invoice was created for payment."
+      redirect_to result.invoice, notice: t("flash.reservations.confirmed")
     else
       redirect_to calendar_room_path(room, date: params[:date]), alert: result.error
     end

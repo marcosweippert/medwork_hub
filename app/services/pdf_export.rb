@@ -188,13 +188,20 @@ class PdfExport
     end.flatten
   end
 
+  def column_weights
+    nil
+  end
+
   def prepare_table(headers)
     @headers = Array(headers)
     usable_w = @page_w - (MARGIN * 2)
     count = [@headers.size, 1].max
-    weights = Array.new(count, 1.0)
-    weights[0] = 1.6
-    weights[-1] = 0.95 if count > 2
+    weights = column_weights
+    unless weights.is_a?(Array) && weights.size == count
+      weights = Array.new(count, 1.0)
+      weights[0] = 1.6
+      weights[-1] = 0.95 if count > 2
+    end
     total = weights.sum.to_f
     @col_w = weights.map { |weight| usable_w * (weight / total) }
     @col_x = []
@@ -261,9 +268,9 @@ class PdfExport
           when Time, DateTime, ActiveSupport::TimeWithZone then value.strftime("%d/%m/%Y %H:%M")
           when Integer then value.to_s
           when Float, BigDecimal then format_number(value)
-          else value.to_s.tr("–—", "-")
+          else value.to_s
           end
-    I18n.transliterate(raw).gsub(/[^\x20-\x7E]/, "?")
+    raw.to_s
   end
 
   def format_number(value)
@@ -276,7 +283,21 @@ class PdfExport
   end
 
   def pdf_string(text)
-    "(" + text.to_s.gsub("\\", "\\\\").gsub("(", "\\(").gsub(")", "\\)") + ")"
+    encoded = text.to_s.encode("Windows-1252", invalid: :replace, undef: :replace, replace: "?")
+    escaped = encoded.bytes.map { |byte| pdf_escape_byte(byte) }.join
+    "(#{escaped})"
+  end
+
+  def pdf_escape_byte(byte)
+    case byte
+    when 0x5C then "\\\\"
+    when 0x28 then "\\("
+    when 0x29 then "\\)"
+    when 0x0D then "\\r"
+    when 0x0A then "\\n"
+    when 0x20..0x7E then byte.chr(Encoding::UTF_8)
+    else format("\\%03o", byte)
+    end
   end
 
   def stream_object(content)

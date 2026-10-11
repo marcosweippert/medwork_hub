@@ -43,7 +43,7 @@ O seed **não** envia e-mail.
 
 ## Lembretes por e-mail
 
-Lembretes de reserva e faturas em atraso **não** disparam em cada request. Rode no cron:
+Lembretes, faturas em atraso e encerramento de chamados **não** disparam em cada request. Rode no cron:
 
 ```bash
 bin/rails medwork:reminders

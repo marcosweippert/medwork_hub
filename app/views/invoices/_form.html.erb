@@ -2,27 +2,27 @@
   <%= render "shared/errors", resource: invoice %>
   <div class="form-grid">
     <div class="field">
-      <%= f.label :professional_id, class: "field-label" %>
-      <%= f.collection_select :professional_id, Professional.includes(:user), :id, :display_name, { include_blank: "Select" }, class: "select" %>
+      <%= f.label :professional_id, t("ui.professional"), class: "field-label" %>
+      <%= f.collection_select :professional_id, Professional.includes(:user), :id, :display_name, { include_blank: t("invoices.select") }, class: "select" %>
     </div>
     <div class="field">
-      <%= f.label :room_id, class: "field-label" %>
-      <%= f.collection_select :room_id, Room.order(:name), :id, :name, { include_blank: "Optional" }, class: "select" %>
+      <%= f.label :room_id, t("ui.room"), class: "field-label" %>
+      <%= f.collection_select :room_id, Room.order(:name), :id, :name, { include_blank: t("invoices.optional") }, class: "select" %>
     </div>
     <div class="field">
-      <%= f.label :amount, class: "field-label" %>
+      <%= f.label :amount, t("invoices.amount"), class: "field-label" %>
       <%= f.number_field :amount, step: 0.01, class: "input" %>
     </div>
     <div class="field">
-      <%= f.label :status, class: "field-label" %>
-      <%= f.select :status, Invoice::STATUSES.map { |s| [s.titleize, s] }, {}, class: "select" %>
+      <%= f.label :status, t("ui.status"), class: "field-label" %>
+      <%= f.select :status, Invoice::STATUSES.map { |s| [t("statuses.#{s}", default: s.humanize), s] }, {}, class: "select" %>
     </div>
     <div class="field">
-      <%= f.label :due_date, class: "field-label" %>
+      <%= f.label :due_date, t("invoices.due_column"), class: "field-label" %>
       <%= f.date_field :due_date, class: "input" %>
     </div>
     <div class="field span-2">
-      <%= f.label :notes, class: "field-label" %>
+      <%= f.label :notes, t("invoices.comment"), class: "field-label" %>
       <%= f.text_area :notes, class: "textarea" %>
     </div>
     <div class="span-2 form-actions">

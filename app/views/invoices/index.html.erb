@@ -68,12 +68,12 @@
   <%= hidden_field_tag :select_matching, "0", data: { bulk_select_target: "matching" } %>
   <% if clinic_staff? %>
   <div class="bulk-bar" data-bulk-select-target="bar" hidden>
-    <strong data-bulk-select-target="count">0 selected</strong>
-    <span class="field-help">The header checkbox selects every invoice matching the current filters, not only this page. To drop a single 30-min time, open the invoice.</span>
+    <strong data-bulk-select-target="count"><%= t("invoices.selected_count", count: 0) %></strong>
+    <span class="field-help"><%= t("invoices.bulk_help") %></span>
     <div class="page-actions">
-      <%= button_tag "Pay", name: "bulk_action", value: "pay", class: "btn btn--primary btn--sm", data: { turbo_confirm: "Mark selected invoices as paid?" } %>
-      <%= button_tag "Cancel", name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Cancel selected invoices? Paid invoices are refunded according to the cancellation policy." } %>
-      <%= button_tag "Refund", name: "bulk_action", value: "refund", class: "btn btn--ghost btn--sm", data: { turbo_confirm: "Refund selected paid invoices and release remaining slots?" } %>
+      <%= button_tag t("invoices.pay"), name: "bulk_action", value: "pay", class: "btn btn--primary btn--sm", data: { turbo_confirm: t("invoices.confirm_pay") } %>
+      <%= button_tag t("invoices.cancel"), name: "bulk_action", value: "cancel", class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("invoices.confirm_cancel") } %>
+      <%= button_tag t("invoices.refund"), name: "bulk_action", value: "refund", class: "btn btn--ghost btn--sm", data: { turbo_confirm: t("invoices.confirm_refund_bulk") } %>
     </div>
   </div>
   <% end %>
@@ -98,19 +98,19 @@
           <tr>
             <% if clinic_staff? %>
               <th class="cell-check">
-                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="Select all invoices matching this filter">
+                <input type="checkbox" class="row-check" data-bulk-select-target="all" data-action="change->bulk-select#toggleAll" aria-label="<%= t("invoices.select_all") %>">
               </th>
             <% end %>
             <th class="cell-num">#</th>
-            <th class="cell-status">Status</th>
-            <th class="cell-due">Due</th>
-            <th class="cell-name">Professional</th>
-            <th class="cell-room">Room</th>
-            <th class="cell-period">Period</th>
-            <th class="cell-type">Type</th>
-            <th class="cell-num">Slots</th>
-            <th class="cell-price">Amount</th>
-            <th class="cell-actions">Open</th>
+            <th class="cell-status"><%= t("ui.status") %></th>
+            <th class="cell-due"><%= t("invoices.due_column") %></th>
+            <th class="cell-name"><%= t("ui.professional") %></th>
+            <th class="cell-room"><%= t("ui.room") %></th>
+            <th class="cell-period"><%= t("invoices.period") %></th>
+            <th class="cell-type"><%= t("invoices.type") %></th>
+            <th class="cell-num"><%= t("invoices.slots") %></th>
+            <th class="cell-price"><%= t("invoices.amount") %></th>
+            <th class="cell-actions"><%= t("ui.open") %></th>
           </tr>
         </thead>
         <tbody>
@@ -118,7 +118,7 @@
             <tr>
               <% if clinic_staff? %>
                 <td class="cell-check">
-                  <%= check_box_tag "invoice_ids[]", invoice.id, false, class: "row-check", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, id: "invoice_#{invoice.id}", aria: { label: "Select invoice #{invoice.id}" } %>
+                  <%= check_box_tag "invoice_ids[]", invoice.id, false, class: "row-check", data: { bulk_select_target: "row", action: "change->bulk-select#refresh" }, id: "invoice_#{invoice.id}", aria: { label: t("invoices.select_invoice", number: invoice.id) } %>
                 </td>
               <% end %>
               <td class="cell-num data-cell-mono">#<%= invoice.id.to_s.rjust(4, "0") %></td>
@@ -152,7 +152,7 @@
             </tr>
           <% end %>
           <% if @invoices.empty? %>
-            <tr><td colspan="<%= clinic_staff? ? 11 : 10 %>">No invoices match these filters.</td></tr>
+            <tr><td colspan="<%= clinic_staff? ? 11 : 10 %>"><%= t("invoices.empty") %></td></tr>
           <% end %>
         </tbody>
       </table>

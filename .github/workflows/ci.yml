@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: medwork_hub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/medwork_hub_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.4"
+          bundler-cache: true
+      - name: Prepare test database
+        run: bin/rails db:test:prepare
+      - name: Test
+        run: bin/rails test && bin/rails test:system
+      - name: Brakeman
+        run: bundle exec brakeman --no-pager -q --no-exit-on-warn
+      - name: RuboCop
+        run: bundle exec rubocop

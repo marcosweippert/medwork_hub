@@ -36,8 +36,8 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Disk by default. Set AWS_BUCKET (and the access keys) to store uploads on S3.
+  config.active_storage.service = ENV["AWS_BUCKET"].present? ? :amazon : :local
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
@@ -66,9 +66,9 @@ Rails.application.configure do
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
 
-  # Use a real queuing backend for Active Job (and separate queues per environment).
-  # config.active_job.queue_adapter = :resque
-  # config.active_job.queue_name_prefix = "medwork_hub_production"
+  # In-process queue so welcome and outbound mail do not block the request.
+  # Reminder mail still runs inside `bin/rails medwork:reminders`.
+  config.active_job.queue_adapter = :async
 
   config.action_mailer.perform_caching = false
   # SMTP is applied in config/initializers/mailer.rb from ENV.

@@ -139,12 +139,12 @@ class Room < ApplicationRecord
 
   def closes_after_opens
     return if opens_at.blank? || closes_at.blank?
-    errors.add(:closes_at, "must be after opening hour") if closes_at <= opens_at
+    errors.add(:closes_at, I18n.t("clinic_errors.closes_after_open")) if closes_at <= opens_at
   end
 
   def room_types_are_known
     unknown = Array(room_types) - PracticeArea.room_type_keys
-    errors.add(:room_types, "contains an unknown type") if unknown.any?
+    errors.add(:room_types, I18n.t("clinic_errors.unknown_room_type")) if unknown.any?
   end
 
   def normalize_arrays

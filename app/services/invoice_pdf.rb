@@ -6,14 +6,16 @@ class InvoicePdf < PdfExport
   def initialize(invoice)
     @invoice = invoice
     @policy = ClinicPolicy.summary
-    super(
-      title: "Invoice ##{invoice.id.to_s.rjust(4, "0")}",
-      headers: ["#", "Date", "Start", "End", "Duration", "Room", "Type", "Status", "Value"],
-      rows: line_rows,
+    @rows = line_rows
+    @headers = %w[index date start end duration room type status value].map { |key| I18n.t("invoices.pdf_doc.columns.#{key}") }
+    number = invoice.id.to_s.rjust(4, "0")
+    super({
+      title: I18n.t("invoices.pdf_doc.title", number: number),
       subtitle: invoice.professional.display_name,
-      meta: [],
-      landscape: true
-    )
+      landscape: false
+    })
+    prepare_table(@headers)
+    @align_right[-1] = true
   end
 
   private
@@ -27,8 +29,8 @@ class InvoicePdf < PdfExport
         row[:end]&.strftime("%H:%M"),
         duration_label(row),
         row[:booking].room.name,
-        row[:booking].billing_type.to_s.titleize,
-        row[:status].to_s.titleize,
+        billing_label(row[:booking].billing_type),
+        I18n.t("statuses.#{row[:status]}", default: row[:status].to_s),
         money(row[:amount])
       ]
     end
@@ -51,20 +53,27 @@ class InvoicePdf < PdfExport
   end
 
   def paginate
-    super
-    available = @page_h - MARGIN - header_block_height - 118
-    per_page = [(available / ROW_H).floor - 1, 6].max
-    chunks = @rows.each_slice(per_page).to_a
+    available = @page_h - MARGIN - header_block_height - 168
+    per_page = [[(available / ROW_H).floor, 16].min, 6].max
+    chunks = Array(@rows).each_slice(per_page).to_a
     chunks = [[]] if chunks.empty?
     chunks
   end
 
   def column_weights
-    [0.5, 1.0, 0.65, 0.65, 0.75, 2.0, 0.85, 1.05, 1.05]
+    [0.42, 1.15, 0.7, 0.7, 0.95, 1.35, 0.95, 1.2, 1.05]
   end
 
   def numeric_column?(index)
-    @headers[index].to_s.match?(/\AValue\z/i)
+    index == @headers.size - 1
+  end
+
+  def billing_label(type)
+    I18n.t("invoices.types.#{type}", default: type.to_s)
+  end
+
+  def billing_summary
+    @invoice.bookings.map { |booking| billing_label(booking.billing_type) }.uniq.join(" / ").presence || "—"
   end
 
   def money(value)
@@ -84,7 +93,7 @@ class InvoicePdf < PdfExport
     ops << fill_rect(0, @page_h - band_h, @page_w, band_h, 0.11, 0.29, 0.56)
     ops << text_op("/F1", 9, MARGIN, @page_h - 18, @clinic, 1, 1, 1)
     ops << text_op("/F2", 16, MARGIN, @page_h - 38, @title, 1, 1, 1)
-    ops << text_op("/F2", 10, @page_w - MARGIN - 110, @page_h - 28, @invoice.status.to_s.upcase, 0.85, 0.92, 1)
+    ops << text_op("/F2", 10, @page_w - MARGIN - 110, @page_h - 28, I18n.t("statuses.#{@invoice.status}", default: @invoice.status.to_s).upcase, 0.85, 0.92, 1)
 
     y = @page_h - band_h - 14
     box_gap = 10
@@ -92,22 +101,22 @@ class InvoicePdf < PdfExport
     box_h = 78
     boxes = [
       [
-        "Bill to",
+        I18n.t("invoices.bill_to"),
         stringify(@invoice.professional.display_name),
-        stringify(Array(@invoice.professional.practice_area_labels).first(2).join(", ").presence || @invoice.professional.specialty.presence || "Professional"),
-        "Room: #{stringify(@invoice.room&.name || "General")}"
+        stringify(Array(@invoice.professional.practice_area_labels).first(2).join(", ").presence || @invoice.professional.specialty.presence || I18n.t("invoices.professional_fallback")),
+        I18n.t("invoices.pdf_doc.room", name: stringify(@invoice.room&.name || I18n.t("invoices.general")))
       ],
       [
-        "Dates",
-        "Issued #{@invoice.issued_on.strftime("%d/%m/%Y")}",
-        "Due #{@invoice.due_date&.strftime("%d/%m/%Y") || "-"}",
-        @invoice.paid_at ? "Paid #{@invoice.paid_at.strftime("%d/%m/%Y %H:%M")}" : "Payment: PIX or reception"
+        I18n.t("invoices.dates"),
+        I18n.t("invoices.issued", date: @invoice.issued_on.strftime("%d/%m/%Y")),
+        I18n.t("invoices.due", date: @invoice.due_date&.strftime("%d/%m/%Y") || "-"),
+        @invoice.paid_at ? I18n.t("invoices.paid_at", time: @invoice.paid_at.strftime("%d/%m/%Y %H:%M")) : I18n.t("invoices.pdf_doc.payment_open")
       ],
       [
-        "Summary",
-        "Slots #{@invoice.slot_count}  |  Type #{stringify(@invoice.billing_type_label)}",
-        "Amount #{money(@invoice.amount)}  |  Refunded #{money(@invoice.refunded_amount)}",
-        "#{@invoice.payable? ? "Amount due" : "Net"} #{money(@invoice.net_amount)}"
+        I18n.t("invoices.pdf_doc.summary"),
+        I18n.t("invoices.pdf_doc.slots", count: @invoice.slot_count, type: stringify(billing_summary)),
+        I18n.t("invoices.pdf_doc.amounts", amount: money(@invoice.amount), refunded: money(@invoice.refunded_amount)),
+        "#{@invoice.payable? ? I18n.t("invoices.amount_due") : I18n.t("invoices.net")} #{money(@invoice.net_amount)}"
       ]
     ]
     boxes.each_with_index do |box, index|
@@ -120,7 +129,7 @@ class InvoicePdf < PdfExport
     end
 
     y -= box_h + 8
-    ops << text_op("/F1", 8, MARGIN, y, "Each hourly line is one #{Room.slot_minutes}-minute slot. PIX #{stringify(@invoice.pix_txid.presence || "-")}", 0.35, 0.42, 0.52)
+    ops << text_op("/F1", 8, MARGIN, y, I18n.t("invoices.pdf_doc.slot_note", minutes: Room.slot_minutes, txid: stringify(@invoice.pix_txid.presence || "-")), 0.35, 0.42, 0.52)
     y -= 16
 
     ops << fill_rect(MARGIN, y - 5, table_w, ROW_H, 0.11, 0.29, 0.56)
@@ -136,10 +145,10 @@ class InvoicePdf < PdfExport
     if page == pages
       y -= 16
       totals = [
-        ["Amount", money(@invoice.amount)],
-        (["Refunded", money(@invoice.refunded_amount)] if @invoice.refunded_amount.positive?),
-        (["Cancellation fee", money(@invoice.cancellation_fee)] if @invoice.cancellation_fee.positive?),
-        [@invoice.payable? ? "Amount due" : "Net", money(@invoice.net_amount)]
+        [I18n.t("invoices.amount"), money(@invoice.amount)],
+        ([I18n.t("invoices.refunded"), money(@invoice.refunded_amount)] if @invoice.refunded_amount.positive?),
+        ([I18n.t("invoices.cancellation_fee"), money(@invoice.cancellation_fee)] if @invoice.cancellation_fee.positive?),
+        [@invoice.payable? ? I18n.t("invoices.amount_due") : I18n.t("invoices.net"), money(@invoice.net_amount)]
       ].compact
       totals_w = 220
       totals_x = MARGIN + table_w - totals_w
@@ -150,19 +159,19 @@ class InvoicePdf < PdfExport
         y -= 16
       end
       y -= 10
-      ops << text_op("/F2", 9, MARGIN, y, "Cancellation policy", 0.11, 0.29, 0.56)
+      ops << text_op("/F2", 9, MARGIN, y, I18n.t("invoices.pdf_doc.policy_title"), 0.11, 0.29, 0.56)
       y -= 13
-      ops << text_op("/F1", 8, MARGIN, y, "Free cancel until #{@policy[:free_hours]}h before start. After that, #{@policy[:late_percent]}% is kept. After start, #{@policy[:started_percent]}% is kept.", 0.2, 0.25, 0.32)
+      ops << text_op("/F1", 8, MARGIN, y, I18n.t("invoices.pdf_doc.policy", hours: @policy[:free_hours], late: @policy[:late_percent], started: @policy[:started_percent]), 0.2, 0.25, 0.32)
       y -= 12
-      ops << text_op("/F1", 8, MARGIN, y, "Individual 30-minute slots can be cancelled on a paid hourly invoice; remaining times stay reserved.", 0.2, 0.25, 0.32)
+      ops << text_op("/F1", 8, MARGIN, y, I18n.t("invoices.pdf_doc.partial"), 0.2, 0.25, 0.32)
       if @invoice.notes.present?
         y -= 12
-        ops << text_op("/F1", 8, MARGIN, y, "Notes: #{stringify(@invoice.notes.to_s.tr("\n", " ")[0, 140])}", 0.35, 0.42, 0.52)
+        ops << text_op("/F1", 8, MARGIN, y, I18n.t("invoices.pdf_doc.notes", notes: stringify(@invoice.notes.to_s.tr("\n", " ")[0, 140])), 0.35, 0.42, 0.52)
       end
     end
 
-    ops << text_op("/F1", 8, MARGIN, MARGIN - 8, "Generated #{@generated}  |  #{@clinic}", 0.45, 0.5, 0.58)
-    ops << text_op("/F1", 8, @page_w - MARGIN - 70, MARGIN - 8, "Page #{page} of #{pages}", 0.45, 0.5, 0.58)
+    ops << text_op("/F1", 8, MARGIN, MARGIN - 8, I18n.t("invoices.pdf_doc.generated", time: @generated, clinic: @clinic), 0.45, 0.5, 0.58)
+    ops << text_op("/F1", 8, @page_w - MARGIN - 90, MARGIN - 8, I18n.t("invoices.pdf_doc.page", page: page, pages: pages), 0.45, 0.5, 0.58)
     ops.join("\n")
   end
 end

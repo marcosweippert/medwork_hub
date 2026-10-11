@@ -17,7 +17,7 @@ class WaitlistOffer
 
     entry.update!(status: "offered", notified_at: Time.current)
     begin
-      ClinicMailer.waitlist_offer(entry).deliver_now
+      ClinicMailer.waitlist_offer(entry).deliver_later
     rescue StandardError => e
       Rails.logger.warn("Waitlist email failed: #{e.message}")
     end

@@ -79,7 +79,11 @@ Rails.application.routes.draw do
   get "reports/patients", to: "reports#patients", as: :patients_reports
   get "reports/emails", to: "reports#emails", as: :emails_reports
   get "reports/activity", to: "reports#activity", as: :activity_reports
-  resources :patients
+  resources :patients do
+    member do
+      get :export
+    end
+  end
   resources :tickets, only: %i[index show new create update] do
     collection do
       patch :bulk

@@ -7,8 +7,8 @@ class CancelReservation
   end
 
   def call
-    return failure("This booking is already cancelled") if @booking.status == "cancelled"
-    return failure("Completed bookings cannot be cancelled") if @booking.status == "completed"
+    return failure(I18n.t("clinic_errors.booking_cancelled")) if @booking.status == "cancelled"
+    return failure(I18n.t("clinic_errors.booking_completed")) if @booking.status == "completed"
 
     if ClinicPolicy.monthly?(@booking)
       cancel_monthly

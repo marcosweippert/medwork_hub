@@ -55,6 +55,37 @@ class InvoicesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "paid", paid.reload.status
   end
 
+  test "renders the invoice pdf" do
+    get invoice_path(@invoice, format: :pdf)
+    assert_response :success
+    assert_equal "application/pdf", response.media_type
+    assert response.body.start_with?("%PDF")
+
+    room = Room.create!(name: "Inv Room PDF", capacity: 1, daily_rate: 100, monthly_rate: 1000, hourly_rate: 40, opens_at: 8, closes_at: 18, room_types: %w[psicologia_psiquiatria])
+    Booking.create!(
+      professional: @professional,
+      room: room,
+      invoice: @invoice,
+      start_time: 2.days.from_now.change(hour: 10),
+      end_time: 2.days.from_now.change(hour: 11),
+      status: "confirmed",
+      billing_type: "hourly",
+      amount: 40
+    )
+    get invoice_path(@invoice, format: :pdf)
+    assert_response :success
+    assert response.body.start_with?("%PDF")
+    assert_includes response.body, "0 0 595 842"
+    assert_includes response.body, "Cobran\\347a"
+    assert_includes response.body, "Dura\\347\\343o"
+    assert_includes response.body, "Pol\\355tica"
+
+    get invoice_path(@invoice)
+    assert_response :success
+    assert_includes response.body, "Fatura #"
+    assert_not_includes response.body, "Amount due"
+  end
+
   test "cancels a paid invoice and refunds according to policy" do
     @other.update!(status: "paid", paid_at: Time.current)
     booking = Booking.create!(

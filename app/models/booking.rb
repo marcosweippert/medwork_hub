@@ -117,7 +117,7 @@ class Booking < ApplicationRecord
 
   def end_after_start
     return if start_time.blank? || end_time.blank?
-    errors.add(:end_time, "must be after start time") if end_time <= start_time
+    errors.add(:end_time, I18n.t("clinic_errors.end_after_start")) if end_time <= start_time
   end
 
   def no_overlap
@@ -125,14 +125,14 @@ class Booking < ApplicationRecord
     return if status == "cancelled"
 
     overlap = room.bookings.holding.where.not(id: id).where("start_time < ? AND end_time > ?", end_time, start_time)
-    errors.add(:base, "This room is already booked for the selected time") if overlap.exists?
+    errors.add(:base, I18n.t("clinic_errors.room_booked")) if overlap.exists?
   end
 
   def not_blocked
     return if start_time.blank? || end_time.blank? || room_id.blank?
     return if status == "cancelled"
 
-    errors.add(:base, "This room is blocked for the selected time") if room.blocked?(start_time, end_time)
+    errors.add(:base, I18n.t("clinic_errors.room_blocked")) if room.blocked?(start_time, end_time)
   end
 
   def room_matches_professional
@@ -140,6 +140,6 @@ class Booking < ApplicationRecord
     return if status == "cancelled"
     return if professional.can_reserve?(room)
 
-    errors.add(:base, "This professional cannot reserve this room type")
+    errors.add(:base, I18n.t("clinic_errors.room_type_blocked"))
   end
 end

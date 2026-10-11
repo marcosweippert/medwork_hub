@@ -34,7 +34,7 @@ Não é prontuário clínico completo: o foco é ocupação de salas, financeiro
 
 **Reserva (`Booking`)** — intervalo na sala. Status interno: `pending`, `scheduled`, `confirmed`, `cancelled`, `completed`. No calendário o que importa é a fatura: **open → reservado**, **paid → ocupado**.
 
-**Fatura (`Invoice`)** — cobra o profissional pela reserva (hora / dia / mês). Status: `open`, `paid`, `overdue`, `cancelled`, `refunded`. Atrasadas viram `overdue` automaticamente (job operacional a cada ~5 min).
+**Fatura (`Invoice`)** — cobra o profissional pela reserva (hora / dia / mês). Status: `open`, `paid`, `overdue`, `cancelled`, `refunded`. Atrasadas viram `overdue` no cron `medwork:reminders`.
 
 **Chamado (`Ticket`)** — suporte interno. Profissional vê só os seus; staff/admin vê a fila.
 

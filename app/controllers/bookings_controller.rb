@@ -53,11 +53,11 @@ class BookingsController < ApplicationController
     else
       @booking = Booking.new(booking_params)
       if @booking.professional&.delinquent?
-        @booking.errors.add(:professional, "has overdue invoices and cannot make new reservations")
+        @booking.errors.add(:professional, t("flash.bookings.delinquent"))
         load_booking_form
         render :new, status: :unprocessable_entity
       elsif @booking.save
-        redirect_back_to @booking, notice: "Booking created successfully."
+        redirect_back_to @booking, notice: t("flash.bookings.created")
       else
         load_booking_form
         render :new, status: :unprocessable_entity
@@ -71,7 +71,7 @@ class BookingsController < ApplicationController
 
   def update
     if @booking.update(booking_params)
-      redirect_back_to @booking, notice: "Booking updated successfully."
+      redirect_back_to @booking, notice: t("flash.bookings.updated")
     else
       load_booking_form
       render :edit, status: :unprocessable_entity
@@ -80,22 +80,21 @@ class BookingsController < ApplicationController
 
   def destroy
     @booking.destroy
-    redirect_to bookings_url, notice: "Booking deleted."
+    redirect_to bookings_url, notice: t("flash.bookings.deleted")
   end
 
   def cancel
     result = CancelReservation.new(booking: @booking, reason: params[:reason]).call
     if result.success?
       message = if result.refund.to_d.positive?
-                  "Booking cancelled. Refund #{helpers.number_to_currency(result.refund)}" \
-                    "#{result.fee.to_d.positive? ? " · kept #{helpers.number_to_currency(result.fee)}" : ""}."
+                  t("flash.bookings.cancelled_refund", refund: helpers.number_to_currency(result.refund), fee: fee_note(result.fee))
                 elsif result.fee.to_d.positive?
-                  "Booking cancelled. Cancellation fee: #{helpers.number_to_currency(result.fee)}."
+                  t("flash.bookings.cancelled_fee", fee: helpers.number_to_currency(result.fee))
                 else
-                  "Booking cancelled."
+                  t("flash.bookings.cancelled")
                 end
       if result.offered
-        message += " Waitlist: #{result.offered.professional.display_name} was notified."
+        message += t("flash.bookings.waitlist_notified", name: result.offered.professional.display_name)
       end
       redirect_back_to @booking, notice: message
     else
@@ -110,7 +109,7 @@ class BookingsController < ApplicationController
       end_time: params[:end_time]
     ).call
     if result.success?
-      redirect_back_to @booking, notice: "Booking rescheduled."
+      redirect_back_to @booking, notice: t("flash.bookings.rescheduled")
     else
       redirect_back_to @booking, alert: result.error
     end
@@ -119,9 +118,9 @@ class BookingsController < ApplicationController
   def complete
     if @booking.end_time.present? && @booking.end_time <= Time.current && @booking.status != "cancelled"
       @booking.update!(status: "completed")
-      redirect_back_to @booking, notice: "Booking marked as completed."
+      redirect_back_to @booking, notice: t("flash.bookings.completed")
     else
-      redirect_back_to @booking, alert: "Only finished live bookings can be completed."
+      redirect_back_to @booking, alert: t("flash.bookings.complete_blocked")
     end
   end
 
@@ -153,6 +152,12 @@ class BookingsController < ApplicationController
     @calendar = RoomCalendar.new(@selected_room, start_date: @date, days: 7) if @selected_room
   end
 
+  def fee_note(fee)
+    return "" unless fee.to_d.positive?
+
+    t("flash.bookings.kept_fee", fee: helpers.number_to_currency(fee))
+  end
+
   def create_from_slots
     professional = if professional_user?
                      current_professional
@@ -169,7 +174,7 @@ class BookingsController < ApplicationController
     ).call
 
     if result.success?
-      redirect_to result.invoice, notice: "Reservation confirmed. An invoice was created for payment."
+      redirect_to result.invoice, notice: t("flash.reservations.confirmed")
     else
       @booking = Booking.new(professional: professional, room: room)
       @booking.errors.add(:base, result.error)

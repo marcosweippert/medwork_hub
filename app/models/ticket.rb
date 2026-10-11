@@ -115,13 +115,6 @@ class Ticket < ApplicationRecord
 
   def notify_opened
     NotifyTicket.opened(self)
-    NotifyN8n.event("ticket.created", {
-      id: id,
-      subject: subject,
-      priority: priority,
-      category: category,
-      user: user&.display_name
-    })
   rescue StandardError => e
     Rails.logger.warn("Ticket notify failed: #{e.class}: #{e.message}")
   end

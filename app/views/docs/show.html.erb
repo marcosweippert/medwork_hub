@@ -1,0 +1,33 @@
+<div class="docs-shell">
+  <%= render "docs/nav" %>
+
+  <article class="docs-article">
+    <header class="docs-hero">
+      <h1 class="docs-title"><%= @title %></h1>
+      <p class="docs-lead"><%= t("docs.pages.#{@slug}.body") %></p>
+    </header>
+
+    <div class="docs-prose">
+      <%= @body_html %>
+    </div>
+
+    <nav class="docs-pager" aria-label="<%= t("docs.contents") %>">
+      <% if @prev_slug %>
+        <%= link_to doc_path(@prev_slug), class: "docs-pager-link" do %>
+          <span><%= t("docs.previous") %></span>
+          <strong><%= t("docs.pages.#{@prev_slug}.title") %></strong>
+        <% end %>
+      <% else %>
+        <span></span>
+      <% end %>
+      <% if @next_slug %>
+        <%= link_to doc_path(@next_slug), class: "docs-pager-link docs-pager-link--next" do %>
+          <span><%= t("docs.next") %></span>
+          <strong><%= t("docs.pages.#{@next_slug}.title") %></strong>
+        <% end %>
+      <% end %>
+    </nav>
+  </article>
+
+  <%= render "docs/toc" %>
+</div>

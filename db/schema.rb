@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_09_19_235100) do
+ActiveRecord::Schema[7.1].define(version: 2026_10_11_021500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,20 +40,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_235100) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
-  end
-
-  create_table "api_keys", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "token_digest", null: false
-    t.string "token_prefix", null: false
-    t.boolean "enabled", default: true, null: false
-    t.date "renewal_on"
-    t.datetime "last_used_at"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["token_digest"], name: "index_api_keys_on_token_digest", unique: true
-    t.index ["user_id"], name: "index_api_keys_on_user_id"
   end
 
   create_table "appointment_notes", force: :cascade do |t|
@@ -100,20 +86,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_235100) do
     t.index ["professional_id"], name: "index_bookings_on_professional_id"
     t.index ["recurrence_group_id"], name: "index_bookings_on_recurrence_group_id"
     t.index ["room_id"], name: "index_bookings_on_room_id"
-  end
-
-  create_table "clinic_integrations", force: :cascade do |t|
-    t.string "provider", null: false
-    t.boolean "enabled", default: false, null: false
-    t.datetime "connected_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.jsonb "config", default: {}, null: false
-    t.string "name", null: false
-    t.string "kind", null: false
-    t.text "notes"
-    t.index ["kind"], name: "index_clinic_integrations_on_kind"
-    t.index ["provider"], name: "index_clinic_integrations_on_provider", unique: true
   end
 
   create_table "invoices", force: :cascade do |t|
@@ -340,7 +312,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_19_235100) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "api_keys", "users"
   add_foreign_key "appointment_notes", "bookings"
   add_foreign_key "appointment_notes", "patients"
   add_foreign_key "audit_events", "users"

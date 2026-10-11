@@ -1,6 +1,9 @@
 # MedWork Hub
 
-Clínica para reserva de salas, profissionais, pacientes, faturas (PIX), lista de espera, relatórios e e-mail.
+Sistema da clínica para **salas**, **reservas**, **profissionais**, **pacientes**, **faturas (PIX)**, **lista de espera**, **chamados**, **relatórios** e **e-mail**.
+
+Documentação completa: **[docs/README.md](docs/README.md)**  
+(visão geral, papéis, módulos, desenvolvimento e produção).
 
 ## Requisitos
 

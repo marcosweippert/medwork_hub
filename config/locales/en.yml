@@ -14,13 +14,12 @@ en:
     transactions: Transactions
     profile: Profile
     settings: Settings
-    integrations: Integrations
-    api_keys: API keys
     users: Users
     emails: Emails
     audit: Audit log
     finance: Finance
     admin: Admin
+    docs: Documentation
     log_out: Log out
   helpers:
     page:
@@ -37,8 +36,7 @@ en:
       reports: Reports
       users: Users
       settings: Settings
-      integrations: Integrations
-      api_keys: API keys
+      docs: Documentation
       waitlist_entries: Waitlist
       room_blocks: Room blocks
       audit_events: Audit log
@@ -47,10 +45,6 @@ en:
       welcome_email: Welcome email
       new: "New %{base}"
       edit: "Edit %{base}"
-    heading:
-      integrations:
-        new: New integration
-        edit: Edit integration
     select_professional: Select professional
     select_room: Select room
     professional_overdue: "%{name} (overdue)"

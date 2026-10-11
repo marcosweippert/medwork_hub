@@ -267,190 +267,42 @@ pt-BR:
     mail_nav: E-mail
     pix_nav: PIX
     tickets_nav: Chamados
-  integrations:
-    title: Integrações
-    subtitle: Conecte e-mail, PIX, WhatsApp e apps da clínica — ou adicione um webhook próprio.
-    new: Nova integração
-    new_help: Escolha o aplicativo, dê um nome e, se quiser, salve a URL do webhook para receber eventos do Hub.
-    edit: Editar integração
-    add: Adicionar
-    installed: Aplicativos da clínica
-    catalog: Aplicativos disponíveis
-    catalog_help: Inclua um app na clínica. Os que têm webhook recebem eventos de reserva, fatura e chamado.
-    details: Detalhes
-    configure: Configurar
-    connect: Conectar
-    remove: Remover
-    enabled: Ativo
-    kind: Aplicativo
-    notes: Observações
-    notes_placeholder: Canal, ambiente, quem responde por esta conexão…
-    channel: Canal ou destino
-    channel_placeholder: "#recepção, @financeiro…"
-    webhook_help: Com URL salva e integração ativa, o Hub envia POST JSON para este endereço.
-    resources_title: Recursos
-    resources_help: Atalhos deste aplicativo dentro do Hub.
-    events_title: Eventos do Hub
-    created: "%{name} adicionada."
-    updated: "%{name} atualizada."
-    deleted: "%{name} excluída."
-    connected: "%{name} conectado."
-    disconnected: "%{name} desconectado."
-    connected_badge: Conectado
-    disconnected_badge: Não conectado
-    available_badge: Disponível
-    connected_at: Conectado em
-    type: Tipo
-    builtin: Nativo
-    optional: Opcional
-    required: Esta integração faz parte da clínica e não pode ser desligada.
-    unknown: Integração não encontrada.
-    confirm_delete: Excluir esta integração?
-    resources:
-      mail_settings: Configurações de e-mail
-      outbound_emails: E-mails enviados
-      email_report: Relatório de e-mails
-      pix_settings: Configurações de PIX
-      whatsapp_settings: Número do WhatsApp
-      invoices: Faturas
-      receivables: Recebíveis
-      room_calendar: Calendário das salas
-      availability: Disponibilidade
-      waitlist: Lista de espera
-      blocks: Bloqueios
-      api_keys: Chaves de API
-      workflow: Fluxo n8n
-      tickets: Chamados
-      bookings: Reservas
-      professionals: Profissionais
-      reports: Relatórios
-      patients: Pacientes
-    providers:
-      smtp:
-        name: SMTP
-        body: Envio de faturas, convites e avisos pela conta de e-mail da clínica.
-        help: Configure servidor, remetente e senha em Configurações → E-mail.
-      pix:
-        name: PIX
-        body: Gera cobrança instantânea nas faturas com a chave da clínica.
-        help: Informe chave, nome e cidade em Configurações → PIX.
-      whatsapp:
-        name: WhatsApp
-        body: Compartilha o código PIX da fatura pelo WhatsApp da clínica.
-        help: O número fica junto das configurações de PIX.
-      calendar:
-        name: Calendário
-        body: Grade de horários, reservas e lista de espera das salas.
-        help: Sempre ativo. Horários vêm de cada sala e da política da clínica.
-      webhooks:
-        name: Webhooks
-        body: Recebe eventos de reserva e fatura em um endpoint seu.
-        help: Salve uma URL POST. O Hub envia event, clinic, occurred_at e data.
-      zapier:
-        name: Zapier
-        body: Encadeia reservas e faturas com planilhas e outros apps.
-        help: Use a URL Catch Hook e, se o Zapier for ler o Hub, uma chave de API.
-      google_calendar:
-        name: Google Calendar
-        body: Espelha reservas da sala na agenda do profissional.
-        help: Marque como ativo enquanto as agendas dos profissionais são ligadas.
-      slack:
-        name: Slack
-        body: Avisa a equipe sobre chamados, reservas e faturas pagas.
-        help: Cole a URL de Incoming Webhook ou encaminhe pelo n8n.
-      n8n:
-        name: n8n
-        body: Dispara automações quando houver reserva, fatura paga ou chamado novo.
-        help: Salve a URL do webhook do fluxo. A chave da API do n8n é opcional e só serve para testar a conexão.
-      make:
-        name: Make
-        body: Monta cenários a partir dos eventos do Hub, sem código.
-        help: Cole a URL de webhook customizado do Make.
-      discord:
-        name: Discord
-        body: Publica eventos da clínica em um canal do Discord.
-        help: Use a URL de webhook do canal.
-      telegram:
-        name: Telegram
-        body: Envia alertas de reserva e chamado para um chat ou grupo.
-        help: Cole o webhook do bot ou o webhook do n8n para o Telegram.
-      microsoft_teams:
-        name: Microsoft Teams
-        body: Avisa um canal do Teams quando a fatura é paga ou o chamado abre.
-        help: Cole a URL do conector Incoming Webhook.
-      google_sheets:
-        name: Google Sheets
-        body: Acrescenta linhas de reservas e pagamentos na planilha.
-        help: Use um webhook (n8n/Make) que grave na planilha.
-      notion:
-        name: Notion
-        body: Registra chamados e reservas em um banco do Notion.
-        help: Cole o webhook da automação que cria páginas no Notion.
-      twilio:
-        name: Twilio
-        body: SMS de lembrete para lista de espera e próximas reservas.
-        help: Salve o webhook que fala com a Twilio, ou passe pelo n8n.
-      outlook:
-        name: Outlook Calendar
-        body: Espelha reservas no Outlook / Microsoft 365.
-        help: Marque como ativo enquanto a sincronização da agenda é configurada.
-      custom:
-        name: Webhook personalizado
-        body: Qualquer outro endpoint que deva receber os mesmos eventos do Hub.
-        help: Dê o nome que quiser. Dá para cadastrar mais de um.
-    n8n:
-      setup: Conexão com o n8n
-      setup_help: O caminho usual é um nó Webhook no n8n. A chave JWT da API pública do n8n não entra no Hub — ela fica só no n8n, ou aqui se você quiser testar a API.
-      webhook_url: URL do webhook
-      webhook_help: No n8n, adicione um nó Webhook (POST), ative o fluxo e cole a URL de produção.
-      api_base_url: URL do n8n
-      api_token: Chave da API do n8n
-      token_set: Chave já salva. Deixe em branco para manter.
-      token_placeholder: Cole a chave nova só se for trocar
-      api_help: Opcional. Header X-N8N-API-KEY, só para o botão Testar na API do n8n.
-      saved: Dados do n8n salvos.
-      test: Testar conexão
-      test_ok_webhook: Webhook respondeu.
-      test_ok_api: API respondeu.
-      test_failed: "Não conectou: %{error}"
-      missing_config: Informe a URL do webhook ou a URL do n8n com a chave.
-      hub_api: O n8n chamando o Hub
-      hub_api_help: Crie uma chave em Chaves de API com o nome n8n e use no nó HTTP Request.
-      step_key: Gere uma chave mwh_ em
-      step_node: No n8n, HTTP Request com método GET.
-      or_header: ou
-      events_help: "O Hub envia POST JSON nestes eventos, se a URL do webhook estiver salva:"
-      import_help: "No n8n: menu ⋯ do editor → Import from File. Depois ative o fluxo e ligue Slack/e-mail no nó Pronto."
-      import_file: Baixar workflow MedWork Hub (JSON)
-  api_keys:
-    title: Chaves de API
-    subtitle: Gere tokens para integrar sistemas externos. O valor completo aparece só uma vez.
-    generate: Gerar chave
-    generate_help: Dê um nome à plataforma e, se quiser, uma data de renovação.
-    platform: Plataforma
-    platform_placeholder: Zapier, app interno…
-    key: Chave
-    renewal: Renovação
-    toggle: Ativa
-    edit: Editar chave
-    empty: Nenhuma chave ainda.
-    created: Chave criada. Copie agora — ela não será mostrada de novo.
-    updated: Chave atualizada.
-    deleted: Chave excluída.
-    enabled: Chave ativada.
-    disabled: Chave desativada.
-    regenerated: Nova chave gerada. Copie agora.
-    copy_now: "Chave de %{name}"
-    regenerate: Regenerar
-    activate_all: Ativar selecionadas
-    deactivate_all: Desativar selecionadas
-    delete_all: Excluir selecionadas
-    confirm_delete: Excluir esta chave?
-    confirm_delete_all: Excluir as chaves selecionadas?
-    confirm_regenerate: Regenerar invalida a chave atual. Continuar?
-    bulk_activated: Chaves ativadas.
-    bulk_deactivated: Chaves desativadas.
-    bulk_deleted: Chaves excluídas.
+  docs:
+    title: Documentação
+    kicker: MedWork Hub
+    subtitle: Como a clínica usa o Hub — salas, faturas, chamados e relatórios.
+    contents: Conteúdo
+    on_this_page: Nesta página
+    index: Início
+    previous: Anterior
+    next: Próxima
+    back_to_hub: Voltar ao Hub
+    prev_page: "Anterior: %{title}"
+    next_page: "Próxima: %{title}"
+    unknown: Página não encontrada.
+    groups:
+      getting_started: Primeiros passos
+      clinic: Clínica
+      build: Construir
+    pages:
+      visao-geral:
+        title: Visão geral
+        body: O que é o Hub, a stack e os conceitos de sala, reserva e fatura.
+      instalacao:
+        title: Instalação
+        body: Ambiente local, seed, logins de demo e testes.
+      papeis:
+        title: Papéis e permissões
+        body: O que admin, staff e profissional podem fazer.
+      modulos:
+        title: Módulos
+        body: Telas do dia a dia, do calendário à auditoria.
+      desenvolvimento:
+        title: Desenvolvimento
+        body: Pastas, i18n e testes.
+      producao:
+        title: Produção
+        body: SMTP, cron, HTTPS, backup e checklist de go-live.
   audit:
     subtitle: Histórico de criações, alterações e exclusões na clínica.
     export_xlsx: Baixar Excel
@@ -502,8 +354,6 @@ pt-BR:
       waitlist_entry: lista de espera
       room_block: bloqueio
       appointment_note: nota
-      api_key: chave de API
-      clinic_integration: integração
       outbound_email: e-mail
       setting: configuração
     fields:

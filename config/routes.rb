@@ -107,27 +107,7 @@ Rails.application.routes.draw do
   resource :billing, only: :show, controller: "billings"
   resources :transactions, only: :index
   resource :profile, only: %i[show update], controller: "profiles"
-  resources :integrations, param: :provider do
-    member do
-      patch :connect
-      patch :disconnect
-      post :test
-    end
-  end
-  resources :api_keys, only: %i[index create edit update destroy] do
-    collection do
-      patch :bulk
-    end
-    member do
-      patch :regenerate
-      patch :toggle
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get :status, to: "status#show"
-    end
-  end
 
+  resources :docs, only: %i[index show]
   root "dashboards#index"
 end

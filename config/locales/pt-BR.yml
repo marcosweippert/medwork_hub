@@ -14,13 +14,12 @@ pt-BR:
     transactions: Transações
     profile: Perfil
     settings: Configurações
-    integrations: Integrações
-    api_keys: Chaves de API
     users: Usuários
     emails: E-mails
     audit: Auditoria
     finance: Financeiro
     admin: Administração
+    docs: Documentação
     log_out: Sair
   helpers:
     page:
@@ -37,8 +36,7 @@ pt-BR:
       reports: Relatórios
       users: Usuários
       settings: Configurações
-      integrations: Integrações
-      api_keys: Chaves de API
+      docs: Documentação
       waitlist_entries: Lista de espera
       room_blocks: Bloqueios
       audit_events: Auditoria
@@ -47,10 +45,6 @@ pt-BR:
       welcome_email: E-mail de boas-vindas
       new: "Novo(a) %{base}"
       edit: "Editar %{base}"
-    heading:
-      integrations:
-        new: Nova integração
-        edit: Editar integração
     select_professional: Selecione o profissional
     select_room: Selecione a sala
     professional_overdue: "%{name} (em atraso)"

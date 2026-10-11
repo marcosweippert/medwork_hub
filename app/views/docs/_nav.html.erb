@@ -1,0 +1,14 @@
+<aside class="docs-nav" aria-label="<%= t("docs.contents") %>">
+  <% DocsController::GROUPS.each do |group| %>
+    <p class="docs-nav-label"><%= t("docs.groups.#{group[:key]}") %></p>
+    <ul class="docs-nav-list">
+      <% group[:slugs].each do |slug| %>
+        <li>
+          <%= link_to t("docs.pages.#{slug}.title"),
+                slug == "visao-geral" ? docs_path : doc_path(slug),
+                class: "docs-nav-link #{"is-active" if slug == @slug}" %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</aside>

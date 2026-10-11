@@ -7,7 +7,6 @@ class User < ApplicationRecord
   has_many :tickets, dependent: :destroy
   has_many :assigned_tickets, class_name: "Ticket", foreign_key: :assignee_id, dependent: :nullify
   has_many :notifications, dependent: :destroy
-  has_many :api_keys, dependent: :nullify
   accepts_nested_attributes_for :professional
 
   validates :name, presence: true

@@ -197,10 +197,6 @@ module ApplicationHelper
     when "Room" then room_path(event.auditable_id)
     when "Patient" then patient_path(event.auditable_id)
     when "Ticket" then ticket_path(event.auditable_id)
-    when "ApiKey" then api_keys_path
-    when "ClinicIntegration"
-      provider = event.auditable.try(:provider)
-      provider.present? ? integration_path(provider) : integrations_path
     when "WaitlistEntry" then waitlist_entries_path
     when "RoomBlock" then room_blocks_path
     when "AppointmentNote"

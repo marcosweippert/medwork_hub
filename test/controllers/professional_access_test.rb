@@ -72,9 +72,7 @@ class ProfessionalAccessTest < ActionDispatch::IntegrationTest
     assert_redirected_to rooms_path
     get audit_events_path
     assert_redirected_to rooms_path
-    get integrations_path
-    assert_redirected_to rooms_path
-    get api_keys_path
+    get docs_path
     assert_redirected_to rooms_path
   end
 

@@ -266,190 +266,42 @@ en:
     mail_nav: Email
     pix_nav: PIX
     tickets_nav: Tickets
-  integrations:
-    title: Integrations
-    subtitle: Connect email, PIX, WhatsApp, and clinic apps — or add your own webhook.
-    new: New integration
-    new_help: Pick an app, name it, and optionally save a webhook URL to receive Hub events.
-    edit: Edit integration
-    add: Add
-    installed: Connected apps
-    catalog: Available apps
-    catalog_help: Add an app to the clinic. Webhook-based apps receive booking, invoice, and ticket events.
-    details: Details
-    configure: Configure
-    connect: Connect
-    remove: Remove
-    enabled: Active
-    kind: App
-    notes: Notes
-    notes_placeholder: Channel, environment, who owns this connection…
-    channel: Channel or destination
-    channel_placeholder: "#recepção, @financeiro…"
-    webhook_help: When saved and active, the Hub POSTs JSON events to this URL.
-    resources_title: Resources
-    resources_help: Shortcuts for this connection inside the Hub.
-    events_title: Hub events
-    created: "%{name} added."
-    updated: "%{name} updated."
-    deleted: "%{name} removed."
-    connected: "%{name} connected."
-    disconnected: "%{name} disconnected."
-    connected_badge: Connected
-    disconnected_badge: Not connected
-    available_badge: Available
-    connected_at: Connected at
-    type: Type
-    builtin: Built-in
-    optional: Optional
-    required: This integration is part of the clinic and cannot be turned off.
-    unknown: Integration not found.
-    confirm_delete: Remove this integration?
-    resources:
-      mail_settings: Email settings
-      outbound_emails: Outbound email
-      email_report: Email report
-      pix_settings: PIX settings
-      whatsapp_settings: WhatsApp number
-      invoices: Invoices
-      receivables: Receivables
-      room_calendar: Room calendar
-      availability: Availability
-      waitlist: Waitlist
-      blocks: Room blocks
-      api_keys: API keys
-      workflow: n8n workflow
-      tickets: Tickets
-      bookings: Bookings
-      professionals: Professionals
-      reports: Reports
-      patients: Patients
-    providers:
-      smtp:
-        name: SMTP
-        body: Send invoices, invites, and notices from the clinic mailbox.
-        help: Set server, sender, and password in Settings → Email.
-      pix:
-        name: PIX
-        body: Generate instant invoice charges with the clinic PIX key.
-        help: Enter key, name, and city in Settings → PIX.
-      whatsapp:
-        name: WhatsApp
-        body: Share the invoice PIX code from the clinic WhatsApp number.
-        help: The number lives with the PIX settings.
-      calendar:
-        name: Calendar
-        body: Room slot grid, bookings, and waitlist.
-        help: Always on. Hours come from each room and clinic policy.
-      webhooks:
-        name: Webhooks
-        body: Push booking and invoice events to your own endpoint.
-        help: Save a POST URL. The Hub sends event, clinic, occurred_at, and data.
-      zapier:
-        name: Zapier
-        body: Pipe bookings and invoices into spreadsheets and other apps.
-        help: Use a Catch Hook URL and a Hub API key if Zapier needs to read the Hub.
-      google_calendar:
-        name: Google Calendar
-        body: Mirror room bookings onto the professional’s calendar.
-        help: Mark as active while you connect the professional calendars.
-      slack:
-        name: Slack
-        body: Notify the team about new tickets, bookings, and paid invoices.
-        help: Paste an Incoming Webhook URL or route through n8n.
-      n8n:
-        name: n8n
-        body: Trigger automations on new bookings, paid invoices, and tickets.
-        help: Save the workflow webhook URL. The n8n API key is optional and only used to test the connection.
-      make:
-        name: Make
-        body: Build scenarios from Hub events without writing code.
-        help: Paste a Make custom webhook URL.
-      discord:
-        name: Discord
-        body: Post clinic events to a Discord channel.
-        help: Use a Discord webhook URL for the channel.
-      telegram:
-        name: Telegram
-        body: Send booking and ticket alerts to a Telegram chat or group.
-        help: Paste a bot webhook or n8n Telegram webhook URL.
-      microsoft_teams:
-        name: Microsoft Teams
-        body: Notify a Teams channel when invoices are paid or tickets open.
-        help: Paste an Incoming Webhook connector URL.
-      google_sheets:
-        name: Google Sheets
-        body: Append rows for bookings and payments.
-        help: Use a webhook (n8n/Make) that writes to the spreadsheet.
-      notion:
-        name: Notion
-        body: Log tickets and bookings in a Notion database.
-        help: Paste the automation webhook that creates Notion pages.
-      twilio:
-        name: Twilio
-        body: SMS reminders for waitlist offers and upcoming bookings.
-        help: Save the webhook that talks to Twilio, or route through n8n.
-      outlook:
-        name: Outlook Calendar
-        body: Mirror bookings onto Outlook/Microsoft 365 calendars.
-        help: Mark as active while calendar sync is configured.
-      custom:
-        name: Custom webhook
-        body: Any extra endpoint that should receive the same Hub events.
-        help: Name it however you like. You can add more than one.
-    n8n:
-      setup: n8n connection
-      setup_help: The usual path is an n8n Webhook node. The n8n public API JWT does not belong in git — keep it in n8n, or paste it here only to test the API.
-      webhook_url: Webhook URL
-      webhook_help: In n8n, add a Webhook node (POST), activate the workflow, and paste the production URL.
-      api_base_url: n8n URL
-      api_token: n8n API key
-      token_set: Key already saved. Leave blank to keep it.
-      token_placeholder: Paste a new key only to replace it
-      api_help: Optional. X-N8N-API-KEY header, only for the Test button against the n8n API.
-      saved: n8n settings saved.
-      test: Test connection
-      test_ok_webhook: Webhook responded.
-      test_ok_api: API responded.
-      test_failed: "Could not reach the endpoint: %{error}"
-      missing_config: Enter a webhook URL, or the n8n URL plus API key.
-      hub_api: n8n calling the Hub
-      hub_api_help: Create an API key named n8n and use it in an HTTP Request node.
-      step_key: Generate an mwh_ key in
-      step_node: In n8n, add an HTTP Request node with GET.
-      or_header: or
-      events_help: "The Hub POSTs JSON on these events when a webhook URL is saved:"
-      import_help: "In n8n: editor ⋯ menu → Import from File. Then activate the workflow and attach Slack/email to the Pronto node."
-      import_file: Download MedWork Hub workflow (JSON)
-  api_keys:
-    title: API keys
-    subtitle: Generate tokens for external systems. The full value is shown only once.
-    generate: Generate key
-    generate_help: Name the platform and optionally set a renewal date.
-    platform: Platform
-    platform_placeholder: Zapier, internal app…
-    key: Key
-    renewal: Renewal
-    toggle: Active
-    edit: Edit key
-    empty: No keys yet.
-    created: Key created. Copy it now — it will not be shown again.
-    updated: Key updated.
-    deleted: Key deleted.
-    enabled: Key enabled.
-    disabled: Key disabled.
-    regenerated: New key generated. Copy it now.
-    copy_now: "Key for %{name}"
-    regenerate: Regenerate
-    activate_all: Activate selected
-    deactivate_all: Deactivate selected
-    delete_all: Delete selected
-    confirm_delete: Delete this key?
-    confirm_delete_all: Delete the selected keys?
-    confirm_regenerate: Regenerating invalidates the current key. Continue?
-    bulk_activated: Keys activated.
-    bulk_deactivated: Keys deactivated.
-    bulk_deleted: Keys deleted.
+  docs:
+    title: Documentation
+    kicker: MedWork Hub
+    subtitle: How the clinic uses the Hub — rooms, invoices, tickets, and reports.
+    contents: Contents
+    on_this_page: On this page
+    index: Home
+    previous: Previous
+    next: Next
+    back_to_hub: Back to Hub
+    prev_page: "Previous: %{title}"
+    next_page: "Next: %{title}"
+    unknown: Page not found.
+    groups:
+      getting_started: Getting started
+      clinic: Clinic
+      build: Build
+    pages:
+      visao-geral:
+        title: Overview
+        body: What the Hub is, the stack, and room/booking/invoice concepts.
+      instalacao:
+        title: Setup
+        body: Local environment, seed, demo logins, and tests.
+      papeis:
+        title: Roles and access
+        body: What admin, staff, and professionals can do.
+      modulos:
+        title: Modules
+        body: Day-to-day screens, from the calendar to audit.
+      desenvolvimento:
+        title: Development
+        body: Folders, i18n, and tests.
+      producao:
+        title: Production
+        body: SMTP, cron, HTTPS, backups, and a go-live checklist.
   audit:
     subtitle: History of creates, updates, and deletes in the clinic.
     export_xlsx: Download Excel
@@ -501,8 +353,6 @@ en:
       waitlist_entry: waitlist
       room_block: block
       appointment_note: note
-      api_key: API key
-      clinic_integration: integration
       outbound_email: email
       setting: settings
     fields:

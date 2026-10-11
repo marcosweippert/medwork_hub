@@ -16,8 +16,6 @@
     <%= link_to t("settings.mail_nav"), settings_path(edit: "mail"), class: (@edit_section.to_s == "mail" ? "is-on" : nil) %>
     <%= link_to t("settings.pix_nav"), settings_path(edit: "pix"), class: (@edit_section.to_s == "pix" ? "is-on" : nil) %>
     <%= link_to t("settings.tickets_nav"), settings_path(edit: "tickets"), class: (@edit_section.to_s == "tickets" ? "is-on" : nil) %>
-    <%= link_to t("nav.integrations"), integrations_path %>
-    <%= link_to t("nav.api_keys"), api_keys_path %>
     <%= link_to t("nav.profile"), profile_path %>
   </nav>
   <div class="settings-panels">

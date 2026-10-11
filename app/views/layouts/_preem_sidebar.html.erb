@@ -25,9 +25,8 @@
       <div class="preem-list-label"><%= t("dashboards.other_options") %></div>
       <% if admin_user? %>
         <%= link_to t("nav.settings"), settings_path, class: "preem-indent" %>
-        <%= link_to t("nav.integrations"), integrations_path, class: "preem-indent" %>
-        <%= link_to t("nav.api_keys"), api_keys_path, class: "preem-indent" %>
         <%= link_to t("nav.users"), users_path, class: "preem-indent" %>
+        <%= link_to t("nav.docs"), docs_path, class: "preem-indent" %>
         <%= link_to t("nav.emails"), outbound_emails_path, class: "preem-indent" %>
       <% end %>
       <%= button_to t("nav.log_out"), destroy_user_session_path, method: :delete, class: "preem-indent preem-signout" %>

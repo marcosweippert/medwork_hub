@@ -1,0 +1,14 @@
+<aside class="docs-toc" aria-label="<%= t("docs.on_this_page") %>" data-controller="docs-toc">
+  <p class="docs-toc-label"><%= t("docs.on_this_page") %></p>
+  <% if @headings.present? %>
+    <ul class="docs-toc-list">
+      <% @headings.each do |heading| %>
+        <li class="docs-toc-item docs-toc-item--h<%= heading[:level] %>">
+          <%= link_to heading[:text], "##{heading[:id]}", class: "docs-toc-link", data: { docs_toc_target: "link" } %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="docs-toc-empty"><%= t("docs.pages.#{@slug}.body") %></p>
+  <% end %>
+</aside>
